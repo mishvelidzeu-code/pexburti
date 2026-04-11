@@ -184,7 +184,7 @@
     }
 
     .hero{
-      padding:0 0 74px;
+      padding:0 0 34px;
       overflow:hidden;
       position:relative;
       background:#fff;
@@ -209,7 +209,7 @@
     .hero-grid{
       display:grid;
       grid-template-columns:1.05fr .95fr;
-      gap:34px;
+      gap:28px;
       align-items:center;
       position:relative;
       z-index:1;
@@ -233,11 +233,11 @@
 
     .hero-side{
       position:relative;
-      min-height:690px;
+      min-height:610px;
     }
     .phone-wrap{
       position:absolute;
-      inset:28px 70px 26px 70px;
+      inset:20px 62px 18px 62px;
       border-radius:42px;
       padding:14px;
       background:#fff;
@@ -266,7 +266,7 @@
     .screen{
       position:absolute;
       inset:0;
-      padding:34px 20px 20px;
+      padding:30px 18px 18px;
     }
     .screen-top{
       display:flex;
@@ -279,7 +279,7 @@
     }
     .screen-card{
       border-radius:24px;
-      padding:18px;
+      padding:16px;
       border:1px solid var(--line);
       background:#fff;
       margin-bottom:14px;
@@ -327,7 +327,7 @@
       margin-bottom:14px;
     }
     .mini-card{
-      min-height:122px;
+      min-height:104px;
       border-radius:22px;
       padding:16px;
       border:1px solid var(--line);
@@ -344,8 +344,62 @@
     }
     .f1{top:8px;left:0;width:220px}
     .f2{top:88px;right:0;width:196px}
-    .f3{bottom:50px;left:10px;width:228px}
-    .f4{bottom:92px;right:4px;width:214px}
+    .f3{bottom:34px;left:10px;width:228px}
+    .f4{bottom:70px;right:4px;width:214px}
+
+    .weekly-preview{
+      position:relative;
+      z-index:3;
+      margin-top:-24px;
+      padding-bottom:24px;
+    }
+    .weekly-card{
+      border-radius:30px;
+      padding:24px;
+      background:#fff;
+      border:1px solid var(--line);
+      box-shadow:var(--shadow);
+    }
+    .weekly-head{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:18px;
+      margin-bottom:18px;
+    }
+    .weekly-lead{
+      max-width:720px;
+      color:var(--muted);
+      font-size:.88rem;
+      margin-top:10px;
+    }
+    .weekly-grid{
+      display:grid;
+      grid-template-columns:repeat(4,minmax(0,1fr));
+      gap:12px;
+    }
+    .weekly-slot{
+      padding:14px 16px;
+      border-radius:20px;
+      border:1px solid var(--line);
+      background:#f8fafc;
+    }
+    .weekly-slot.featured{
+      background:linear-gradient(135deg,#fff5f5 0%,#fff 100%);
+      border-color:rgba(185,28,28,.2);
+    }
+    .weekly-slot strong{
+      display:block;
+      font-size:.94rem;
+      font-weight:900;
+      margin-bottom:6px;
+    }
+    .weekly-slot span{
+      display:block;
+      color:var(--muted);
+      font-size:.79rem;
+      line-height:1.45;
+    }
 
     .stats-bar{
       display:grid;
@@ -580,8 +634,9 @@
       }
       .brand-strip{grid-template-columns:repeat(3,1fr)}
       .stats-bar{grid-template-columns:1fr}
-      .hero-side{min-height:600px}
-      .phone-wrap{inset:26px 40px}
+      .hero-side{min-height:540px}
+      .phone-wrap{inset:18px 34px 16px}
+      .weekly-grid{grid-template-columns:repeat(3,1fr)}
     }
 
     @media (max-width:760px){
@@ -598,7 +653,7 @@
       .split-showcase{
         grid-template-columns:1fr;
       }
-      .hero{padding:0 0 54px}
+      .hero{padding:0 0 24px}
       .hero::before{
         background:url('1.webp') center center/contain no-repeat;
         opacity:1;
@@ -608,9 +663,11 @@
         background:linear-gradient(180deg, rgba(255,255,255,.92) 0%, rgba(255,255,255,.72) 44%, rgba(255,255,255,.36) 100%);
       }
       .section{padding:70px 0}
-      .hero-side{min-height:470px}
+      .hero-side{min-height:410px}
       .phone-wrap{inset:18px 10px}
       .floating{display:none}
+      .weekly-head{flex-direction:column}
+      .weekly-grid{grid-template-columns:repeat(2,1fr)}
       .camp-copy,.camp-visual,.cta-box{padding:28px}
     }
   </style>
@@ -747,6 +804,38 @@
           <div class="pill">Exposure</div>
           <h3 style="margin-top:10px;">აჩვენე შენი თავი</h3>
           <p class="small" style="margin-top:8px;">შეფასება, ბანაკები, კარიერული ხედვა.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="weekly-preview">
+    <div class="container">
+      <div class="weekly-card">
+        <div class="weekly-head">
+          <div>
+            <div class="eyebrow" style="margin-bottom:10px;">კვირის გუნდი</div>
+            <h3 style="font-size:1.45rem;">სიმბოლური 11-ეული ერთ ფანჯარაში</h3>
+            <p class="weekly-lead">
+              კვირის საუკეთესო არჩევანი ასაკის შეზღუდვის გარეშე. აქ ერთ symbolic XI-ში ერთად იყრის თავს
+              გამორჩეული ფორმა, ლიდერობა და შედეგი.
+            </p>
+          </div>
+          <div class="pill">ფორმაცია 4-3-3</div>
+        </div>
+
+        <div class="weekly-grid">
+          <div class="weekly-slot featured"><strong>გიორგი ლომიძე • GK</strong><span>დინამო თბილისი<br>კვირის საუკეთესო სეივი</span></div>
+          <div class="weekly-slot"><strong>სანდრო კაკაშვილი • RB</strong><span>იბერია 1999<br>ენერგია და სისწრაფე</span></div>
+          <div class="weekly-slot"><strong>ლევან ჩხეტიანი • CB</strong><span>ტორპედო ქუთაისი<br>ლიდერი დაცვაში</span></div>
+          <div class="weekly-slot"><strong>დათა გეგუჩაძე • CB</strong><span>საბურთალო თბილისი<br>4 მოგებული ორთაბრძოლა</span></div>
+          <div class="weekly-slot"><strong>ანდრია თურმანიძე • LB</strong><span>დინამო ბათუმი<br>აქტიური ფლანგი</span></div>
+          <div class="weekly-slot featured"><strong>ლუკა ბერიძე • CM</strong><span>დინამო თბილისი<br>კვირის კაპიტანი</span></div>
+          <div class="weekly-slot"><strong>ნიკა ჯანგიძე • CM</strong><span>სამგურალი<br>ტემპის კონტროლი</span></div>
+          <div class="weekly-slot"><strong>საბა მჭედლიძე • AM</strong><span>დილა გორი<br>2 ასისტი და 1 გოლი</span></div>
+          <div class="weekly-slot"><strong>გაბრიელ აბაშიძე • RW</strong><span>ვიტ ჯორჯია<br>1v1 დომინაცია</span></div>
+          <div class="weekly-slot"><strong>თემო კვარაცხელია • ST</strong><span>ლოკომოტივი თბილისი<br>კვირის ფინიშერი</span></div>
+          <div class="weekly-slot"><strong>დემეტრე კირთაძე • LW</strong><span>რუსთავი<br>სისწრაფე და შექმნილი სივრცე</span></div>
         </div>
       </div>
     </div>

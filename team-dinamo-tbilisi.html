@@ -722,6 +722,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="teams-shared.js"></script>
+  <script src="age-groups-shared.js"></script>
   <script src="auth-shared.js"></script>
   <script>
     const fallbackTeam = {
@@ -740,20 +741,22 @@
       ? (window.siteTeams.findTeamByName('დინამო თბილისი') || fallbackTeam)
       : fallbackTeam;
 
-    const AGE_GROUPS = [
-      { key: 'pro', label: 'PRO', copy: 'ძირითადი პროფესიონალური ჯგუფი' },
-      { key: 'u19', label: 'U19', copy: '18-19 წლის ასაკობრივი ხაზი' },
-      { key: 'u17', label: 'U17', copy: '17 წლის ასაკობრივი ჯგუფი' },
-      { key: 'u16', label: 'U16', copy: '16 წლის ასაკობრივი ჯგუფი' },
-      { key: 'u15', label: 'U15', copy: '15 წლის ასაკობრივი ჯგუფი' },
-      { key: 'u14', label: 'U14', copy: '14 წლის ასაკობრივი ჯგუფი' },
-      { key: 'u13', label: 'U13', copy: '13 წლის ასაკობრივი ჯგუფი' },
-      { key: 'u12', label: 'U12', copy: '12 წლის ასაკობრივი ჯგუფი' },
-      { key: 'u11', label: 'U11', copy: '11 წლის ასაკობრივი ჯგუფი' },
-      { key: 'u10', label: 'U10', copy: '10 წლის ასაკობრივი ჯგუფი' },
-      { key: 'u9', label: 'U9', copy: '9 წლის ასაკობრივი ჯგუფი' },
-      { key: 'u8', label: 'U8', copy: '8 წლის და უფრო პატარა ასაკობრივი ჯგუფი' }
-    ];
+    const AGE_GROUPS = window.siteAgeGroups?.getAgeGroups
+      ? window.siteAgeGroups.getAgeGroups()
+      : [
+        { key: 'pro', label: 'PRO', copy: 'ძირითადი პროფესიონალური ჯგუფი' },
+        { key: 'u19', label: 'U19', copy: '18-19 წლის ასაკობრივი ხაზი' },
+        { key: 'u17', label: 'U17', copy: '17 წლის ასაკობრივი ჯგუფი' },
+        { key: 'u16', label: 'U16', copy: '16 წლის ასაკობრივი ჯგუფი' },
+        { key: 'u15', label: 'U15', copy: '15 წლის ასაკობრივი ჯგუფი' },
+        { key: 'u14', label: 'U14', copy: '14 წლის ასაკობრივი ჯგუფი' },
+        { key: 'u13', label: 'U13', copy: '13 წლის ასაკობრივი ჯგუფი' },
+        { key: 'u12', label: 'U12', copy: '12 წლის ასაკობრივი ჯგუფი' },
+        { key: 'u11', label: 'U11', copy: '11 წლის ასაკობრივი ჯგუფი' },
+        { key: 'u10', label: 'U10', copy: '10 წლის ასაკობრივი ჯგუფი' },
+        { key: 'u9', label: 'U9', copy: '9 წლის ასაკობრივი ჯგუფი' },
+        { key: 'u8', label: 'U8', copy: '8 წლის და უფრო პატარა ასაკობრივი ჯგუფი' }
+      ];
 
     const sampleRoster = [
       { name: 'ლუკა კაპანაძე', position: 'ნახევარმცველი', pos: 'MF', foot: 'მარჯვენა', age: 23, ageGroup: 'pro', img: 'https://images.unsplash.com/photo-1543326727-cf6c39e8f84c?auto=format&fit=crop&w=300&h=400&q=80', tag: 'დინამოს აკადემია', actionHref: 'pexburtelebi.html', actionLabel: 'პროფილი' },
@@ -774,7 +777,6 @@
     const rosterGroups = document.getElementById('rosterGroups');
     const connectedBanner = document.getElementById('connectedBanner');
     const connectedBannerText = document.getElementById('connectedBannerText');
-    const currentYear = new Date().getFullYear();
 
     function normalizeTeamText(value) {
       if (window.siteTeams?.normalizeText) {
@@ -795,6 +797,10 @@
     }
 
     function parseBirthDate(value) {
+      if (window.siteAgeGroups?.parseBirthDate) {
+        return window.siteAgeGroups.parseBirthDate(value);
+      }
+
       const raw = String(value || '').trim();
       if (!raw) {
         return null;
@@ -842,6 +848,10 @@
     }
 
     function calculateAgeFromBirthDate(value) {
+      if (window.siteAgeGroups?.calculateActualAgeFromBirthDate) {
+        return window.siteAgeGroups.calculateActualAgeFromBirthDate(value);
+      }
+
       const parsed = parseBirthDate(value);
       if (!parsed) {
         return null;
@@ -860,12 +870,16 @@
     }
 
     function getAgeGroupKeyFromBirthDate(value) {
+      if (window.siteAgeGroups?.getAgeGroupKeyFromBirthDate) {
+        return window.siteAgeGroups.getAgeGroupKeyFromBirthDate(value);
+      }
+
       const parsed = parseBirthDate(value);
       if (!parsed) {
         return 'pro';
       }
 
-      const diff = currentYear - parsed.year;
+      const diff = new Date().getFullYear() - parsed.year;
       if (diff <= 8) {
         return 'u8';
       }
@@ -903,6 +917,10 @@
     }
 
     function getAgeGroupConfig(key) {
+      if (window.siteAgeGroups?.getAgeGroupConfig) {
+        return window.siteAgeGroups.getAgeGroupConfig(key);
+      }
+
       return AGE_GROUPS.find((group) => group.key === key) || AGE_GROUPS[0];
     }
 
@@ -1058,12 +1076,26 @@
         ? (profile.childFoot || 'არ არის მითითებული')
         : (profile.playerFoot || 'არ არის მითითებული');
       const ageValue = role === 'parent'
-        ? (profile.childAge || calculateAgeFromBirthDate(profile.childBirthDate) || 'არ არის მითითებული')
-        : (profile.playerAge || calculateAgeFromBirthDate(profile.playerBirthDate) || 'არ არის მითითებული');
-      const ageGroupKey = role === 'parent'
-        ? (profile.childAgeCategory || getAgeGroupKeyFromBirthDate(profile.childBirthDate))
-        : (profile.playerAgeCategory || getAgeGroupKeyFromBirthDate(profile.playerBirthDate));
-      const ageGroup = getAgeGroupConfig(ageGroupKey);
+        ? (calculateAgeFromBirthDate(profile.childBirthDate) ?? profile.childAge ?? 'არ არის მითითებული')
+        : (calculateAgeFromBirthDate(profile.playerBirthDate) ?? profile.playerAge ?? 'არ არის მითითებული');
+      const ageState = window.siteAgeGroups?.resolveAgeGroupState
+        ? window.siteAgeGroups.resolveAgeGroupState({
+          birthDate: role === 'parent' ? profile.childBirthDate : profile.playerBirthDate,
+          birthYear: role === 'parent' ? profile.childBirthYear : profile.playerBirthYear,
+          overrideKey: role === 'parent' ? profile.childAgeCategoryOverride : profile.playerAgeCategoryOverride,
+          autoKey: role === 'parent' ? profile.childAgeCategoryAuto : profile.playerAgeCategoryAuto,
+          fallbackKey: role === 'parent' ? profile.childAgeCategory : profile.playerAgeCategory
+        })
+        : {
+          effectiveKey: role === 'parent'
+            ? (profile.childAgeCategory || getAgeGroupKeyFromBirthDate(profile.childBirthDate))
+            : (profile.playerAgeCategory || getAgeGroupKeyFromBirthDate(profile.playerBirthDate)),
+          manual: false,
+          autoKey: role === 'parent'
+            ? (profile.childAgeCategory || getAgeGroupKeyFromBirthDate(profile.childBirthDate))
+            : (profile.playerAgeCategory || getAgeGroupKeyFromBirthDate(profile.playerBirthDate))
+        };
+      const ageGroup = getAgeGroupConfig(ageState.effectiveKey);
 
       renderRoster({
         name: displayName,
@@ -1080,9 +1112,9 @@
       });
 
       connectedBanner.hidden = false;
-      connectedBannerText.textContent = role === 'parent'
-        ? `${displayName} ავტომატურად დაემატა ${ageGroup.label} კატეგორიაში, რადგან მშობლის რეგისტრაციაში ბავშვის გუნდი და დაბადების წელი ამ ჯგუფს დაემთხვა.`
-        : `${displayName} ავტომატურად დაემატა ${ageGroup.label} კატეგორიაში, რადგან რეგისტრაციაში მითითებული დაბადების წელი ამ ჯგუფს ეკუთვნის.`;
+      connectedBannerText.textContent = ageState.manual
+        ? `${displayName} ახლა ${ageGroup.label} კატეგორიაში ჩანს, რადგან პროფილში ასაკობრივი ჯგუფი ხელით არის მითითებული.`
+        : `${displayName} ავტომატურად დაემატა ${ageGroup.label} კატეგორიაში მიმდინარე სეზონის ასაკის მიხედვით. დაბადების დღეზე კატეგორია არ იცვლება და იანვრიდან ახლდება.`;
     }
 
     hydratePage();

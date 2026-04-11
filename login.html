@@ -549,6 +549,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="teams-shared.js"></script>
+  <script src="age-groups-shared.js"></script>
   <script src="auth-shared.js"></script>
   <script>
     const roleSelect = document.getElementById('roleSelect');
@@ -577,14 +578,14 @@
     const roleConfigurations = {
       player: {
         title: 'მოთამაშის რეგისტრაცია',
-        description: 'მოთამაშის დაბადების თარიღის არჩევის შემდეგ ასაკი ავტომატურად გამოითვლება და გუნდის გვერდზე შესაბამის ასაკობრივ კატეგორიაში გამოჩნდება.',
+        description: 'მოთამაშის დაბადების თარიღის არჩევის შემდეგ ასაკი ავტომატურად გამოითვლება, ასაკობრივი ჯგუფი კი სეზონის წესით განისაზღვრება და იანვრიდან ავტომატურად ახლდება.',
         fields: [
           {
             id: 'playerBirthDate',
             label: 'დაბადების თარიღი',
             type: 'birthdate',
             ageTarget: 'playerAge',
-            helper: 'აირჩიე თარიღი კალენდრიდან. დაბადების წლის მიხედვით მოთამაშე თავის ასაკობრივ ჯგუფში გადავა, მაგალითად 2018 -> U8.'
+            helper: 'აირჩიე თარიღი კალენდრიდან. ასაკობრივი ჯგუფი ითვლება მიმდინარე წლის 1 იანვრის ასაკით, ამიტომ დაბადების დღეზე არ იცვლება და იანვრიდან ახლდება.'
           },
           {
             id: 'playerAge',
@@ -599,7 +600,7 @@
       },
       parent: {
         title: 'მშობლის რეგისტრაცია',
-        description: 'ზედა ველები ეკუთვნის მშობელს. ბავშვის დაბადების თარიღს აირჩევ კალენდრიდან, გუნდს კი იმავე წესით მიუთითებ როგორც მოთამაშის რეგისტრაციაში.',
+        description: 'ზედა ველები ეკუთვნის მშობელს. ბავშვის დაბადების თარიღს აირჩევ კალენდრიდან, გუნდს კი იმავე წესით მიუთითებ როგორც მოთამაშის რეგისტრაციაში, ასაკობრივი ჯგუფი კი სეზონურად განისაზღვრება.',
         fields: [
           { id: 'childName', label: 'ბავშვის სახელი და გვარი', type: 'text', placeholder: 'მაგ: ლუკა გიორგაძე' },
           {
@@ -607,7 +608,7 @@
             label: 'ბავშვის დაბადების თარიღი',
             type: 'birthdate',
             ageTarget: 'childAge',
-            helper: 'აირჩიე თარიღი კალენდრიდან. ბავშვის ასაკი ავტომატურად გამოჩნდება.'
+            helper: 'აირჩიე თარიღი კალენდრიდან. ბავშვის ასაკი ავტომატურად გამოჩნდება, ასაკობრივი ჯგუფი კი იანვარში თავიდან გადაითვლება.'
           },
           {
             id: 'childAge',
@@ -733,6 +734,10 @@
     }
 
     function getAgeCategoryByBirthYear(year) {
+      if (window.siteAgeGroups?.getAgeGroupKeyByBirthYear) {
+        return window.siteAgeGroups.getAgeGroupKeyByBirthYear(year);
+      }
+
       if (!Number.isFinite(year)) {
         return '';
       }
@@ -971,8 +976,17 @@
       if (role === 'player') {
         const playerBirth = parseBirthDate(payload.playerBirthDate);
         const teamSelection = resolveTeamSelection(document.getElementById('playerTeam')?.value);
+        const playerAgeState = window.siteAgeGroups?.resolveAgeGroupState
+          ? window.siteAgeGroups.resolveAgeGroupState({ birthDate: payload.playerBirthDate, birthYear: playerBirth?.year })
+          : {
+            seasonYear: currentYear,
+            autoKey: playerBirth ? getAgeCategoryByBirthYear(playerBirth.year) : ''
+          };
         payload.playerBirthYear = playerBirth ? String(playerBirth.year) : '';
-        payload.playerAgeCategory = playerBirth ? getAgeCategoryByBirthYear(playerBirth.year) : '';
+        payload.playerAgeCategory = playerAgeState.autoKey || '';
+        payload.playerAgeCategoryAuto = playerAgeState.autoKey || '';
+        payload.playerAgeCategoryOverride = '';
+        payload.playerAgeSeasonYear = playerAgeState.autoKey ? String(playerAgeState.seasonYear || currentYear) : '';
         payload.playerTeam = teamSelection.name;
         payload.playerTeamRegistered = String(teamSelection.registered);
         payload.playerTeamRoute = teamSelection.route || '';
@@ -983,8 +997,17 @@
       if (role === 'parent') {
         const childBirth = parseBirthDate(payload.childBirthDate);
         const teamSelection = resolveTeamSelection(document.getElementById('childTeam')?.value);
+        const childAgeState = window.siteAgeGroups?.resolveAgeGroupState
+          ? window.siteAgeGroups.resolveAgeGroupState({ birthDate: payload.childBirthDate, birthYear: childBirth?.year })
+          : {
+            seasonYear: currentYear,
+            autoKey: childBirth ? getAgeCategoryByBirthYear(childBirth.year) : ''
+          };
         payload.childBirthYear = childBirth ? String(childBirth.year) : '';
-        payload.childAgeCategory = childBirth ? getAgeCategoryByBirthYear(childBirth.year) : '';
+        payload.childAgeCategory = childAgeState.autoKey || '';
+        payload.childAgeCategoryAuto = childAgeState.autoKey || '';
+        payload.childAgeCategoryOverride = '';
+        payload.childAgeSeasonYear = childAgeState.autoKey ? String(childAgeState.seasonYear || currentYear) : '';
         payload.childTeam = teamSelection.name;
         payload.childTeamRegistered = String(teamSelection.registered);
         payload.childTeamRoute = teamSelection.route || '';
