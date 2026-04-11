@@ -1031,40 +1031,58 @@
         ? window.siteAuth.getUserRole(user)
         : String(user?.user_metadata?.role || '');
       const profile = user.user_metadata?.profile || {};
-      const selectedTeam = String(profile.playerTeam || '').trim();
-      const selectedTeamRoute = String(profile.playerTeamRoute || '').trim();
-      const isLinkedPlayer = role === 'player' && (
-        selectedTeamRoute === team.route ||
-        normalizeTeamText(selectedTeam) === normalizeTeamText(team.name)
+
+      const playerLinked = role === 'player' && (
+        String(profile.playerTeamRoute || '').trim() === team.route ||
+        normalizeTeamText(profile.playerTeam) === normalizeTeamText(team.name)
+      );
+      const parentLinked = role === 'parent' && (
+        String(profile.childTeamRoute || '').trim() === team.route ||
+        normalizeTeamText(profile.childTeam) === normalizeTeamText(team.name)
       );
 
-      if (!isLinkedPlayer) {
+      if (!playerLinked && !parentLinked) {
         return;
       }
 
-      const displayName = window.siteAuth?.getUserDisplayName
+      const accountName = window.siteAuth?.getUserDisplayName
         ? window.siteAuth.getUserDisplayName(user)
         : (user.email || 'შენი პროფილი');
-      const ageValue = profile.playerAge || calculateAgeFromBirthDate(profile.playerBirthDate) || 'არ არის მითითებული';
-      const ageGroupKey = profile.playerAgeCategory || getAgeGroupKeyFromBirthDate(profile.playerBirthDate);
+      const displayName = role === 'parent'
+        ? (String(profile.childName || '').trim() || `${accountName} - შვილი`)
+        : accountName;
+      const positionValue = role === 'parent'
+        ? (profile.childPosition || 'მოთამაშე')
+        : (profile.playerPosition || 'მოთამაშე');
+      const footValue = role === 'parent'
+        ? (profile.childFoot || 'არ არის მითითებული')
+        : (profile.playerFoot || 'არ არის მითითებული');
+      const ageValue = role === 'parent'
+        ? (profile.childAge || calculateAgeFromBirthDate(profile.childBirthDate) || 'არ არის მითითებული')
+        : (profile.playerAge || calculateAgeFromBirthDate(profile.playerBirthDate) || 'არ არის მითითებული');
+      const ageGroupKey = role === 'parent'
+        ? (profile.childAgeCategory || getAgeGroupKeyFromBirthDate(profile.childBirthDate))
+        : (profile.playerAgeCategory || getAgeGroupKeyFromBirthDate(profile.playerBirthDate));
       const ageGroup = getAgeGroupConfig(ageGroupKey);
 
       renderRoster({
         name: displayName,
-        position: profile.playerPosition || 'მოთამაშე',
-        pos: getPositionCode(profile.playerPosition),
-        foot: profile.playerFoot || 'არ არის მითითებული',
+        position: positionValue,
+        pos: getPositionCode(positionValue),
+        foot: footValue,
         age: ageValue,
         ageGroup: ageGroup.key,
         ageLabel: ageGroup.label,
         img: '',
-        tag: 'შენი პროფილი',
+        tag: role === 'parent' ? 'შენი ბავშვის პროფილი' : 'შენი პროფილი',
         actionHref: 'user-profile.html?from=team-dinamo-tbilisi.html',
         actionLabel: 'პროფილი'
       });
 
       connectedBanner.hidden = false;
-      connectedBannerText.textContent = `${displayName} ავტომატურად დაემატა ${ageGroup.label} კატეგორიაში, რადგან რეგისტრაციაში მითითებული დაბადების წელი ამ ჯგუფს ეკუთვნის.`;
+      connectedBannerText.textContent = role === 'parent'
+        ? `${displayName} ავტომატურად დაემატა ${ageGroup.label} კატეგორიაში, რადგან მშობლის რეგისტრაციაში ბავშვის გუნდი და დაბადების წელი ამ ჯგუფს დაემთხვა.`
+        : `${displayName} ავტომატურად დაემატა ${ageGroup.label} კატეგორიაში, რადგან რეგისტრაციაში მითითებული დაბადების წელი ამ ჯგუფს ეკუთვნის.`;
     }
 
     hydratePage();

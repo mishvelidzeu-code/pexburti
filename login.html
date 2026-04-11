@@ -599,7 +599,7 @@
       },
       parent: {
         title: 'მშობლის რეგისტრაცია',
-        description: 'ზედა ველები ეკუთვნის მშობელს. ბავშვის დაბადების თარიღს შეიყვან და ასაკს სისტემა ავტომატურად გამოთვლის.',
+        description: 'ზედა ველები ეკუთვნის მშობელს. ბავშვის დაბადების თარიღს აირჩევ კალენდრიდან, გუნდს კი იმავე წესით მიუთითებ როგორც მოთამაშის რეგისტრაციაში.',
         fields: [
           { id: 'childName', label: 'ბავშვის სახელი და გვარი', type: 'text', placeholder: 'მაგ: ლუკა გიორგაძე' },
           {
@@ -616,6 +616,7 @@
             placeholder: 'ავტომატურად გამოითვლება'
           },
           { id: 'childPosition', label: 'ბავშვის პოზიცია', type: 'select', options: ['მეკარე', 'დამცველი', 'ნახევარმცველი', 'თავდამსხმელი', 'ჯერ არ არის განსაზღვრული'] },
+          { id: 'childTeam', label: 'ბავშვის მიმდინარე გუნდი', type: 'team-autocomplete', placeholder: 'მაგ: დინამო თბილისი ან უგუნდოდ', helper: 'ჩაწერისას გამოჩნდება მსგავსი გუნდები. შეგიძლია აირჩიო დარეგისტრირებული გუნდი, მიუთითო უგუნდოდ ან ჩაწერო ახალი გუნდი ბავშვისთვის.' },
           { id: 'childFoot', label: 'ბავშვის უპირატესი ფეხი', type: 'select', options: ['მარჯვენა', 'მარცხენა', 'ორივე', 'ჯერ არ არის განსაზღვრული'] },
           { id: 'parentRelation', label: 'კავშირი ბავშვთან', type: 'select', options: ['დედა', 'მამა', 'მეურვე'] }
         ]
@@ -917,6 +918,10 @@
       if (role === 'player') {
         initializeTeamAutocomplete(document.getElementById('playerTeam'));
       }
+
+      if (role === 'parent') {
+        initializeTeamAutocomplete(document.getElementById('childTeam'));
+      }
     }
 
     function setStatus(element, message = '', state = 'info') {
@@ -977,8 +982,14 @@
 
       if (role === 'parent') {
         const childBirth = parseBirthDate(payload.childBirthDate);
+        const teamSelection = resolveTeamSelection(document.getElementById('childTeam')?.value);
         payload.childBirthYear = childBirth ? String(childBirth.year) : '';
         payload.childAgeCategory = childBirth ? getAgeCategoryByBirthYear(childBirth.year) : '';
+        payload.childTeam = teamSelection.name;
+        payload.childTeamRegistered = String(teamSelection.registered);
+        payload.childTeamRoute = teamSelection.route || '';
+        payload.childTeamSlug = teamSelection.slug || '';
+        payload.childTeamStatus = teamSelection.kind;
       }
 
       return payload;
@@ -1307,12 +1318,24 @@
       if (role === 'parent') {
         const childBirthDateInput = document.getElementById('childBirthDate');
         const childAgeInput = document.getElementById('childAge');
+        const childTeamInput = document.getElementById('childTeam');
+        const teamSelection = resolveTeamSelection(childTeamInput?.value);
 
         syncComputedAge(childBirthDateInput);
         if (!childAgeInput?.value) {
           setStatus(registerStatus, 'აირჩიე ბავშვის დაბადების თარიღი კალენდრიდან, რომ ასაკი ავტომატურად გამოითვალოს.', 'error');
           childBirthDateInput?.focus();
           return false;
+        }
+
+        if (!teamSelection.name) {
+          setStatus(registerStatus, 'აირჩიე ბავშვის მიმდინარე გუნდი, მიუთითე უგუნდოდ ან ჩაწერე ახალი გუნდი.', 'error');
+          childTeamInput?.focus();
+          return false;
+        }
+
+        if (teamSelection.kind === 'registered' || teamSelection.kind === 'free-agent') {
+          childTeamInput.value = teamSelection.name;
         }
       }
 
