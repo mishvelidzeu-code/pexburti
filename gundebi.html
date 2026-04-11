@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>გუნდები | Mishvela Football Georgia</title>
+  <meta name="description" content="გუნდების სატესტო ბაზა თეთრი სტილით და სწრაფი ძებნით.">
+  <style>
+    :root{
+      --bg:#ffffff;
+      --panel:#ffffff;
+      --panel-2:#f8fafc;
+      --panel-3:#eef2f6;
+      --text:#0b1220;
+      --muted:#344054;
+      --muted-2:#1f2937;
+      --line:rgba(16,24,40,0.18);
+      --line-2:rgba(16,24,40,0.28);
+      --red:#b91c1c;
+      --red-2:#991b1b;
+      --gold:#b45309;
+      --black:#020617;
+      --shadow:0 18px 45px rgba(15,23,42,.12);
+      --radius:26px;
+      --container:1220px;
+    }
+
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      font-family:"Segoe UI", "Sylfaen", "Noto Sans Georgian", "DejaVu Sans", sans-serif;
+      background:var(--bg);
+      color:var(--text);
+      font-size:14px;
+      line-height:1.55;
+    }
+
+    a{text-decoration:none;color:inherit}
+    button,input{font:inherit}
+    [hidden]{display:none !important}
+    .container{width:min(var(--container), calc(100% - 32px));margin-inline:auto}
+
+    .header{
+      position:sticky;
+      top:0;
+      z-index:1000;
+      background:rgba(255,255,255,.98);
+      backdrop-filter:blur(16px);
+      border-bottom:1px solid var(--line);
+    }
+    .nav{
+      min-height:78px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:18px;
+    }
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      font-size:.95rem;
+      font-weight:900;
+      letter-spacing:-.03em;
+    }
+    .logo{
+      width:42px;
+      height:42px;
+      border-radius:14px;
+      display:grid;
+      place-items:center;
+      background:#ea580c;
+      color:#fff;
+      font-weight:900;
+      box-shadow:0 10px 24px rgba(234,88,12,.28);
+    }
+    .nav-links{
+      display:flex;
+      align-items:center;
+      gap:22px;
+      color:var(--muted-2);
+      font-size:12px;
+    }
+    .nav-links a:hover,
+    .nav-links a.active{color:var(--red)}
+    .nav-actions{
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-height:52px;
+      padding:0 20px;
+      border-radius:999px;
+      border:1px solid transparent;
+      font-size:13px;
+      font-weight:800;
+      transition:.25s ease;
+      white-space:nowrap;
+    }
+    .btn:hover{transform:translateY(-2px)}
+    .btn-red{
+      background:var(--red);
+      color:#fff;
+      border-color:var(--red);
+      box-shadow:0 12px 28px rgba(185,28,28,.28);
+    }
+    .btn-red:hover{background:var(--red-2)}
+    .btn-black{
+      background:var(--black);
+      color:#fff;
+      border-color:var(--black);
+      box-shadow:0 12px 28px rgba(2,6,23,.24);
+    }
+    .btn-white{
+      background:#fff;
+      color:var(--text);
+      border-color:var(--line);
+    }
+    .btn-white:hover{background:#eef2f6}
+
+    .hero{
+      position:relative;
+      overflow:hidden;
+      background:#fff;
+      isolation:isolate;
+      border-bottom:1px solid var(--line);
+    }
+    .hero::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:url('1.webp') center right/contain no-repeat;
+      transform:scale(1.02);
+      z-index:0;
+    }
+    .hero::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:linear-gradient(90deg, rgba(255,255,255,.97) 0%, rgba(255,255,255,.88) 34%, rgba(255,255,255,.44) 60%, rgba(255,255,255,.10) 82%, rgba(255,255,255,.02) 100%);
+      z-index:0;
+    }
+    .hero-grid{
+      position:relative;
+      z-index:1;
+      display:grid;
+      grid-template-columns:1fr;
+      gap:16px;
+      align-items:start;
+      min-height:auto;
+      padding:16px 0 14px;
+    }
+    .eyebrow{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      color:var(--red-2);
+      text-transform:uppercase;
+      letter-spacing:.16em;
+      font-size:11px;
+      font-weight:800;
+      margin-bottom:16px;
+    }
+    .eyebrow::before{
+      content:"";
+      width:9px;
+      height:9px;
+      border-radius:999px;
+      background:var(--red);
+      box-shadow:0 0 0 6px rgba(185,28,28,.16);
+    }
+    h1{
+      margin:0;
+      max-width:700px;
+      font-size:clamp(1.75rem, 3.7vw, 3rem);
+      line-height:.98;
+      letter-spacing:-.05em;
+      font-weight:950;
+    }
+    .lead{
+      margin-top:12px;
+      max-width:760px;
+      color:var(--muted);
+      font-size:.88rem;
+    }
+    .hero-actions{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+      margin-top:16px;
+    }
+    .hero-stats{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-top:16px;
+      max-width:920px;
+    }
+    .hero-stat{
+      flex:0 1 170px;
+      border-radius:18px;
+      padding:12px 14px;
+      background:#fff;
+      border:1px solid var(--line);
+      box-shadow:none;
+    }
+    .hero-stat strong{
+      display:block;
+      font-size:1rem;
+      font-weight:900;
+      margin-bottom:2px;
+    }
+    .hero-stat span{
+      display:block;
+      font-size:.8rem;
+      color:var(--muted);
+    }
+    .hero-card{
+      display:none;
+    }
+    .hero-card-top{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom:18px;
+    }
+    .chip{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:8px 12px;
+      border-radius:999px;
+      background:#fcb0b0;
+      color:#7f1d1d;
+      font-size:11px;
+      font-weight:800;
+      border:1px solid rgba(185,28,28,.22);
+    }
+    .hero-card-box{
+      border-radius:24px;
+      padding:22px;
+      background:linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+      color:#fff;
+      box-shadow:0 18px 36px rgba(185,28,28,.28);
+    }
+    .hero-card-box h3{
+      margin:0 0 8px;
+      font-size:1.2rem;
+      line-height:1.2;
+    }
+    .hero-card-box p{
+      margin:0;
+      font-size:.92rem;
+      opacity:.94;
+    }
+    .hero-progress{
+      margin-top:16px;
+      height:10px;
+      border-radius:999px;
+      background:rgba(255,255,255,.24);
+      overflow:hidden;
+    }
+    .hero-progress span{
+      display:block;
+      width:78%;
+      height:100%;
+      border-radius:999px;
+      background:#f59e0b;
+    }
+    .hero-mini{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+      margin-top:14px;
+    }
+    .hero-mini-card{
+      border-radius:18px;
+      padding:16px;
+      background:#fff;
+      border:1px solid var(--line);
+    }
+    .hero-mini-card strong{
+      display:block;
+      margin-top:8px;
+      font-size:1rem;
+      line-height:1.2;
+    }
+    .hero-mini-card span{
+      display:block;
+      margin-top:6px;
+      color:var(--muted);
+      font-size:.84rem;
+    }
+    .section{
+      padding:14px 0 70px;
+    }
+    .toolbar{
+      display:grid;
+      grid-template-columns:1.25fr auto;
+      gap:18px;
+      align-items:center;
+      margin-bottom:26px;
+    }
+    .search-wrap{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      padding:14px 16px;
+      border-radius:22px;
+      background:#fff;
+      border:1px solid var(--line);
+      box-shadow:var(--shadow);
+    }
+    .search-wrap svg{
+      flex:0 0 auto;
+      color:var(--muted);
+    }
+    .search-input{
+      width:100%;
+      border:none;
+      outline:none;
+      background:transparent;
+      color:var(--text);
+      font-size:.96rem;
+    }
+    .result-box{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      min-height:58px;
+      padding:0 18px;
+      border-radius:22px;
+      background:#fff;
+      border:1px solid var(--line);
+      box-shadow:var(--shadow);
+      font-size:.92rem;
+      font-weight:800;
+      color:var(--muted-2);
+    }
+    .filters{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+      margin-bottom:24px;
+    }
+    .filter-btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-height:44px;
+      padding:0 18px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background:#fff;
+      color:var(--muted-2);
+      font-size:.84rem;
+      font-weight:800;
+      cursor:pointer;
+      transition:.25s ease;
+    }
+    .filter-btn:hover{
+      border-color:rgba(185,28,28,.34);
+      color:var(--red);
+    }
+    .filter-btn.active{
+      background:var(--red);
+      border-color:var(--red);
+      color:#fff;
+      box-shadow:0 12px 28px rgba(185,28,28,.24);
+    }
+    .teams-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit, minmax(250px, 1fr));
+      gap:18px;
+    }
+    .team-card{
+      display:flex;
+      flex-direction:column;
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:28px;
+      padding:18px;
+      min-height:328px;
+      box-shadow:var(--shadow);
+      transition:.25s ease;
+    }
+    .team-card:hover{
+      transform:translateY(-6px);
+      border-color:rgba(185,28,28,.34);
+      box-shadow:0 24px 48px rgba(15,23,42,.14);
+    }
+    .team-top{
+      display:flex;
+      align-items:flex-start;
+      gap:14px;
+    }
+    .team-emblem{
+      width:74px;
+      min-width:74px;
+      height:86px;
+      filter:drop-shadow(0 12px 24px rgba(15,23,42,.10));
+    }
+    .team-emblem svg{
+      display:block;
+      width:100%;
+      height:100%;
+    }
+    .team-head{
+      flex:1 1 auto;
+      min-width:0;
+    }
+    .team-badge{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:6px 10px;
+      border-radius:999px;
+      background:#fcb0b0;
+      color:#7f1d1d;
+      font-size:11px;
+      font-weight:800;
+      border:1px solid rgba(185,28,28,.22);
+    }
+    .team-name{
+      margin:10px 0 4px;
+      font-size:1.05rem;
+      font-weight:900;
+      letter-spacing:-.02em;
+      line-height:1.15;
+    }
+    .team-location{
+      color:var(--muted);
+      font-size:.85rem;
+      min-height:40px;
+    }
+    .team-meta{
+      display:grid;
+      gap:8px;
+      margin:14px 0 0;
+    }
+    .meta-row{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      padding-bottom:8px;
+      border-bottom:1px solid rgba(16,24,40,.08);
+      font-size:.82rem;
+    }
+    .meta-row span:first-child{color:var(--muted)}
+    .meta-row strong{
+      font-size:.84rem;
+      text-align:right;
+    }
+    .team-footer{
+      display:flex;
+      gap:10px;
+      margin-top:auto;
+      padding-top:16px;
+    }
+    .team-footer .btn{
+      min-height:46px;
+      padding:0 16px;
+      font-size:13px;
+      flex:1 1 auto;
+    }
+    .footer{
+      padding:0 0 32px;
+    }
+    .footer-box{
+      border-radius:28px;
+      border:1px solid rgba(185,28,28,.24);
+      background:#fff;
+      box-shadow:var(--shadow);
+      padding:26px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      flex-wrap:wrap;
+    }
+    .footer-box h2{
+      margin:0;
+      font-size:1.6rem;
+      line-height:1;
+      letter-spacing:-.04em;
+    }
+    .footer-box p{
+      margin:8px 0 0;
+      color:var(--muted);
+      font-size:.94rem;
+      max-width:620px;
+    }
+
+    @media (max-width:1050px){
+      .hero-grid,
+      .toolbar{
+        grid-template-columns:1fr;
+      }
+      .hero{
+        border-bottom:none;
+      }
+    }
+
+    @media (max-width:760px){
+      .nav-links{display:none}
+      .nav-actions .btn-white{display:none}
+      .hero-grid{
+        min-height:auto;
+        padding:16px 0 12px;
+      }
+      .hero::before{
+        background:url('1.webp') center center/cover no-repeat;
+        opacity:.18;
+        transform:none;
+      }
+      .hero::after{
+        background:linear-gradient(180deg, rgba(255,255,255,.95) 0%, rgba(255,255,255,.84) 46%, rgba(255,255,255,.74) 100%);
+      }
+      .hero-stats{gap:8px}
+      .hero-stat{flex:1 1 calc(50% - 8px)}
+      .section{
+        padding:12px 0 58px;
+      }
+      .footer-box{
+        padding:22px;
+      }
+      .team-card{
+        min-height:auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="container nav">
+      <a href="index.html" class="brand">
+        <span class="logo">TE</span>
+        <span>Mishvela Football Georgia</span>
+      </a>
+
+      <nav class="nav-links">
+        <a href="index.html">მთავარი</a>
+        <a href="gundebi.html" class="active">გუნდები</a>
+        <a href="pexburtelebi.html">ფეხბურთელები</a>
+        <a href="index.html#coaching">ქოუჩინგი</a>
+        <a href="index.html#camps">ბანაკები</a>
+      </nav>
+
+      <div class="nav-actions">
+        <a href="login.html?redirect=gundebi.html%23login#login" class="btn btn-white">შესვლა</a>
+        <a href="login.html?redirect=gundebi.html%23register#register" class="btn btn-red">რეგისტრაცია</a>
+      </div>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="container hero-grid">
+      <div>
+        <div class="eyebrow">სატესტო გუნდების ბაზა</div>
+        <h1>საქართველოს გუნდები</h1>
+        <p class="lead">
+          ეს გვერდი უკვე გადაყვანილია light სტილზე. დარკ ფონი მოხსნილია, ბარათები არის თეთრი, აქცენტები უფრო მკვეთრი წითელია,
+          ხოლო გუნდის ძებნა და ფილტრაცია მარტივად მუშაობს სატესტო მონაცემებზე.
+        </p>
+
+        <div class="hero-actions">
+          <a href="#teams" class="btn btn-red">ნახე გუნდები</a>
+          <a href="#filters" class="btn btn-black">ფილტრაცია</a>
+        </div>
+
+        <div class="hero-stats">
+          <div class="hero-stat">
+            <strong>20</strong>
+            <span>სატესტო გუნდი</span>
+          </div>
+          <div class="hero-stat">
+            <strong>14</strong>
+            <span>ქალაქი და რეგიონი</span>
+          </div>
+          <div class="hero-stat">
+            <strong>4</strong>
+            <span>ასაკობრივი ჯგუფი</span>
+          </div>
+          <div class="hero-stat">
+            <strong>Light</strong>
+            <span>განახლებული თეთრი სტილი</span>
+          </div>
+        </div>
+      </div>
+
+      <aside class="hero-card">
+        <div class="hero-card-top">
+          <span class="chip">განახლებული გვერდი</span>
+          <span class="chip">20 გუნდი</span>
+        </div>
+
+        <div class="hero-card-box">
+          <h3>გუნდების გვერდი უკვე ერთ სტილშია მთავარ საიტთან</h3>
+          <p>მკვეთრი წითელი, ღრმა შავი, თეთრი ბარათები და სწრაფი ძებნა ერთ გვერდზე.</p>
+          <div class="hero-progress"><span></span></div>
+        </div>
+
+        <div class="hero-mini">
+          <div class="hero-mini-card">
+            <span class="chip">ძებნა</span>
+            <strong>სახელით ან ქალაქით</strong>
+            <span>მარტივი live search გუნდების ბადეში</span>
+          </div>
+          <div class="hero-mini-card">
+            <span class="chip">ფილტრი</span>
+            <strong>PRO, U21, U19, U17</strong>
+            <span>სწრაფი გადართვა ასაკობრივ კატეგორიებზე</span>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <section class="section" id="teams">
+    <div class="container">
+      <div class="toolbar" id="filters">
+        <label class="search-wrap">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M21 21L16.65 16.65M18 10.5C18 14.6421 14.6421 18 10.5 18C6.35786 18 3 14.6421 3 10.5C3 6.35786 6.35786 3 10.5 3C14.6421 3 18 6.35786 18 10.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <input class="search-input" type="text" placeholder="მოძებნე გუნდი, ქალაქი ან კატეგორია...">
+        </label>
+
+        <div class="result-box" data-result-count>ნაპოვნია: 20 გუნდი</div>
+      </div>
+
+      <div class="filters">
+        <button class="filter-btn active" type="button" data-filter="all">ყველა</button>
+        <button class="filter-btn" type="button" data-filter="pro">PRO</button>
+        <button class="filter-btn" type="button" data-filter="u21">U21</button>
+        <button class="filter-btn" type="button" data-filter="u19">U19</button>
+        <button class="filter-btn" type="button" data-filter="u17">U17</button>
+      </div>
+
+      <div class="teams-grid" id="teamsGrid"></div>
+    </div>
+  </section>
+
+  <section class="footer" id="join">
+    <div class="container">
+      <div class="footer-box">
+        <div>
+          <h2>გინდა შენი გუნდიც დაემატოს?</h2>
+          <p>ეს გვერდი უკვე ერთიან light სტილშია. თუ გინდა, შემდეგ ეტაპზე აქ რეალური მონაცემები, ლოგოები და დინამიკური ბარათებიც ჩავამატო.</p>
+        </div>
+        <div class="nav-actions">
+          <a href="index.html" class="btn btn-black">მთავარზე დაბრუნება</a>
+          <a href="login.html?redirect=gundebi.html%23register#register" class="btn btn-red">გუნდის დამატება</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    const teams = [
+      { mark: 'DT', name: 'დინამო თბილისი', city: 'თბილისი, საქართველო', age: 'pro', ageLabel: 'PRO', players: 24, coach: 'გ. აბრამიძე' },
+      { mark: 'TQ', name: 'ტორპედო ქუთაისი', city: 'ქუთაისი, საქართველო', age: 'pro', ageLabel: 'PRO', players: 23, coach: 'ლ. კალანდაძე' },
+      { mark: 'SB', name: 'საბურთალო თბილისი', city: 'თბილისი, საქართველო', age: 'u19', ageLabel: 'U19', players: 26, coach: 'ნ. ჯავახიშვილი' },
+      { mark: 'DB', name: 'დინამო ბათუმი', city: 'ბათუმი, საქართველო', age: 'pro', ageLabel: 'PRO', players: 25, coach: 'რ. შანიძე' },
+      { mark: 'DG', name: 'დილა გორი', city: 'გორი, საქართველო', age: 'u21', ageLabel: 'U21', players: 21, coach: 'თ. ნოზაძე' },
+      { mark: 'KF', name: 'კოლხეთი ფოთი', city: 'ფოთი, საქართველო', age: 'u17', ageLabel: 'U17', players: 20, coach: 'ბ. ქარჩავა' },
+      { mark: 'SZ', name: 'სამგურალი წყალტუბო', city: 'წყალტუბო, საქართველო', age: 'pro', ageLabel: 'PRO', players: 24, coach: 'ს. ფაღავა' },
+      { mark: 'GG', name: 'გაგრა თბილისი', city: 'თბილისი, საქართველო', age: 'u19', ageLabel: 'U19', players: 22, coach: 'ო. ჭელიძე' },
+      { mark: 'TL', name: 'თელავი', city: 'თელავი, საქართველო', age: 'pro', ageLabel: 'PRO', players: 23, coach: 'გ. დიასამიძე' },
+      { mark: 'SM', name: 'სამტრედია', city: 'სამტრედია, საქართველო', age: 'u21', ageLabel: 'U21', players: 21, coach: 'ი. მელქაძე' },
+      { mark: 'SQ', name: 'შუქურა ქობულეთი', city: 'ქობულეთი, საქართველო', age: 'u19', ageLabel: 'U19', players: 22, coach: 'ლ. დუმბაძე' },
+      { mark: 'MM', name: 'მერანი მარტვილი', city: 'მარტვილი, საქართველო', age: 'u17', ageLabel: 'U17', players: 19, coach: 'ა. ჭანტურია' },
+      { mark: 'VJ', name: 'ვიტ ჯორჯია', city: 'თბილისი, საქართველო', age: 'u21', ageLabel: 'U21', players: 23, coach: 'შ. მერაბიშვილი' },
+      { mark: 'LT', name: 'ლოკომოტივი თბილისი', city: 'თბილისი, საქართველო', age: 'u19', ageLabel: 'U19', players: 24, coach: 'დ. გაბიტაშვილი' },
+      { mark: 'RS', name: 'რუსთავი', city: 'რუსთავი, საქართველო', age: 'pro', ageLabel: 'PRO', players: 24, coach: 'ვ. მაისურაძე' },
+      { mark: 'CS', name: 'ჩიხურა საჩხერე', city: 'საჩხერე, საქართველო', age: 'u21', ageLabel: 'U21', players: 20, coach: 'რ. კიკნაძე' },
+      { mark: 'SP', name: 'სპაერი', city: 'თბილისი, საქართველო', age: 'pro', ageLabel: 'PRO', players: 22, coach: 'დ. ჩხეტიანი' },
+      { mark: 'IB', name: 'იბერია 1999', city: 'თბილისი, საქართველო', age: 'u19', ageLabel: 'U19', players: 25, coach: 'გ. ზაქარეიშვილი' },
+      { mark: 'GR', name: 'გარეჯი საგარეჯო', city: 'საგარეჯო, საქართველო', age: 'u17', ageLabel: 'U17', players: 18, coach: 'მ. ხუციშვილი' },
+      { mark: 'SN', name: 'სიონი ბოლნისი', city: 'ბოლნისი, საქართველო', age: 'pro', ageLabel: 'PRO', players: 24, coach: 'ზ. მუმლაძე' }
+    ];
+
+    const teamsGrid = document.getElementById('teamsGrid');
+    const searchInput = document.querySelector('.search-input');
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    const resultCount = document.querySelector('[data-result-count]');
+    let activeFilter = 'all';
+
+    const emblemPalettes = [
+      ['#b91c1c', '#7f1d1d', '#fca5a5'],
+      ['#1d4ed8', '#1e3a8a', '#93c5fd'],
+      ['#0f766e', '#134e4a', '#99f6e4'],
+      ['#7c3aed', '#4c1d95', '#c4b5fd'],
+      ['#ea580c', '#9a3412', '#fdba74'],
+      ['#ca8a04', '#854d0e', '#fde68a'],
+      ['#be123c', '#881337', '#fda4af'],
+      ['#4338ca', '#312e81', '#a5b4fc']
+    ];
+
+    function createEmblem(team, index) {
+      const [primary, secondary, accent] = emblemPalettes[index % emblemPalettes.length];
+      const initials = team.mark;
+      return `
+        <svg viewBox="0 0 84 96" xmlns="http://www.w3.org/2000/svg" aria-label="${team.name}">
+          <defs>
+            <linearGradient id="shield-${index}" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="${primary}" />
+              <stop offset="100%" stop-color="${secondary}" />
+            </linearGradient>
+          </defs>
+          <path d="M42 4L72 14V42C72 60 59 78 42 90C25 78 12 60 12 42V14L42 4Z" fill="url(#shield-${index})"/>
+          <path d="M42 11L66 19V42C66 56 56 70 42 80C28 70 18 56 18 42V19L42 11Z" fill="none" stroke="#ffffff" stroke-opacity=".65" stroke-width="2"/>
+          <circle cx="42" cy="34" r="13" fill="${accent}" opacity=".95"/>
+          <path d="M26 56H58" stroke="#ffffff" stroke-opacity=".35" stroke-width="2" stroke-linecap="round"/>
+          <text x="42" y="39" text-anchor="middle" font-size="15" font-weight="900" fill="#ffffff" font-family="Inter, Segoe UI, Arial, sans-serif">${initials}</text>
+          <text x="42" y="70" text-anchor="middle" font-size="8.5" font-weight="800" letter-spacing=".18em" fill="#ffffff" font-family="Inter, Segoe UI, Arial, sans-serif">TEAM</text>
+        </svg>
+      `;
+    }
+
+    function createTeamCard(team, index) {
+      return `
+        <article class="team-card" data-age="${team.age}" data-search="${`${team.name} ${team.city} ${team.ageLabel} სატესტო`.toLowerCase()}">
+          <div class="team-top">
+            <div class="team-emblem">${createEmblem(team, index)}</div>
+            <div class="team-head">
+              <div class="team-badge">სატესტო გუნდი</div>
+              <h3 class="team-name">${team.name}</h3>
+              <div class="team-location">${team.city}</div>
+            </div>
+          </div>
+          <div class="team-meta">
+            <div class="meta-row"><span>კატეგორია</span><strong>${team.ageLabel}</strong></div>
+            <div class="meta-row"><span>მოთამაშეები</span><strong>${team.players}</strong></div>
+            <div class="meta-row"><span>მთავარი მწვრთნელი</span><strong>${team.coach}</strong></div>
+          </div>
+          <div class="team-footer">
+          <a href="login.html?redirect=gundebi.html%23login#login" class="btn btn-red">ნახვა</a>
+          <a href="login.html?redirect=gundebi.html%23login#login" class="btn btn-white">კონტაქტი</a>
+          </div>
+        </article>
+      `;
+    }
+
+    function renderTeams() {
+      teamsGrid.innerHTML = teams.map(createTeamCard).join('');
+    }
+
+    function applyFilters() {
+      const term = searchInput.value.trim().toLowerCase();
+      const cards = teamsGrid.querySelectorAll('.team-card');
+      let visible = 0;
+
+      cards.forEach((card) => {
+        const matchesSearch = card.dataset.search.includes(term);
+        const matchesFilter = activeFilter === 'all' || card.dataset.age === activeFilter;
+        const show = matchesSearch && matchesFilter;
+        card.hidden = !show;
+        if (show) visible += 1;
+      });
+
+      resultCount.textContent = `ნაპოვნია: ${visible} გუნდი`;
+    }
+
+    filterButtons.forEach((button) => {
+      button.addEventListener('click', () => {
+        filterButtons.forEach((item) => item.classList.remove('active'));
+        button.classList.add('active');
+        activeFilter = button.dataset.filter;
+        applyFilters();
+      });
+    });
+
+    searchInput.addEventListener('input', applyFilters);
+
+    renderTeams();
+    applyFilters();
+  </script>
+</body>
+</html>

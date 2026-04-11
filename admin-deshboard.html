@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>დეშბორდი | Mishvela Football Georgia</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --panel: #ffffff;
+      --panel-2: #f8fafc;
+      --panel-3: #eef2f6;
+      --text: #0b1220;
+      --muted: #344054;
+      --muted-2: #1f2937;
+      --line: rgba(16,24,40,0.12);
+      --line-2: rgba(16,24,40,0.22);
+      --red: #b91c1c;
+      --red-2: #991b1b;
+      --black: #020617;
+      --shadow: 0 18px 45px rgba(15,23,42,.08);
+      --shadow-sm: 0 4px 12px rgba(15,23,42,.05);
+      --radius: 24px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "Sylfaen", "Noto Sans Georgian", "DejaVu Sans", sans-serif;
+      background: var(--panel-2); /* ნაცრისფერი ფონი დეშბორდისთვის */
+      color: var(--text);
+      line-height: 1.55;
+      display: flex;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    a { text-decoration: none; color: inherit; }
+    button, input { font: inherit; }
+    ul { list-style: none; padding: 0; margin: 0; }
+
+    /* --- SIDEBAR --- */
+    .sidebar {
+      width: 280px;
+      background: #fff;
+      border-right: 1px solid var(--line);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      z-index: 100;
+    }
+    
+    .sidebar-header {
+      padding: 24px;
+      border-bottom: 1px solid var(--line);
+    }
+    
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 1rem;
+      font-weight: 900;
+      letter-spacing: -.03em;
+    }
+    .logo {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      background: #ea580c;
+      color: #fff;
+      font-weight: 900;
+      box-shadow: 0 8px 20px rgba(234,88,12,.25);
+    }
+
+    .sidebar-nav {
+      padding: 20px 16px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 18px;
+      border-radius: 16px;
+      color: var(--muted);
+      font-weight: 700;
+      font-size: .95rem;
+      transition: .2s ease;
+    }
+    .nav-item svg {
+      width: 20px;
+      height: 20px;
+      opacity: 0.7;
+    }
+    .nav-item:hover {
+      background: var(--panel-3);
+      color: var(--text);
+    }
+    .nav-item.active {
+      background: rgba(185,28,28,.08);
+      color: var(--red);
+    }
+    .nav-item.active svg {
+      opacity: 1;
+      color: var(--red);
+    }
+
+    .sidebar-footer {
+      padding: 24px;
+      border-top: 1px solid var(--line);
+    }
+    .user-profile {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: var(--panel-3);
+      border: 1px solid var(--line);
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      color: var(--red);
+    }
+    .user-info strong {
+      display: block;
+      font-size: .9rem;
+      line-height: 1.2;
+    }
+    .user-info span {
+      font-size: .75rem;
+      color: var(--muted);
+    }
+
+    /* --- MAIN CONTENT --- */
+    .main-wrap {
+      flex: 1;
+      margin-left: 280px; /* Sidebar width */
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Top Header */
+    .top-header {
+      height: 78px;
+      background: rgba(255,255,255,.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 32px;
+      position: sticky;
+      top: 0;
+      z-index: 90;
+    }
+    .page-title {
+      font-size: 1.25rem;
+      font-weight: 900;
+      margin: 0;
+      letter-spacing: -.02em;
+    }
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    /* Buttons & Chips (Shared styles) */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 46px;
+      padding: 0 20px;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      font-size: 14px;
+      font-weight: 800;
+      transition: .25s ease;
+      cursor: pointer;
+    }
+    .btn-red {
+      background: var(--red);
+      color: #fff;
+      box-shadow: 0 10px 24px rgba(185,28,28,.25);
+    }
+    .btn-red:hover { background: var(--red-2); transform: translateY(-2px); }
+    .btn-white {
+      background: #fff;
+      color: var(--text);
+      border-color: var(--line);
+    }
+    .btn-white:hover { background: #eef2f6; transform: translateY(-2px); }
+    
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: #fcb0b0;
+      color: #7f1d1d;
+      font-size: 11px;
+      font-weight: 800;
+      border: 1px solid rgba(185,28,28,.22);
+    }
+
+    /* Dashboard Content Grid */
+    .content-area {
+      padding: 32px;
+      max-width: 1400px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    /* Stats Row */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 20px;
+      margin-bottom: 32px;
+    }
+    .stat-card {
+      background: #fff;
+      border-radius: var(--radius);
+      border: 1px solid var(--line);
+      padding: 24px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      transition: .2s ease;
+    }
+    .stat-card:hover {
+      box-shadow: var(--shadow);
+      transform: translateY(-4px);
+    }
+    .stat-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 16px;
+      background: rgba(185,28,28,.08);
+      color: var(--red);
+      display: grid;
+      place-items: center;
+    }
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 900;
+      line-height: 1;
+      letter-spacing: -.03em;
+    }
+    .stat-label {
+      color: var(--muted);
+      font-size: .9rem;
+      font-weight: 700;
+    }
+
+    /* Two Column Section */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 24px;
+    }
+
+    /* Main Cards */
+    .dash-card {
+      background: #fff;
+      border-radius: var(--radius);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+    }
+    .dash-card-header {
+      padding: 24px;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .dash-card-header h3 {
+      margin: 0;
+      font-size: 1.1rem;
+      font-weight: 900;
+    }
+    
+    /* Table inside card */
+    .table-container {
+      width: 100%;
+      overflow-x: auto;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+    th {
+      padding: 16px 24px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: .8rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      border-bottom: 1px solid var(--line);
+    }
+    td {
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--line);
+      font-size: .95rem;
+      font-weight: 600;
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: var(--panel-2); }
+
+    .player-cell {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .player-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: #eef2f6;
+      display: grid;
+      place-items: center;
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    /* List inside card */
+    .action-list {
+      padding: 0;
+    }
+    .action-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--line);
+    }
+    .action-item:last-child { border-bottom: none; }
+    .action-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: #f1f5f9;
+      display: grid;
+      place-items: center;
+      color: var(--muted-2);
+    }
+    .action-content h4 {
+      margin: 0 0 4px;
+      font-size: .95rem;
+      font-weight: 800;
+    }
+    .action-content p {
+      margin: 0;
+      font-size: .85rem;
+      color: var(--muted);
+    }
+
+    @media (max-width: 1024px) {
+      .dashboard-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 768px) {
+      .sidebar { transform: translateX(-100%); }
+      .main-wrap { margin-left: 0; }
+      .top-header { padding: 0 20px; }
+      .content-area { padding: 20px; }
+      /* მობილურისთვის სჭირდება დამატებითი JS ბურგერ მენიუსთვის */
+    }
+  </style>
+</head>
+<body>
+
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <a href="index.html" class="brand">
+        <span class="logo">TE</span>
+        <span>Mishvela Football Georgia</span>
+      </a>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a href="admin-deshboard.html" class="nav-item active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+        მთავარი დაფა
+      </a>
+      <a href="pexburtelebi.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        ფეხბურთელები
+      </a>
+      <a href="gundebi.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        გუნდები
+      </a>
+      <a href="user-profile.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+        მომხმარებლის პროფილი
+      </a>
+      <a href="index.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        მთავარი საიტი
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-profile">
+        <div class="avatar">U</div>
+        <div class="user-info">
+          <strong>უჩა მიშველიძე</strong>
+          <span>მთავარი ადმინისტრატორი</span>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main-wrap">
+    
+    <header class="top-header">
+      <h2 class="page-title">მიმოხილვა</h2>
+      <div class="header-actions">
+        <a href="gundebi.html" class="btn btn-white">გუნდების გვერდი</a>
+        <a href="pexburtelebi.html" class="btn btn-red">ტალანტების ბაზა</a>
+      </div>
+    </header>
+
+    <div class="content-area">
+      
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+          <div>
+            <div class="stat-value">124</div>
+            <div class="stat-label">აქტიური მოთამაშე</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          </div>
+          <div>
+            <div class="stat-value">86%</div>
+            <div class="stat-label">ვარჯიშებზე დასწრება</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon" style="color: #ea580c; background: rgba(234,88,12,.1);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </div>
+          <div>
+            <div class="stat-value">4.8</div>
+            <div class="stat-label">გუნდის საშუალო შეფასება</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="dashboard-grid">
+        
+        <div class="dash-card">
+          <div class="dash-card-header">
+            <h3>ბოლო ვარჯიშის შედეგები (Top Performer)</h3>
+            <span class="chip">U19 გუნდი</span>
+          </div>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>მოთამაშე</th>
+                  <th>პოზიცია</th>
+                  <th>ფიზ. მზადყოფნა</th>
+                  <th>სტატუსი</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <div class="player-cell">
+                      <div class="player-avatar">გმ</div>
+                      <div>გიორგი მიქაუტაძე</div>
+                    </div>
+                  </td>
+                  <td>თავდამსხმელი</td>
+                  <td>98%</td>
+                  <td><span class="chip" style="background:#dcfce7; color:#166534; border-color:#bbf7d0;">მზადაა</span></td>
+                </tr>
+                <tr>
+                  <td>
+                    <div class="player-cell">
+                      <div class="player-avatar">ხკ</div>
+                      <div>ხვიჩა კვარაცხელია</div>
+                    </div>
+                  </td>
+                  <td>შემტევი ნახ.</td>
+                  <td>95%</td>
+                  <td><span class="chip" style="background:#dcfce7; color:#166534; border-color:#bbf7d0;">მზადაა</span></td>
+                </tr>
+                <tr>
+                  <td>
+                    <div class="player-cell">
+                      <div class="player-avatar">გმ</div>
+                      <div>გიორგი მამარდაშვილი</div>
+                    </div>
+                  </td>
+                  <td>მეკარე</td>
+                  <td>88%</td>
+                  <td><span class="chip" style="background:#fef08a; color:#854d0e; border-color:#fde047;">მსუბუქი ტრავმა</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="dash-card">
+          <div class="dash-card-header">
+            <h3>უახლოესი განრიგი</h3>
+          </div>
+          <div class="action-list">
+            
+            <div class="action-item">
+              <div class="action-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              </div>
+              <div class="action-content">
+                <h4>ტაქტიკური გარჩევა</h4>
+                <p>დღეს, 16:00 • საკონფერენციო</p>
+              </div>
+            </div>
+
+            <div class="action-item">
+              <div class="action-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+              </div>
+              <div class="action-content">
+                <h4>ფიზიკური მომზადება</h4>
+                <p>ხვალ, 10:00 • მოედანი 2</p>
+              </div>
+            </div>
+
+            <div class="action-item">
+              <div class="action-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              </div>
+              <div class="action-content">
+                <h4>ინდივიდუალური გასაუბრება</h4>
+                <p>პარასკევი, 14:30 • მწვრთნელის ოთახი</p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </main>
+
+</body>
+</html>

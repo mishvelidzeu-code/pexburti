@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ავტორიზაცია | Mishvela Football Georgia</title>
+  <meta name="description" content="შესვლა და რეგისტრაცია Mishvela Football Georgia-სთვის.">
+  <style>
+    :root {
+      --bg:#ffffff;
+      --panel:#ffffff;
+      --panel-2:#f8fafc;
+      --panel-3:#eef2f6;
+      --text:#0b1220;
+      --muted:#344054;
+      --muted-2:#1f2937;
+      --line:rgba(16,24,40,0.18);
+      --line-2:rgba(16,24,40,0.28);
+      --red:#b91c1c;
+      --red-2:#991b1b;
+      --black:#020617;
+      --shadow:0 18px 45px rgba(15,23,42,.12);
+      --radius:26px;
+      --container:1220px;
+    }
+
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      min-height:100vh;
+      display:flex;
+      flex-direction:column;
+      font-family:"Segoe UI", "Sylfaen", "Noto Sans Georgian", "DejaVu Sans", sans-serif;
+      background:var(--panel-2);
+      color:var(--text);
+      font-size:14px;
+      line-height:1.55;
+    }
+
+    a{text-decoration:none;color:inherit}
+    button,input,select{font:inherit}
+    [hidden]{display:none !important}
+    .container{width:min(var(--container), calc(100% - 32px));margin-inline:auto}
+
+    .header{
+      position:sticky;
+      top:0;
+      z-index:1000;
+      background:rgba(255,255,255,.98);
+      backdrop-filter:blur(16px);
+      border-bottom:1px solid var(--line);
+    }
+    .nav{
+      min-height:78px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:18px;
+    }
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      font-size:.95rem;
+      font-weight:900;
+      letter-spacing:-.03em;
+    }
+    .logo{
+      width:42px;
+      height:42px;
+      border-radius:14px;
+      display:grid;
+      place-items:center;
+      background:#ea580c;
+      color:#fff;
+      font-weight:900;
+      box-shadow:0 10px 24px rgba(234,88,12,.28);
+    }
+    .nav-links{
+      display:flex;
+      align-items:center;
+      gap:22px;
+      color:var(--muted-2);
+      font-size:12px;
+      font-weight:700;
+    }
+    .nav-links a:hover,
+    .nav-links a.active{color:var(--red)}
+    .nav-actions{
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-height:52px;
+      padding:0 20px;
+      border-radius:999px;
+      border:1px solid transparent;
+      font-size:13px;
+      font-weight:800;
+      transition:.25s ease;
+      white-space:nowrap;
+      cursor:pointer;
+    }
+    .btn:hover{transform:translateY(-2px)}
+    .btn-red{
+      background:var(--red);
+      color:#fff;
+      border-color:var(--red);
+      box-shadow:0 12px 28px rgba(185,28,28,.28);
+    }
+    .btn-red:hover{background:var(--red-2)}
+    .btn-white{
+      background:#fff;
+      color:var(--text);
+      border-color:var(--line);
+    }
+    .btn-white:hover{background:#eef2f6}
+    .btn-submit{
+      width:100%;
+      margin-top:8px;
+      font-size:14px;
+    }
+
+    .auth-wrapper{
+      flex:1;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:40px 20px;
+    }
+    .auth-box{
+      width:100%;
+      max-width:480px;
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:28px;
+      padding:36px 32px;
+      box-shadow:var(--shadow);
+    }
+    .auth-header{
+      text-align:center;
+      margin-bottom:28px;
+    }
+    .auth-header h1{
+      margin:0 0 8px;
+      font-size:1.6rem;
+      font-weight:900;
+      letter-spacing:-.03em;
+    }
+    .auth-header p{
+      margin:0;
+      color:var(--muted);
+      font-size:.88rem;
+    }
+
+    .form-group{margin-bottom:18px}
+    .form-row{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+    }
+    .form-label{
+      display:block;
+      font-size:.82rem;
+      font-weight:800;
+      color:var(--muted-2);
+      margin-bottom:8px;
+    }
+    .form-input{
+      width:100%;
+      padding:14px 16px;
+      border-radius:16px;
+      border:1px solid var(--line);
+      background:var(--panel-2);
+      color:var(--text);
+      font-size:.9rem;
+      transition:.2s ease;
+    }
+    .form-input:focus{
+      outline:none;
+      background:#fff;
+      border-color:var(--red);
+      box-shadow:0 0 0 4px rgba(185,28,28,.12);
+    }
+    .forgot-password{
+      display:block;
+      text-align:right;
+      font-size:.76rem;
+      font-weight:700;
+      color:var(--muted);
+      margin-top:6px;
+      margin-bottom:18px;
+    }
+    .forgot-password:hover{color:var(--red)}
+
+    .role-note{
+      margin:-4px 0 18px;
+      padding:14px 16px;
+      border-radius:18px;
+      border:1px solid var(--line);
+      background:var(--panel-2);
+    }
+    .role-note strong{
+      display:block;
+      margin-bottom:4px;
+      font-size:.86rem;
+      font-weight:900;
+      color:var(--muted-2);
+    }
+    .role-note span{
+      display:block;
+      color:var(--muted);
+      font-size:.84rem;
+    }
+    .role-fields{
+      margin-bottom:18px;
+    }
+    .role-empty{
+      padding:14px 16px;
+      border-radius:18px;
+      border:1px dashed var(--line-2);
+      background:var(--panel-2);
+      color:var(--muted);
+      font-size:.88rem;
+    }
+    .role-card{
+      padding:14px 16px;
+      border-radius:18px;
+      border:1px solid rgba(185,28,28,.16);
+      background:#fff7f7;
+      margin-bottom:14px;
+    }
+    .role-card strong{
+      display:block;
+      margin-bottom:4px;
+      font-size:.86rem;
+      font-weight:900;
+      color:var(--red-2);
+    }
+    .role-card span{
+      display:block;
+      color:var(--muted);
+      font-size:.84rem;
+    }
+
+    .auth-switch{
+      text-align:center;
+      margin-top:24px;
+      font-size:.9rem;
+      color:var(--muted);
+    }
+    .auth-switch a{
+      color:var(--red);
+      font-weight:800;
+      margin-left:4px;
+    }
+    .auth-switch a:hover{
+      color:var(--red-2);
+      text-decoration:underline;
+    }
+    .form-status{
+      margin:0 0 16px;
+      padding:12px 14px;
+      border-radius:16px;
+      border:1px solid var(--line);
+      background:var(--panel-2);
+      color:var(--muted-2);
+      font-size:.88rem;
+      font-weight:700;
+    }
+    .form-status[data-state="success"]{
+      border-color:rgba(22,163,74,.22);
+      background:#f0fdf4;
+      color:#166534;
+    }
+    .form-status[data-state="error"]{
+      border-color:rgba(185,28,28,.22);
+      background:#fef2f2;
+      color:#991b1b;
+    }
+    .form-status[data-state="info"]{
+      border-color:rgba(37,99,235,.18);
+      background:#eff6ff;
+      color:#1d4ed8;
+    }
+
+    @media (max-width:560px){
+      .auth-box{
+        padding:28px 20px;
+        border-radius:24px;
+      }
+      .form-row{
+        grid-template-columns:1fr;
+      }
+      .nav-links{
+        display:none;
+      }
+      .nav-actions .btn-white{
+        display:none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="container nav">
+      <a href="index.html" class="brand">
+        <span class="logo">TE</span>
+        <span>Mishvela Football Georgia</span>
+      </a>
+      <nav class="nav-links">
+        <a href="index.html">მთავარი</a>
+        <a href="gundebi.html">გუნდები</a>
+        <a href="pexburtelebi.html">ფეხბურთელები</a>
+        <a href="index.html#coaching">ქოუჩინგი</a>
+        <a href="index.html#camps">ბანაკები</a>
+      </nav>
+      <div class="nav-actions">
+        <a href="#login" class="btn btn-white">შესვლა</a>
+        <a href="#register" class="btn btn-red">რეგისტრაცია</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="auth-wrapper">
+    <div class="auth-box">
+      <section id="loginSection">
+        <div class="auth-header">
+          <h1>სისტემაში შესვლა</h1>
+          <p>მართე შენი გუნდი და მოთამაშეები ერთ სივრცეში</p>
+        </div>
+
+        <form id="loginForm">
+          <div class="form-group">
+            <label class="form-label" for="loginEmail">ელ-ფოსტა</label>
+            <input id="loginEmail" type="email" class="form-input" placeholder="სახელი@domain.com" required>
+          </div>
+
+          <div class="form-group" style="margin-bottom:4px;">
+            <label class="form-label" for="loginPassword">პაროლი</label>
+            <input id="loginPassword" type="password" class="form-input" placeholder="••••••••" required>
+          </div>
+
+          <a href="#" class="forgot-password" id="forgotPasswordLink">პაროლი დაგავიწყდათ?</a>
+          <div id="loginStatus" class="form-status" data-state="info" hidden></div>
+          <button type="submit" class="btn btn-red btn-submit">შესვლა</button>
+        </form>
+
+        <div class="auth-switch">
+          არ გაქვს ანგარიში?<a href="#register">დარეგისტრირდი</a>
+        </div>
+      </section>
+
+      <section id="registerSection" hidden>
+        <div class="auth-header">
+          <h1>რეგისტრაცია</h1>
+          <p>აირჩიე როლი და შეავსე ზუსტად შესაბამისი ინფორმაცია</p>
+        </div>
+
+        <form id="registerForm">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="firstName">სახელი</label>
+              <input id="firstName" type="text" class="form-input" placeholder="თქვენი სახელი" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="lastName">გვარი</label>
+              <input id="lastName" type="text" class="form-input" placeholder="თქვენი გვარი" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="roleSelect">როლი სისტემაში</label>
+            <select id="roleSelect" class="form-input" required>
+              <option value="" selected disabled>აირჩიეთ როლი...</option>
+              <option value="player">მოთამაშე</option>
+              <option value="parent">მშობელი</option>
+              <option value="agent">აგენტი</option>
+            </select>
+          </div>
+
+          <div id="roleNote" class="role-note">
+            <strong>აირჩიეთ როლი</strong>
+            <span>არჩეული როლის მიხედვით ფორმა ავტომატურად გაჩვენებს შესაბამის ველებს.</span>
+          </div>
+
+          <div id="roleFields" class="role-fields">
+            <div class="role-empty">როლის არჩევის შემდეგ აქ გამოჩნდება შესაბამისი კითხვები.</div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="registerEmail">ელ-ფოსტა</label>
+            <input id="registerEmail" type="email" class="form-input" placeholder="სახელი@domain.com" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="registerPassword">პაროლი</label>
+            <input id="registerPassword" type="password" class="form-input" placeholder="მინიმუმ 8 სიმბოლო" minlength="8" required>
+          </div>
+
+          <div id="registerStatus" class="form-status" data-state="info" hidden></div>
+          <button type="submit" class="btn btn-red btn-submit">ანგარიშის შექმნა</button>
+        </form>
+
+        <div class="auth-switch">
+          უკვე გაქვს ანგარიში?<a href="#login">შესვლა</a>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const SUPABASE_URL = 'https://exbakxkfbglnsdescimj.supabase.co';
+    const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_EGyaVD9bOtD5PHJbT5qPpw_9P4MHhwE';
+
+    const roleSelect = document.getElementById('roleSelect');
+    const roleNote = document.getElementById('roleNote');
+    const roleFields = document.getElementById('roleFields');
+    const loginSection = document.getElementById('loginSection');
+    const registerSection = document.getElementById('registerSection');
+    const loginForm = document.getElementById('loginForm');
+    const registerForm = document.getElementById('registerForm');
+    const loginStatus = document.getElementById('loginStatus');
+    const registerStatus = document.getElementById('registerStatus');
+    const forgotPasswordLink = document.getElementById('forgotPasswordLink');
+    const loginSubmitButton = loginForm.querySelector('button[type="submit"]');
+    const registerSubmitButton = registerForm.querySelector('button[type="submit"]');
+    const supabaseClient = window.supabase?.createClient
+      ? window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY)
+      : null;
+
+    const roleConfigurations = {
+      player: {
+        title: 'მოთამაშის რეგისტრაცია',
+        description: 'შეავსე შენი სათამაშო პროფილი, ასაკი და ამჟამინდელი საფეხბურთო ინფორმაცია.',
+        fields: [
+          { id: 'playerAge', label: 'ასაკი', type: 'number', placeholder: 'მაგ: 16', min: '6', max: '40' },
+          { id: 'playerPosition', label: 'პოზიცია', type: 'select', options: ['მეკარე', 'დამცველი', 'ნახევარმცველი', 'თავდამსხმელი'] },
+          { id: 'playerTeam', label: 'მიმდინარე გუნდი', type: 'text', placeholder: 'მაგ: საბურთალო თბილისი' },
+          { id: 'playerFoot', label: 'უპირატესი ფეხი', type: 'select', options: ['მარჯვენა', 'მარცხენა', 'ორივე'] }
+        ]
+      },
+      parent: {
+        title: 'მშობლის რეგისტრაცია',
+        description: 'მიუთითე ბავშვის საბაზისო მონაცემები და შენი კავშირი, რომ სწორი პროფილი შეიქმნას.',
+        fields: [
+          { id: 'childName', label: 'ბავშვის სახელი და გვარი', type: 'text', placeholder: 'მაგ: ლუკა გიორგაძე' },
+          { id: 'childAge', label: 'ბავშვის ასაკი', type: 'number', placeholder: 'მაგ: 12', min: '4', max: '25' },
+          { id: 'childPosition', label: 'ბავშვის პოზიცია', type: 'select', options: ['მეკარე', 'დამცველი', 'ნახევარმცველი', 'თავდამსხმელი', 'ჯერ არ არის განსაზღვრული'] },
+          { id: 'parentRelation', label: 'კავშირი ბავშვთან', type: 'select', options: ['დედა', 'მამა', 'მეურვე'] }
+        ]
+      },
+      agent: {
+        title: 'აგენტის რეგისტრაცია',
+        description: 'მიუთითე სააგენტოს ან წარმომადგენლობის მონაცემები და რამდენ მოთამაშესთან მუშაობ.',
+        fields: [
+          { id: 'agencyName', label: 'სააგენტო / ბრენდი', type: 'text', placeholder: 'მაგ: Prime Football Agency' },
+          { id: 'playersManaged', label: 'რამდენ მოთამაშეს წარმოადგენ', type: 'number', placeholder: 'მაგ: 8', min: '1', max: '200' },
+          { id: 'agencyRegion', label: 'რეგიონი / ბაზარი', type: 'text', placeholder: 'მაგ: თბილისი / საქართველო' },
+          { id: 'agentFocus', label: 'ძირითადი მიმართულება', type: 'select', options: ['ახალგაზრდა მოთამაშეები', 'პროფესიონალები', 'საერთაშორისო ტრანსფერები', 'სკაუტინგი და კარიერის მართვა'] }
+        ]
+      }
+    };
+
+    function renderField(field) {
+      if (field.type === 'select') {
+        const options = field.options.map((option) => `<option value="${option}">${option}</option>`).join('');
+        return `
+          <div class="form-group">
+            <label class="form-label" for="${field.id}">${field.label}</label>
+            <select id="${field.id}" name="${field.id}" class="form-input" required>
+              <option value="" selected disabled>აირჩიეთ...</option>
+              ${options}
+            </select>
+          </div>
+        `;
+      }
+
+      const min = field.min ? ` min="${field.min}"` : '';
+      const max = field.max ? ` max="${field.max}"` : '';
+      return `
+        <div class="form-group">
+          <label class="form-label" for="${field.id}">${field.label}</label>
+          <input id="${field.id}" name="${field.id}" type="${field.type}" class="form-input" placeholder="${field.placeholder || ''}"${min}${max} required>
+        </div>
+      `;
+    }
+
+    function renderRoleFields(role) {
+      const config = roleConfigurations[role];
+
+      if (!config) {
+        roleNote.innerHTML = `
+          <strong>აირჩიეთ როლი</strong>
+          <span>არჩეული როლის მიხედვით ფორმა ავტომატურად გაჩვენებს შესაბამის ველებს.</span>
+        `;
+        roleFields.innerHTML = '<div class="role-empty">როლის არჩევის შემდეგ აქ გამოჩნდება შესაბამისი კითხვები.</div>';
+        return;
+      }
+
+      roleNote.innerHTML = `
+        <strong>${config.title}</strong>
+        <span>${config.description}</span>
+      `;
+
+      const rows = [];
+      for (let i = 0; i < config.fields.length; i += 2) {
+        const currentFields = config.fields.slice(i, i + 2).map(renderField).join('');
+        rows.push(`<div class="form-row">${currentFields}</div>`);
+      }
+
+      roleFields.innerHTML = `
+        <div class="role-card">
+          <strong>${config.title}</strong>
+          <span>${config.description}</span>
+        </div>
+        ${rows.join('')}
+      `;
+    }
+
+    function setStatus(element, message = '', state = 'info') {
+      if (!element) {
+        return;
+      }
+
+      if (!message) {
+        element.hidden = true;
+        element.textContent = '';
+        element.dataset.state = 'info';
+        return;
+      }
+
+      element.hidden = false;
+      element.dataset.state = state;
+      element.textContent = message;
+    }
+
+    function setLoading(button, isLoading, idleLabel, loadingLabel) {
+      button.disabled = isLoading;
+      button.textContent = isLoading ? loadingLabel : idleLabel;
+      button.style.opacity = isLoading ? '.75' : '1';
+      button.style.cursor = isLoading ? 'wait' : 'pointer';
+    }
+
+    function sanitizeRedirect() {
+      const params = new URLSearchParams(window.location.search);
+      const redirect = (params.get('redirect') || '').trim();
+
+      if (!redirect) {
+        return 'index.html';
+      }
+
+      if (/^(https?:|\/\/|javascript:|data:)/i.test(redirect)) {
+        return 'index.html';
+      }
+
+      if (!/^[a-zA-Z0-9._/-]+\.html(?:[?#][^\s]*)?$/i.test(redirect)) {
+        return 'index.html';
+      }
+
+      return redirect;
+    }
+
+    function getRolePayload(role) {
+      const config = roleConfigurations[role];
+      if (!config) {
+        return {};
+      }
+
+      return config.fields.reduce((payload, field) => {
+        const input = document.getElementById(field.id);
+        if (input) {
+          payload[field.id] = input.value.trim();
+        }
+        return payload;
+      }, {});
+    }
+
+    function redirectToTarget(fallbackHash = '') {
+      const target = sanitizeRedirect();
+      const normalizedTarget = fallbackHash && !target.includes('#') ? `${target}${fallbackHash}` : target;
+      window.location.href = normalizedTarget;
+    }
+
+    function toggleForm(type, syncHash = true) {
+      if (type === 'register') {
+        loginSection.hidden = true;
+        registerSection.hidden = false;
+      } else {
+        registerSection.hidden = true;
+        loginSection.hidden = false;
+      }
+
+      if (syncHash) {
+        const targetHash = `#${type}`;
+        if (window.location.hash !== targetHash) {
+          history.replaceState(null, '', targetHash);
+        }
+      }
+    }
+
+    function syncFormFromLocation() {
+      const params = new URLSearchParams(window.location.search);
+      const hash = window.location.hash.replace('#', '').toLowerCase();
+      const mode = (params.get('mode') || hash || 'login').toLowerCase();
+      toggleForm(mode === 'register' ? 'register' : 'login', false);
+    }
+
+    roleSelect.addEventListener('change', (event) => {
+      renderRoleFields(event.target.value);
+      setStatus(registerStatus);
+    });
+
+    loginForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      setStatus(loginStatus);
+
+      if (!supabaseClient) {
+        setStatus(loginStatus, 'Supabase ვერ ჩაიტვირთა. ინტერნეტი ან კავშირი გადაამოწმე.', 'error');
+        return;
+      }
+
+      const email = document.getElementById('loginEmail').value.trim();
+      const password = document.getElementById('loginPassword').value;
+
+      setLoading(loginSubmitButton, true, 'შესვლა', 'მიმდინარეობს...');
+
+      try {
+        const { error } = await supabaseClient.auth.signInWithPassword({
+          email,
+          password
+        });
+
+        if (error) {
+          throw error;
+        }
+
+        setStatus(loginStatus, 'წარმატებით შეხვედი. ახლავე გადაგამისამართებ.', 'success');
+        setTimeout(() => redirectToTarget(), 700);
+      } catch (error) {
+        setStatus(loginStatus, error.message || 'შესვლა ვერ შესრულდა. მონაცემები გადაამოწმე.', 'error');
+      } finally {
+        setLoading(loginSubmitButton, false, 'შესვლა', 'მიმდინარეობს...');
+      }
+    });
+
+    registerForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      if (!roleSelect.value) {
+        roleSelect.reportValidity();
+        return;
+      }
+      setStatus(registerStatus);
+
+      if (!supabaseClient) {
+        setStatus(registerStatus, 'Supabase ვერ ჩაიტვირთა. ინტერნეტი ან კავშირი გადაამოწმე.', 'error');
+        return;
+      }
+
+      const firstName = document.getElementById('firstName').value.trim();
+      const lastName = document.getElementById('lastName').value.trim();
+      const email = document.getElementById('registerEmail').value.trim();
+      const password = document.getElementById('registerPassword').value;
+      const role = roleSelect.value;
+      const rolePayload = getRolePayload(role);
+
+      setLoading(registerSubmitButton, true, 'ანგარიშის შექმნა', 'იქმნება...');
+
+      try {
+        const { data, error } = await supabaseClient.auth.signUp({
+          email,
+          password,
+          options: {
+            data: {
+              first_name: firstName,
+              last_name: lastName,
+              full_name: `${firstName} ${lastName}`.trim(),
+              role,
+              profile: rolePayload
+            }
+          }
+        });
+
+        if (error) {
+          throw error;
+        }
+
+        registerForm.reset();
+        renderRoleFields('');
+
+        if (data.session) {
+          setStatus(registerStatus, 'ანგარიში შეიქმნა და უკვე ავტორიზებული ხარ. ახლავე გადაგამისამართებ.', 'success');
+          setTimeout(() => redirectToTarget(), 700);
+          return;
+        }
+
+        toggleForm('login');
+        setStatus(loginStatus, 'ანგარიში შეიქმნა. ელ-ფოსტაზე გადაამოწმე დადასტურების წერილი, შემდეგ შედი სისტემაში.', 'info');
+      } catch (error) {
+        setStatus(registerStatus, error.message || 'რეგისტრაცია ვერ შესრულდა. სცადე თავიდან.', 'error');
+      } finally {
+        setLoading(registerSubmitButton, false, 'ანგარიშის შექმნა', 'იქმნება...');
+      }
+    });
+
+    forgotPasswordLink.addEventListener('click', async (event) => {
+      event.preventDefault();
+      setStatus(loginStatus);
+
+      if (!supabaseClient) {
+        setStatus(loginStatus, 'Supabase ვერ ჩაიტვირთა. ინტერნეტი ან კავშირი გადაამოწმე.', 'error');
+        return;
+      }
+
+      const email = document.getElementById('loginEmail').value.trim();
+      if (!email) {
+        setStatus(loginStatus, 'პაროლის აღსადგენად ჯერ ელ-ფოსტა ჩაწერე.', 'info');
+        document.getElementById('loginEmail').focus();
+        return;
+      }
+
+      try {
+        const { error } = await supabaseClient.auth.resetPasswordForEmail(email);
+        if (error) {
+          throw error;
+        }
+
+        setStatus(loginStatus, 'პაროლის აღდგენის წერილი გამოგზავნილია ელ-ფოსტაზე.', 'success');
+      } catch (error) {
+        setStatus(loginStatus, error.message || 'პაროლის აღდგენა ვერ შესრულდა.', 'error');
+      }
+    });
+
+    window.addEventListener('hashchange', syncFormFromLocation);
+    window.addEventListener('DOMContentLoaded', () => {
+      syncFormFromLocation();
+      renderRoleFields(roleSelect.value);
+      if (!supabaseClient) {
+        setStatus(loginStatus, 'Supabase კავშირი ჯერ არ არის მზად.', 'error');
+        setStatus(registerStatus, 'Supabase კავშირი ჯერ არ არის მზად.', 'error');
+      }
+    });
+  </script>
+</body>
+</html>

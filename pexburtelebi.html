@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ფეხბურთელები | Mishvela Football Georgia</title>
+  <meta name="description" content="ფეხბურთელების სატესტო ბაზა - 1000+ მოთამაშე.">
+  <style>
+    :root {
+      --bg: #ffffff;
+      --panel: #ffffff;
+      --panel-2: #f8fafc;
+      --panel-3: #eef2f6;
+      --text: #0b1220;
+      --muted: #344054;
+      --muted-2: #1f2937;
+      --line: rgba(16,24,40,0.12);
+      --line-2: rgba(16,24,40,0.22);
+      --red: #b91c1c;
+      --red-2: #991b1b;
+      --black: #020617;
+      --shadow: 0 12px 32px rgba(15,23,42,.08);
+      --shadow-hover: 0 20px 48px rgba(185,28,28,.12);
+      --radius: 20px;
+      --container: 1280px; /* ოდნავ გავზარდეთ კონტეინერი 7 ბარათისთვის */
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "Sylfaen", "Noto Sans Georgian", "DejaVu Sans", sans-serif;
+      background: var(--panel-2); /* ოდნავ ნაცრისფერი ფონი ბარათების გამოსაყოფად */
+      color: var(--text);
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    a { text-decoration: none; color: inherit; }
+    button, input { font: inherit; }
+    [hidden] { display: none !important; }
+    .container { width: min(var(--container), calc(100% - 32px)); margin-inline: auto; }
+
+    /* ნავიგაცია */
+    .header {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: rgba(255,255,255,.98);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--line);
+    }
+    .nav {
+      min-height: 78px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: .95rem;
+      font-weight: 900;
+      letter-spacing: -.03em;
+    }
+    .logo {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      background: #ea580c;
+      color: #fff;
+      font-weight: 900;
+      box-shadow: 0 10px 24px rgba(234,88,12,.28);
+    }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 22px;
+      color: var(--muted-2);
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .nav-links a:hover,
+    .nav-links a.active { color: var(--red); }
+    .nav-actions { display: flex; align-items: center; gap: 10px; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 48px;
+      padding: 0 20px;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      font-size: 13px;
+      font-weight: 800;
+      transition: .25s ease;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+    .btn-red { background: var(--red); color: #fff; box-shadow: 0 8px 20px rgba(185,28,28,.25); }
+    .btn-red:hover { background: var(--red-2); transform: translateY(-2px); }
+    .btn-white { background: #fff; color: var(--text); border: 1px solid var(--line); }
+    .btn-white:hover { background: #eef2f6; transform: translateY(-2px); }
+
+    /* ჰერო (სათაურის) სექცია */
+    .hero {
+      background: #fff;
+      padding: 32px 0 24px;
+      border-bottom: 1px solid var(--line);
+    }
+    .hero h1 {
+      margin: 0 0 10px;
+      font-size: 2.2rem;
+      font-weight: 950;
+      letter-spacing: -.03em;
+    }
+    .hero p {
+      margin: 0;
+      color: var(--muted);
+      font-size: .95rem;
+      max-width: 600px;
+    }
+
+    /* ფილტრების სექცია */
+    .filter-section {
+      background: #fff;
+      padding: 20px 0;
+      border-bottom: 1px solid var(--line);
+      position: sticky;
+      top: 78px; /* ჰედერის ქვემოთ დაფიქსირება */
+      z-index: 990;
+    }
+    
+    .search-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      margin-bottom: 16px;
+    }
+    .search-wrap {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      border-radius: 999px;
+      background: var(--panel-2);
+      border: 1px solid var(--line);
+      max-width: 400px;
+    }
+    .search-input {
+      width: 100%;
+      border: none;
+      outline: none;
+      background: transparent;
+      color: var(--text);
+      font-size: .9rem;
+    }
+    .result-count {
+      font-weight: 800;
+      color: var(--red);
+      font-size: .95rem;
+    }
+
+    /* ფილტრების ჯგუფები */
+    .filter-group {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .filter-group:last-child { margin-bottom: 0; }
+    .filter-label {
+      font-size: .8rem;
+      font-weight: 800;
+      color: var(--muted);
+      margin-right: 8px;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+    
+    .chip-btn {
+      padding: 6px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--muted-2);
+      font-size: .8rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: .2s ease;
+    }
+    .chip-btn:hover { border-color: var(--red); color: var(--red); }
+    .chip-btn.active {
+      background: var(--red);
+      border-color: var(--red);
+      color: #fff;
+    }
+
+    /* მოთამაშეების ბადე (6-7 თითო ხაზში) */
+    .players-section { padding: 32px 0 80px; }
+    .players-grid {
+      display: grid;
+      /* მინიმალური სიგანე 160px უზრუნველყოფს 6-7 ბარათს დიდ ეკრანზე */
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 16px;
+    }
+
+    /* ბარათის დიზაინი (დიდი სურათი, პატარა ტექსტი) */
+    .player-card {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: var(--shadow);
+      transition: .25s ease;
+      position: relative;
+    }
+    .player-card:hover {
+      transform: translateY(-5px);
+      border-color: rgba(185,28,28,.4);
+      box-shadow: var(--shadow-hover);
+    }
+
+    .player-photo {
+      width: 100%;
+      aspect-ratio: 4/5;
+      background: var(--panel-3);
+      object-fit: cover;
+      display: block;
+    }
+
+    .pos-indicator {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(4px);
+      color: #fff;
+      padding: 4px 8px;
+      border-radius: 8px;
+      font-size: .7rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+
+    .player-info {
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+
+    .player-name {
+      margin: 0 0 6px;
+      font-size: 1rem;
+      font-weight: 900;
+      line-height: 1.1;
+      letter-spacing: -.02em;
+    }
+
+    .meta-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+    .meta-item {
+      display: flex;
+      flex-direction: column;
+    }
+    .meta-item span {
+      font-size: 0.65rem;
+      color: var(--muted);
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    .meta-item strong {
+      font-size: 0.8rem;
+      color: var(--text);
+      font-weight: 800;
+    }
+
+    /* პატარა შესვლის ღილაკი */
+    .btn-enter {
+      width: 100%;
+      margin-top: auto;
+      padding: 8px;
+      background: var(--panel-2);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      color: var(--red);
+      font-size: .8rem;
+      font-weight: 800;
+      text-align: center;
+      transition: .2s ease;
+      cursor: pointer;
+    }
+    .player-card:hover .btn-enter {
+      background: var(--red);
+      color: #fff;
+      border-color: var(--red);
+    }
+
+    @media (max-width: 768px) {
+      .players-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
+      .search-row { flex-direction: column; align-items: stretch; }
+      .search-wrap { max-width: 100%; }
+      .nav-links { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="header">
+    <div class="container nav">
+      <a href="index.html" class="brand">
+        <span class="logo">TE</span>
+        <span>Mishvela Football Georgia</span>
+      </a>
+      <nav class="nav-links">
+        <a href="index.html">მთავარი</a>
+        <a href="gundebi.html">გუნდები</a>
+        <a href="pexburtelebi.html" class="active">ფეხბურთელები</a>
+        <a href="index.html#coaching">ქოუჩინგი</a>
+        <a href="index.html#camps">ბანაკები</a>
+      </nav>
+      <div class="nav-actions">
+        <a href="login.html?redirect=pexburtelebi.html%23login#login" class="btn btn-white">შესვლა</a>
+        <a href="login.html?redirect=pexburtelebi.html%23register#register" class="btn btn-red">რეგისტრაცია</a>
+      </div>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="container">
+      <h1>ტალანტების ბაზა</h1>
+      <p>აღმოაჩინე 1000+ ახალგაზრდა ფეხბურთელი. გაფილტრე ასაკის და პოზიციის მიხედვით.</p>
+    </div>
+  </section>
+
+  <div class="filter-section">
+    <div class="container">
+      
+      <div class="search-row">
+        <label class="search-wrap">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          <input id="searchInput" class="search-input" type="text" placeholder="მოძებნე სახელით...">
+        </label>
+        <div class="result-count" id="resultCount">ნაპოვნია: 30</div>
+      </div>
+
+      <div class="filter-group" id="posFilters">
+        <span class="filter-label">პოზიცია:</span>
+        <button class="chip-btn active" data-pos="all">ყველა</button>
+        <button class="chip-btn" data-pos="fw">თავდამსხმელი</button>
+        <button class="chip-btn" data-pos="mf">ნახევარმცველი</button>
+        <button class="chip-btn" data-pos="df">მცველი</button>
+        <button class="chip-btn" data-pos="gk">მეკარე</button>
+      </div>
+
+      <div class="filter-group" id="ageFilters">
+        <span class="filter-label">ასაკი:</span>
+        <button class="chip-btn active" data-age="all">ყველა</button>
+        <button class="chip-btn" data-age="u8">U8</button>
+        <button class="chip-btn" data-age="u9">U9</button>
+        <button class="chip-btn" data-age="u10">U10</button>
+        <button class="chip-btn" data-age="u11">U11</button>
+        <button class="chip-btn" data-age="u12">U12</button>
+        <button class="chip-btn" data-age="u13">U13</button>
+        <button class="chip-btn" data-age="u14">U14</button>
+        <button class="chip-btn" data-age="u15">U15</button>
+        <button class="chip-btn" data-age="u16">U16</button>
+        <button class="chip-btn" data-age="u17">U17</button>
+      </div>
+
+    </div>
+  </div>
+
+  <section class="players-section">
+    <div class="container">
+      <div class="players-grid" id="playersGrid"></div>
+    </div>
+  </section>
+
+  <script>
+    // 30 სატესტო ფეხბურთელი, დაგენერირებული ასაკებით U8-დან U17-მდე
+    const players = [
+      { id: 1, first: "გიორგი", last: "მიქაუტაძე", pos: "fw", ageCat: "u17", age: 16, foot: "მარჯვენა", img: "https://images.unsplash.com/photo-1543326727-cf6c39e8f84c?auto=format&fit=crop&w=300&h=400&q=80" },
+      { id: 2, first: "ხვიჩა", last: "კვარაცხელია", pos: "mf", ageCat: "u16", age: 15, foot: "ორივე", img: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=300&h=400&q=80" },
+      { id: 3, first: "ლუკა", last: "მაისურაძე", pos: "df", ageCat: "u15", age: 14, foot: "მარცხენა", img: "https://images.unsplash.com/photo-1510566337590-2fc1f21d0faa?auto=format&fit=crop&w=300&h=400&q=80" },
+      { id: 4, first: "საბა", last: "ლობჟანიძე", pos: "mf", ageCat: "u14", age: 13, foot: "მარჯვენა", img: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=300&h=400&q=80" },
+      { id: 5, first: "ზურიკო", last: "დავითაშვილი", pos: "fw", ageCat: "u13", age: 12, foot: "მარჯვენა", img: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=300&h=400&q=80" },
+      { id: 6, first: "გიორგი", last: "მამარდაშვილი", pos: "gk", ageCat: "u17", age: 16, foot: "მარჯვენა", img: "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?auto=format&fit=crop&w=300&h=400&q=80" },
+      { id: 7, first: "ოთარ", last: "კაკაბაძე", pos: "df", ageCat: "u12", age: 11, foot: "მარჯვენა", img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&h=400&q=80" },
+      { id: 8, first: "გურამ", last: "კაშია", pos: "df", ageCat: "u11", age: 10, foot: "მარჯვენა", img: "https://images.unsplash.com/photo-1528892952291-009c663ce843?auto=format&fit=crop&w=300&h=400&q=80" },
+      { id: 9, first: "ბუდუ", last: "ზივზივაძე", pos: "fw", ageCat: "u10", age: 9, foot: "მარჯვენა", img: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=300&h=400&q=80" },
+      { id: 10, first: "გიორგი", last: "ჩაკვეტაძე", pos: "mf", ageCat: "u9", age: 8, foot: "მარჯვენა", img: "https://images.unsplash.com/photo-1480455624313-e29b44bbfde1?auto=format&fit=crop&w=300&h=400&q=80" },
+      { id: 11, first: "ნიკა", last: "კვეკვესკირი", pos: "mf", ageCat: "u8", age: 7, foot: "მარჯვენა", img: "https://images.unsplash.com/photo-1531427186611-ecfd6d936c79?auto=format&fit=crop&w=300&h=400&q=80" },
+      { id: 12, first: "ლუკა", last: "ლოჩოშვილი", pos: "df", ageCat: "u15", age: 14, foot: "მარცხენა", img: "https://images.unsplash.com/photo-1513956589380-bad6acb9b9d4?auto=format&fit=crop&w=300&h=400&q=80" },
+      { id: 13, first: "სანდრო", last: "ალთუნაშვილი", pos: "mf", ageCat: "u16", age: 15, foot: "მარჯვენა", img: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=300&h=400&q=80" },
+      { id: 14, first: "გიორგი", last: "გოჩოლეიშვილი", pos: "df", ageCat: "u14", age: 13, foot: "მარჯვენა", img: "https://images.unsplash.com/photo-1543326727-cf6c39e8f84c?auto=format&fit=crop&w=300&h=400&q=80" },
+      { id: 15, first: "ლაშა", last: "დვალი", pos: "df", ageCat: "u17", age: 16, foot: "მარცხენა", img: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=300&h=400&q=80" },
+      { id: 16, first: "შოთა", last: "ნონიკაშვილი", pos: "mf", ageCat: "u13", age: 12, foot: "მარჯვენა", img: "https://images.unsplash.com/photo-1510566337590-2fc1f21d0faa?auto=format&fit=crop&w=300&h=400&q=80" },
+      { id: 17, first: "ანზორ", last: "მექვაბიშვილი", pos: "mf", ageCat: "u12", age: 11, foot: "მარჯვენა", img: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=300&h=400&q=80" },
+      { id: 18, first: "გიორგი", last: "ლორია", pos: "gk", ageCat: "u15", age: 14, foot: "მარჯვენა", img: "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?auto=format&fit=crop&w=300&h=400&q=80" },
+      { id: 19, first: "ლევან", last: "შენგელია", pos: "fw", ageCat: "u10", age: 9, foot: "მარცხენა", img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&h=400&q=80" },
+      { id: 20, first: "თორნიკე", last: "ოქრიაშვილი", pos: "mf", ageCat: "u11", age: 10, foot: "მარჯვენა", img: "https://images.unsplash.com/photo-1528892952291-009c663ce843?auto=format&fit=crop&w=300&h=400&q=80" },
+      { id: 21, first: "ლუკა", last: "გუგეშაშვილი", pos: "gk", ageCat: "u8", age: 7, foot: "მარჯვენა", img: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=300&h=400&q=80" },
+      { id: 22, first: "ივა", last: "გელაშვილი", pos: "df", ageCat: "u9", age: 8, foot: "მარჯვენა", img: "https://images.unsplash.com/photo-1480455624313-e29b44bbfde1?auto=format&fit=crop&w=300&h=400&q=80" },
+      { id: 23, first: "გიორგი", last: "არაბიძე", pos: "fw", ageCat: "u16", age: 15, foot: "მარცხენა", img: "https://images.unsplash.com/photo-1531427186611-ecfd6d936c79?auto=format&fit=crop&w=300&h=400&q=80" },
+      { id: 24, first: "ბექა", last: "მიქელთაძე", pos: "fw", ageCat: "u14", age: 13, foot: "მარჯვენა", img: "https://images.unsplash.com/photo-1513956589380-bad6acb9b9d4?auto=format&fit=crop&w=300&h=400&q=80" },
+      { id: 25, first: "დავით", last: "ხოჭოლავა", pos: "df", ageCat: "u17", age: 16, foot: "მარჯვენა", img: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=300&h=400&q=80" },
+      { id: 26, first: "ჯაბა", last: "კანკავა", pos: "mf", ageCat: "u15", age: 14, foot: "მარჯვენა", img: "https://images.unsplash.com/photo-1543326727-cf6c39e8f84c?auto=format&fit=crop&w=300&h=400&q=80" },
+      { id: 27, first: "გაბრიელ", last: "სიგუა", pos: "mf", ageCat: "u13", age: 12, foot: "მარჯვენა", img: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=300&h=400&q=80" },
+      { id: 28, first: "ირაკლი", last: "აზაროვი", pos: "df", ageCat: "u14", age: 13, foot: "მარცხენა", img: "https://images.unsplash.com/photo-1510566337590-2fc1f21d0faa?auto=format&fit=crop&w=300&h=400&q=80" },
+      { id: 29, first: "ვლადიმერ", last: "მამუჩაშვილი", pos: "mf", ageCat: "u16", age: 15, foot: "მარჯვენა", img: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=300&h=400&q=80" },
+      { id: 30, first: "როინ", last: "კვასხვაძე", pos: "gk", ageCat: "u12", age: 11, foot: "მარჯვენა", img: "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?auto=format&fit=crop&w=300&h=400&q=80" }
+    ];
+
+    const playersGrid = document.getElementById('playersGrid');
+    const searchInput = document.getElementById('searchInput');
+    const resultCount = document.getElementById('resultCount');
+    
+    // ფილტრების სტატუსი
+    let activePos = 'all';
+    let activeAge = 'all';
+
+    function createPlayerCard(player) {
+      return `
+        <article class="player-card" data-pos="${player.pos}" data-age="${player.ageCat}" data-search="${player.first.toLowerCase()} ${player.last.toLowerCase()}">
+          <img src="${player.img}" alt="${player.first}" class="player-photo" loading="lazy">
+          <div class="pos-indicator">${player.pos}</div>
+          
+          <div class="player-info">
+            <h3 class="player-name">${player.first} ${player.last}</h3>
+            
+            <div class="meta-grid">
+              <div class="meta-item">
+                <span>კატეგორია</span>
+                <strong>${player.ageCat.toUpperCase()} (${player.age} წ.)</strong>
+              </div>
+              <div class="meta-item">
+                <span>ფეხი</span>
+                <strong>${player.foot}</strong>
+              </div>
+            </div>
+            
+            <a href="user-profile.html" class="btn-enter">პროფილი</a>
+          </div>
+        </article>
+      `;
+    }
+
+    function renderPlayers() {
+      playersGrid.innerHTML = players.map(createPlayerCard).join('');
+    }
+
+    function applyFilters() {
+      const term = searchInput.value.trim().toLowerCase();
+      const cards = playersGrid.querySelectorAll('.player-card');
+      let visible = 0;
+
+      cards.forEach((card) => {
+        const matchesSearch = card.dataset.search.includes(term);
+        const matchesPos = activePos === 'all' || card.dataset.pos === activePos;
+        const matchesAge = activeAge === 'all' || card.dataset.age === activeAge;
+        
+        const show = matchesSearch && matchesPos && matchesAge;
+        card.style.display = show ? 'flex' : 'none';
+        if (show) visible++;
+      });
+
+      resultCount.textContent = `ნაპოვნია: ${visible}`;
+    }
+
+    // პოზიციის ღილაკებზე ლისენერი
+    document.querySelectorAll('#posFilters .chip-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        document.querySelectorAll('#posFilters .chip-btn').forEach(b => b.classList.remove('active'));
+        e.target.classList.add('active');
+        activePos = e.target.dataset.pos;
+        applyFilters();
+      });
+    });
+
+    // ასაკის ღილაკებზე ლისენერი
+    document.querySelectorAll('#ageFilters .chip-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        document.querySelectorAll('#ageFilters .chip-btn').forEach(b => b.classList.remove('active'));
+        e.target.classList.add('active');
+        activeAge = e.target.dataset.age;
+        applyFilters();
+      });
+    });
+
+    searchInput.addEventListener('input', applyFilters);
+
+    // გაშვება
+    renderPlayers();
+    applyFilters();
+  </script>
+</body>
+</html>
