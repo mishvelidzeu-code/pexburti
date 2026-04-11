@@ -323,73 +323,194 @@
       color:var(--muted);
       font-size:.84rem;
     }
+    .age-nav{
+      display:flex;
+      align-items:center;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-bottom:18px;
+    }
+    .age-chip{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      min-height:42px;
+      padding:0 14px;
+      border-radius:999px;
+      background:#fff;
+      border:1px solid var(--line);
+      box-shadow:var(--shadow);
+      font-size:.8rem;
+      font-weight:800;
+      transition:.2s ease;
+      white-space:nowrap;
+    }
+    .age-chip:hover{
+      border-color:rgba(185,28,28,.28);
+      color:var(--red);
+      transform:translateY(-2px);
+    }
+    .age-chip strong{
+      color:var(--red);
+      font-size:.78rem;
+    }
+
+    .group-stack{
+      display:grid;
+      gap:20px;
+    }
+    .group-section{
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:28px;
+      padding:20px;
+      box-shadow:var(--shadow);
+    }
+    .group-head{
+      display:flex;
+      align-items:end;
+      justify-content:space-between;
+      gap:16px;
+      margin-bottom:16px;
+    }
+    .group-head h3{
+      margin:0 0 6px;
+      font-size:1.08rem;
+      font-weight:900;
+      letter-spacing:-.02em;
+    }
+    .group-head p{
+      margin:0;
+      color:var(--muted);
+      font-size:.84rem;
+    }
+    .group-count{
+      flex:0 0 auto;
+      padding:8px 12px;
+      border-radius:999px;
+      background:#fff7f7;
+      border:1px solid rgba(185,28,28,.14);
+      color:var(--red-2);
+      font-size:.78rem;
+      font-weight:900;
+      white-space:nowrap;
+    }
 
     .roster-grid{
       display:grid;
-      grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));
-      gap:18px;
+      grid-template-columns:repeat(auto-fill, minmax(170px, 1fr));
+      gap:16px;
+    }
+    .empty-group{
+      grid-column:1 / -1;
+      padding:18px;
+      border-radius:20px;
+      border:1px dashed rgba(16,24,40,.2);
+      background:var(--panel-2);
+      color:var(--muted);
+      font-size:.86rem;
+      text-align:center;
     }
     .player-card{
       background:#fff;
       border:1px solid var(--line);
-      border-radius:26px;
-      padding:18px;
-      box-shadow:var(--shadow);
-      display:grid;
-      gap:12px;
-    }
-    .player-head{
+      border-radius:20px;
+      overflow:hidden;
       display:flex;
-      align-items:center;
-      gap:12px;
+      flex-direction:column;
+      box-shadow:0 12px 32px rgba(15,23,42,.08);
+      transition:.25s ease;
+      position:relative;
     }
-    .player-avatar{
-      width:52px;
-      height:52px;
-      border-radius:18px;
+    .player-card:hover{
+      transform:translateY(-5px);
+      border-color:rgba(185,28,28,.4);
+      box-shadow:0 20px 48px rgba(185,28,28,.12);
+    }
+    .player-photo{
+      width:100%;
+      aspect-ratio:4/5;
+      background:var(--panel-3);
+      object-fit:cover;
+      display:block;
+    }
+    .player-photo--fallback{
       display:grid;
       place-items:center;
-      background:#eff6ff;
-      color:#1e3a8a;
-      font-weight:900;
-      font-size:1rem;
-    }
-    .player-head strong{
-      display:block;
-      font-size:.96rem;
-      font-weight:900;
-    }
-    .player-head span{
-      display:block;
-      color:var(--muted);
-      font-size:.78rem;
-      margin-top:2px;
-    }
-    .player-meta{
-      display:grid;
-      gap:8px;
-    }
-    .player-meta div{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-      padding-bottom:8px;
-      border-bottom:1px solid rgba(16,24,40,.08);
-      font-size:.8rem;
-    }
-    .player-meta span{color:var(--muted)}
-    .player-meta strong{font-size:.82rem}
-    .player-tag{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      padding:6px 10px;
-      border-radius:999px;
-      background:#fee2e2;
+      background:linear-gradient(135deg,#fee2e2 0%,#fde68a 100%);
       color:var(--red-2);
-      font-size:.72rem;
+      font-size:1.4rem;
+      font-weight:900;
+      letter-spacing:-.04em;
+    }
+    .pos-indicator{
+      position:absolute;
+      top:10px;
+      right:10px;
+      background:rgba(0,0,0,0.72);
+      color:#fff;
+      padding:4px 8px;
+      border-radius:999px;
+      font-size:.65rem;
+      font-weight:900;
+      letter-spacing:.06em;
+      text-transform:uppercase;
+    }
+    .player-info{
+      padding:12px;
+      display:flex;
+      flex-direction:column;
+      flex:1;
+    }
+    .player-name{
+      margin:0 0 6px;
+      font-size:1rem;
+      font-weight:900;
+      line-height:1.1;
+      letter-spacing:-.02em;
+    }
+    .meta-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:6px;
+      margin-bottom:12px;
+    }
+    .meta-item{
+      display:flex;
+      flex-direction:column;
+    }
+    .meta-item span{
+      font-size:.65rem;
+      color:var(--muted);
+      font-weight:700;
+      text-transform:uppercase;
+      letter-spacing:.04em;
+    }
+    .meta-item strong{
+      font-size:.75rem;
+      font-weight:900;
+      margin-top:2px;
+      line-height:1.2;
+    }
+    .btn-enter{
+      width:100%;
+      margin-top:auto;
+      padding:8px;
+      background:var(--panel-2);
+      border:1px solid var(--line);
+      border-radius:12px;
+      color:var(--red);
+      font-size:.8rem;
       font-weight:800;
+      text-align:center;
+      transition:.2s ease;
+      cursor:pointer;
+    }
+    .player-card:hover .btn-enter{
+      background:var(--red);
+      color:#fff;
+      border-color:var(--red);
     }
 
     .contact-box{
@@ -441,6 +562,14 @@
         min-width:calc(50% - 5px);
         flex:1 1 calc(50% - 5px);
       }
+      .group-head{
+        align-items:flex-start;
+        flex-direction:column;
+      }
+      .roster-grid{
+        grid-template-columns:repeat(auto-fill, minmax(140px, 1fr));
+        gap:12px;
+      }
     }
   </style>
 </head>
@@ -484,8 +613,8 @@
 
         <div class="hero-stats">
           <div class="hero-stat">
-            <strong id="teamAge">PRO</strong>
-            <span>ძირითადი კატეგორია</span>
+            <strong id="teamAge">PRO - U8</strong>
+            <span>ასაკობრივი განყოფილებები</span>
           </div>
           <div class="hero-stat">
             <strong id="teamPlayers">24</strong>
@@ -554,20 +683,22 @@
     <div class="container">
       <div class="section-heading">
         <div>
-          <h2>შემადგენლობა</h2>
+          <h2>შემადგენლობა კატეგორიებით</h2>
           <p>
-            ქვემოთ არის სატესტო roster. თუ ავტორიზებული მოთამაშე ამ გუნდს დაუკავშირდა რეგისტრაციაში,
-            მისი ბარათიც ამავე სიაში გამოჩნდება.
+            ქვემოთ ასაკობრივი ჩამონათვალია: PRO, U19 და U17-დან U8-ის ჩათვლით. რეგისტრირებული მოთამაშე
+            ავტომატურად თავის განყოფილებაში ჩაჯდება დაბადების წლის მიხედვით.
           </p>
         </div>
       </div>
 
+      <div class="age-nav" id="ageNav"></div>
+
       <div id="connectedBanner" class="connected-banner" hidden>
         <strong>შენი პროფილი დაკავშირებულია დინამო თბილისთან</strong>
-        <span id="connectedBannerText">რეგისტრაციისას არჩეული გუნდის მიხედვით შენი ბარათი დაემატა ამ roster-ს.</span>
+        <span id="connectedBannerText">რეგისტრაციისას არჩეული გუნდის მიხედვით შენი ბარათი დაემატა სწორ ასაკობრივ განყოფილებას.</span>
       </div>
 
-      <div class="roster-grid" id="rosterGrid"></div>
+      <div class="group-stack" id="rosterGroups"></div>
     </div>
   </section>
 
@@ -609,16 +740,41 @@
       ? (window.siteTeams.findTeamByName('დინამო თბილისი') || fallbackTeam)
       : fallbackTeam;
 
-    const sampleRoster = [
-      { name: 'ლუკა კაპანაძე', position: 'ნახევარმცველი', foot: 'მარჯვენა', age: '19', tag: 'სატესტო roster' },
-      { name: 'ნიკა თოფურია', position: 'დამცველი', foot: 'ორივე', age: '20', tag: 'სატესტო roster' },
-      { name: 'სანდრო გელაშვილი', position: 'თავდამსხმელი', foot: 'მარცხენა', age: '18', tag: 'სატესტო roster' },
-      { name: 'გიორგი მაისურაძე', position: 'მეკარე', foot: 'მარჯვენა', age: '21', tag: 'სატესტო roster' }
+    const AGE_GROUPS = [
+      { key: 'pro', label: 'PRO', copy: 'ძირითადი პროფესიონალური ჯგუფი' },
+      { key: 'u19', label: 'U19', copy: '18-19 წლის ასაკობრივი ხაზი' },
+      { key: 'u17', label: 'U17', copy: '17 წლის ასაკობრივი ჯგუფი' },
+      { key: 'u16', label: 'U16', copy: '16 წლის ასაკობრივი ჯგუფი' },
+      { key: 'u15', label: 'U15', copy: '15 წლის ასაკობრივი ჯგუფი' },
+      { key: 'u14', label: 'U14', copy: '14 წლის ასაკობრივი ჯგუფი' },
+      { key: 'u13', label: 'U13', copy: '13 წლის ასაკობრივი ჯგუფი' },
+      { key: 'u12', label: 'U12', copy: '12 წლის ასაკობრივი ჯგუფი' },
+      { key: 'u11', label: 'U11', copy: '11 წლის ასაკობრივი ჯგუფი' },
+      { key: 'u10', label: 'U10', copy: '10 წლის ასაკობრივი ჯგუფი' },
+      { key: 'u9', label: 'U9', copy: '9 წლის ასაკობრივი ჯგუფი' },
+      { key: 'u8', label: 'U8', copy: '8 წლის და უფრო პატარა ასაკობრივი ჯგუფი' }
     ];
 
-    const rosterGrid = document.getElementById('rosterGrid');
+    const sampleRoster = [
+      { name: 'ლუკა კაპანაძე', position: 'ნახევარმცველი', pos: 'MF', foot: 'მარჯვენა', age: 23, ageGroup: 'pro', img: 'https://images.unsplash.com/photo-1543326727-cf6c39e8f84c?auto=format&fit=crop&w=300&h=400&q=80', tag: 'დინამოს აკადემია', actionHref: 'pexburtelebi.html', actionLabel: 'პროფილი' },
+      { name: 'ნიკა თოფურია', position: 'დამცველი', pos: 'DF', foot: 'ორივე', age: 18, ageGroup: 'u19', img: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=300&h=400&q=80', tag: 'დინამოს აკადემია', actionHref: 'pexburtelebi.html', actionLabel: 'პროფილი' },
+      { name: 'სანდრო გელაშვილი', position: 'თავდამსხმელი', pos: 'FW', foot: 'მარცხენა', age: 17, ageGroup: 'u17', img: 'https://images.unsplash.com/photo-1510566337590-2fc1f21d0faa?auto=format&fit=crop&w=300&h=400&q=80', tag: 'დინამოს აკადემია', actionHref: 'pexburtelebi.html', actionLabel: 'პროფილი' },
+      { name: 'გიორგი ხუციშვილი', position: 'მეკარე', pos: 'GK', foot: 'მარჯვენა', age: 16, ageGroup: 'u16', img: 'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?auto=format&fit=crop&w=300&h=400&q=80', tag: 'დინამოს აკადემია', actionHref: 'pexburtelebi.html', actionLabel: 'პროფილი' },
+      { name: 'დავით აბაშიძე', position: 'დამცველი', pos: 'DF', foot: 'მარცხენა', age: 15, ageGroup: 'u15', img: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&h=400&q=80', tag: 'დინამოს აკადემია', actionHref: 'pexburtelebi.html', actionLabel: 'პროფილი' },
+      { name: 'საბა კვინტრაძე', position: 'ნახევარმცველი', pos: 'MF', foot: 'მარჯვენა', age: 14, ageGroup: 'u14', img: 'https://images.unsplash.com/photo-1528892952291-009c663ce843?auto=format&fit=crop&w=300&h=400&q=80', tag: 'დინამოს აკადემია', actionHref: 'pexburtelebi.html', actionLabel: 'პროფილი' },
+      { name: 'ბექა მეფარიშვილი', position: 'თავდამსხმელი', pos: 'FW', foot: 'მარჯვენა', age: 13, ageGroup: 'u13', img: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=300&h=400&q=80', tag: 'დინამოს აკადემია', actionHref: 'pexburtelebi.html', actionLabel: 'პროფილი' },
+      { name: 'ირაკლი მაისურაძე', position: 'დამცველი', pos: 'DF', foot: 'ორივე', age: 12, ageGroup: 'u12', img: 'https://images.unsplash.com/photo-1480455624313-e29b44bbfde1?auto=format&fit=crop&w=300&h=400&q=80', tag: 'დინამოს აკადემია', actionHref: 'pexburtelebi.html', actionLabel: 'პროფილი' },
+      { name: 'გაბრიელ ლომიძე', position: 'მეკარე', pos: 'GK', foot: 'მარჯვენა', age: 11, ageGroup: 'u11', img: 'https://images.unsplash.com/photo-1531427186611-ecfd6d936c79?auto=format&fit=crop&w=300&h=400&q=80', tag: 'დინამოს აკადემია', actionHref: 'pexburtelebi.html', actionLabel: 'პროფილი' },
+      { name: 'ანდრია დევდარიანი', position: 'ნახევარმცველი', pos: 'MF', foot: 'მარცხენა', age: 10, ageGroup: 'u10', img: 'https://images.unsplash.com/photo-1513956589380-bad6acb9b9d4?auto=format&fit=crop&w=300&h=400&q=80', tag: 'დინამოს აკადემია', actionHref: 'pexburtelebi.html', actionLabel: 'პროფილი' },
+      { name: 'თემო მჭედლიშვილი', position: 'თავდამსხმელი', pos: 'FW', foot: 'მარჯვენა', age: 9, ageGroup: 'u9', img: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=300&h=400&q=80', tag: 'დინამოს აკადემია', actionHref: 'pexburtelebi.html', actionLabel: 'პროფილი' },
+      { name: 'ლევან ბერუაშვილი', position: 'დამცველი', pos: 'DF', foot: 'მარცხენა', age: 8, ageGroup: 'u8', img: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=300&h=400&q=80', tag: 'დინამოს აკადემია', actionHref: 'pexburtelebi.html', actionLabel: 'პროფილი' }
+    ];
+
+    const ageNav = document.getElementById('ageNav');
+    const rosterGroups = document.getElementById('rosterGroups');
     const connectedBanner = document.getElementById('connectedBanner');
     const connectedBannerText = document.getElementById('connectedBannerText');
+    const currentYear = new Date().getFullYear();
 
     function normalizeTeamText(value) {
       if (window.siteTeams?.normalizeText) {
@@ -638,35 +794,212 @@
         .toUpperCase() || 'MF';
     }
 
+    function parseBirthDate(value) {
+      const raw = String(value || '').trim();
+      if (!raw) {
+        return null;
+      }
+
+      if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) {
+        const [yearPart, monthPart, dayPart] = raw.split('-');
+        const year = Number(yearPart);
+        const month = Number(monthPart);
+        const day = Number(dayPart);
+        const date = new Date(year, month - 1, day);
+
+        if (
+          Number.isNaN(date.getTime()) ||
+          date.getFullYear() !== year ||
+          date.getMonth() !== month - 1 ||
+          date.getDate() !== day
+        ) {
+          return null;
+        }
+
+        return { year, month, day, date };
+      }
+
+      const match = raw.match(/^(\d{2})\.(\d{2})\.(\d{4})$/);
+      if (!match) {
+        return null;
+      }
+
+      const day = Number(match[1]);
+      const month = Number(match[2]);
+      const year = Number(match[3]);
+      const date = new Date(year, month - 1, day);
+
+      if (
+        Number.isNaN(date.getTime()) ||
+        date.getFullYear() !== year ||
+        date.getMonth() !== month - 1 ||
+        date.getDate() !== day
+      ) {
+        return null;
+      }
+
+      return { year, month, day, date };
+    }
+
+    function calculateAgeFromBirthDate(value) {
+      const parsed = parseBirthDate(value);
+      if (!parsed) {
+        return null;
+      }
+
+      const today = new Date();
+      let age = today.getFullYear() - parsed.year;
+      const monthDiff = today.getMonth() - (parsed.month - 1);
+      const dayDiff = today.getDate() - parsed.day;
+
+      if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
+        age -= 1;
+      }
+
+      return age;
+    }
+
+    function getAgeGroupKeyFromBirthDate(value) {
+      const parsed = parseBirthDate(value);
+      if (!parsed) {
+        return 'pro';
+      }
+
+      const diff = currentYear - parsed.year;
+      if (diff <= 8) {
+        return 'u8';
+      }
+      if (diff === 9) {
+        return 'u9';
+      }
+      if (diff === 10) {
+        return 'u10';
+      }
+      if (diff === 11) {
+        return 'u11';
+      }
+      if (diff === 12) {
+        return 'u12';
+      }
+      if (diff === 13) {
+        return 'u13';
+      }
+      if (diff === 14) {
+        return 'u14';
+      }
+      if (diff === 15) {
+        return 'u15';
+      }
+      if (diff === 16) {
+        return 'u16';
+      }
+      if (diff === 17) {
+        return 'u17';
+      }
+      if (diff <= 19) {
+        return 'u19';
+      }
+      return 'pro';
+    }
+
+    function getAgeGroupConfig(key) {
+      return AGE_GROUPS.find((group) => group.key === key) || AGE_GROUPS[0];
+    }
+
+    function getPositionCode(position) {
+      const normalized = String(position || '').trim().toLowerCase();
+      if (normalized.includes('მეკარე')) {
+        return 'GK';
+      }
+      if (normalized.includes('დამცველი')) {
+        return 'DF';
+      }
+      if (normalized.includes('ნახევარ')) {
+        return 'MF';
+      }
+      if (normalized.includes('თავდამ')) {
+        return 'FW';
+      }
+      return 'MF';
+    }
+
     function createPlayerCard(player) {
+      const group = getAgeGroupConfig(player.ageGroup);
+      const photo = player.img
+        ? `<img src="${player.img}" alt="${player.name}" class="player-photo" loading="lazy">`
+        : `<div class="player-photo player-photo--fallback">${getInitials(player.name)}</div>`;
+
       return `
         <article class="player-card">
-          <div class="player-head">
-            <div class="player-avatar">${getInitials(player.name)}</div>
-            <div>
-              <strong>${player.name}</strong>
-              <span>${player.tag}</span>
+          ${photo}
+          <div class="pos-indicator">${player.pos || getPositionCode(player.position)}</div>
+          <div class="player-info">
+            <h3 class="player-name">${player.name}</h3>
+            <div class="meta-grid">
+              <div class="meta-item">
+                <span>კატეგორია</span>
+                <strong>${group.label} (${player.age} წ.)</strong>
+              </div>
+              <div class="meta-item">
+                <span>ფეხი</span>
+                <strong>${player.foot}</strong>
+              </div>
             </div>
+            <a href="${player.actionHref || 'pexburtelebi.html'}" class="btn-enter">${player.actionLabel || 'პროფილი'}</a>
           </div>
-          <div class="player-meta">
-            <div><span>პოზიცია</span><strong>${player.position}</strong></div>
-            <div><span>უპირატესი ფეხი</span><strong>${player.foot}</strong></div>
-            <div><span>ასაკი</span><strong>${player.age}</strong></div>
-          </div>
-          <span class="player-tag">${player.tag}</span>
         </article>
       `;
     }
 
+    function renderAgeNav(groupedPlayers) {
+      ageNav.innerHTML = AGE_GROUPS.map((group) => `
+        <a href="#group-${group.key}" class="age-chip">
+          <span>${group.label}</span>
+          <strong>${groupedPlayers[group.key].length}</strong>
+        </a>
+      `).join('');
+    }
+
     function renderRoster(extraPlayer) {
-      const players = extraPlayer ? [extraPlayer, ...sampleRoster] : sampleRoster;
-      rosterGrid.innerHTML = players.map(createPlayerCard).join('');
+      const players = extraPlayer ? [...sampleRoster, extraPlayer] : [...sampleRoster];
+      const groupedPlayers = AGE_GROUPS.reduce((acc, group) => {
+        acc[group.key] = [];
+        return acc;
+      }, {});
+
+      players.forEach((player) => {
+        const key = groupedPlayers[player.ageGroup] ? player.ageGroup : 'pro';
+        groupedPlayers[key].push(player);
+      });
+
+      renderAgeNav(groupedPlayers);
+      rosterGroups.innerHTML = AGE_GROUPS.map((group) => {
+        const items = groupedPlayers[group.key];
+        const body = items.length
+          ? items.map(createPlayerCard).join('')
+          : '<div class="empty-group">ამ კატეგორიაში მოთამაშე ჯერ არ არის დამატებული.</div>';
+
+        return `
+          <section class="group-section" id="group-${group.key}">
+            <div class="group-head">
+              <div>
+                <h3>${group.label}</h3>
+                <p>${group.copy}</p>
+              </div>
+              <div class="group-count">${items.length} მოთამაშე</div>
+            </div>
+            <div class="roster-grid">${body}</div>
+          </section>
+        `;
+      }).join('');
+
+      document.getElementById('teamPlayers').textContent = String(players.length);
     }
 
     async function hydratePage() {
       document.getElementById('teamName').textContent = team.name;
-      document.getElementById('teamAge').textContent = team.ageLabel;
-      document.getElementById('teamPlayers').textContent = String(team.players);
+      document.getElementById('teamAge').textContent = 'PRO - U8';
+      document.getElementById('teamPlayers').textContent = String(sampleRoster.length);
       document.getElementById('teamCity').textContent = team.city.split(',')[0];
       document.getElementById('teamCoach').textContent = team.coach;
 
@@ -677,8 +1010,8 @@
           currentPath: 'team-dinamo-tbilisi.html',
           loginClass: 'btn btn-white',
           registerClass: 'btn btn-red',
-          profileClass: 'btn btn-white',
-          logoutClass: 'btn btn-red',
+          profileClass: 'btn btn-red',
+          logoutClass: 'btn btn-white',
           afterLogout: 'team-dinamo-tbilisi.html'
         });
       }
@@ -694,7 +1027,9 @@
         return;
       }
 
-      const role = window.siteAuth?.getUserRole ? window.siteAuth.getUserRole(user) : String(user?.user_metadata?.role || '');
+      const role = window.siteAuth?.getUserRole
+        ? window.siteAuth.getUserRole(user)
+        : String(user?.user_metadata?.role || '');
       const profile = user.user_metadata?.profile || {};
       const selectedTeam = String(profile.playerTeam || '').trim();
       const selectedTeamRoute = String(profile.playerTeamRoute || '').trim();
@@ -710,17 +1045,26 @@
       const displayName = window.siteAuth?.getUserDisplayName
         ? window.siteAuth.getUserDisplayName(user)
         : (user.email || 'შენი პროფილი');
+      const ageValue = profile.playerAge || calculateAgeFromBirthDate(profile.playerBirthDate) || 'არ არის მითითებული';
+      const ageGroupKey = profile.playerAgeCategory || getAgeGroupKeyFromBirthDate(profile.playerBirthDate);
+      const ageGroup = getAgeGroupConfig(ageGroupKey);
 
       renderRoster({
         name: displayName,
         position: profile.playerPosition || 'მოთამაშე',
+        pos: getPositionCode(profile.playerPosition),
         foot: profile.playerFoot || 'არ არის მითითებული',
-        age: profile.playerAge || 'არ არის მითითებული',
-        tag: 'შენი პროფილი'
+        age: ageValue,
+        ageGroup: ageGroup.key,
+        ageLabel: ageGroup.label,
+        img: '',
+        tag: 'შენი პროფილი',
+        actionHref: 'user-profile.html?from=team-dinamo-tbilisi.html',
+        actionLabel: 'პროფილი'
       });
 
       connectedBanner.hidden = false;
-      connectedBannerText.textContent = `${displayName} უკვე გამოჩნდა დინამო თბილისის სატესტო roster-ში, რადგან რეგისტრაციაში ეს გუნდი დაემთხვა არსებულ ჩანაწერს.`;
+      connectedBannerText.textContent = `${displayName} ავტომატურად დაემატა ${ageGroup.label} კატეგორიაში, რადგან რეგისტრაციაში მითითებული დაბადების წელი ამ ჯგუფს ეკუთვნის.`;
     }
 
     hydratePage();

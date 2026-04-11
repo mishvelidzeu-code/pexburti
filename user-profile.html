@@ -3,348 +3,89 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ჩემი პასპორტი | Mishvela Football Georgia</title>
+  <title>ჩემი პროფილი | Mishvela Football Georgia</title>
   <style>
-    :root {
-      --bg: #ffffff;
-      --panel: #ffffff;
-      --panel-2: #f8fafc;
-      --panel-3: #eef2f6;
-      --text: #0b1220;
-      --muted: #344054;
-      --muted-2: #1f2937;
-      --line: rgba(16,24,40,0.12);
-      --line-2: rgba(16,24,40,0.22);
-      --red: #b91c1c;
-      --red-2: #991b1b;
-      --gold: #d97706;
-      --gold-bg: #fef3c7;
-      --black: #020617;
-      --shadow: 0 18px 45px rgba(15,23,42,.08);
-      --shadow-sm: 0 4px 12px rgba(15,23,42,.05);
-      --radius: 24px;
-      --radius-sm: 16px;
-    }
-
-    * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
-    body {
-      margin: 0;
-      font-family: "Segoe UI", "Sylfaen", "Noto Sans Georgian", "DejaVu Sans", sans-serif;
-      background: var(--panel-2);
-      color: var(--text);
-      line-height: 1.55;
-      display: flex;
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
-
-    a { text-decoration: none; color: inherit; }
-    button { font: inherit; cursor: pointer; }
-    ul { list-style: none; padding: 0; margin: 0; }
-
-    /* --- SIDEBAR (მენიუ) --- */
-    .sidebar {
-      width: 280px;
-      background: #fff;
-      border-right: 1px solid var(--line);
-      display: flex;
-      flex-direction: column;
-      position: fixed;
-      top: 0; bottom: 0; left: 0;
-      z-index: 100;
-    }
-    .sidebar-header { padding: 24px; border-bottom: 1px solid var(--line); }
-    .brand { display: flex; align-items: center; gap: 12px; font-weight: 900; }
-    .logo { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; background: #ea580c; color: #fff; box-shadow: 0 8px 20px rgba(234,88,12,.25); }
-    
-    .sidebar-nav { padding: 20px 16px; flex: 1; display: flex; flex-direction: column; gap: 8px; }
-    .nav-item { display: flex; align-items: center; gap: 14px; padding: 14px 18px; border-radius: var(--radius-sm); color: var(--muted); font-weight: 700; font-size: .95rem; transition: .2s ease; }
-    .nav-item svg { width: 20px; height: 20px; opacity: 0.7; }
-    .nav-item:hover { background: var(--panel-3); color: var(--text); }
-    .nav-item.active { background: rgba(185,28,28,.08); color: var(--red); }
-    .nav-item.active svg { opacity: 1; color: var(--red); }
-
-    .premium-banner-nav {
-      margin: 16px; padding: 16px; background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border-radius: var(--radius-sm); color: #fff; text-align: center;
-    }
-    .premium-banner-nav h4 { margin: 0 0 8px; font-size: .9rem; color: #fbbf24; }
-    .premium-banner-nav p { margin: 0 0 12px; font-size: .75rem; opacity: .8; }
-    .btn-gold { background: #fbbf24; color: #78350f; border: none; padding: 8px 16px; border-radius: 999px; font-weight: 800; font-size: .8rem; width: 100%; transition: .2s; }
-    .btn-gold:hover { background: #f59e0b; }
-
-    /* --- MAIN CONTENT --- */
-    .main-wrap { flex: 1; margin-left: 280px; display: flex; flex-direction: column; }
-    
-    .top-header {
-      height: 78px; background: rgba(255,255,255,.95); backdrop-filter: blur(12px); border-bottom: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; padding: 0 32px; position: sticky; top: 0; z-index: 90;
-    }
-    .top-header h2 { margin: 0; font-size: 1.25rem; font-weight: 900; }
-    .header-actions { display: flex; align-items: center; gap: 12px; }
-    .btn-red { background: var(--red); color: #fff; border: none; padding: 10px 20px; border-radius: 999px; font-weight: 800; font-size: .9rem; box-shadow: 0 10px 24px rgba(185,28,28,.25); transition: .2s; }
-    .btn-red:hover { background: var(--red-2); transform: translateY(-2px); }
-    .top-header .btn-red,
-    .top-header .btn-white {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .top-header .btn-white {
-      color: var(--text);
-      border: 1px solid var(--line);
-      box-shadow: var(--shadow-sm);
-    }
-    .top-header .btn-white:hover { background: #eef2f6; }
-
-    .content-area { padding: 32px; max-width: 1300px; margin: 0 auto; width: 100%; }
-
-    /* --- PROFILE HEADER (PASSPORT COVER) --- */
-    .profile-cover {
-      background: linear-gradient(135deg, var(--red) 0%, #7f1d1d 100%);
-      height: 200px; border-radius: var(--radius) var(--radius) 0 0; position: relative;
-    }
-    .profile-info-bar {
-      background: #fff; padding: 0 32px 24px; border-radius: 0 0 var(--radius) var(--radius); border: 1px solid var(--line); border-top: none; box-shadow: var(--shadow-sm); display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 32px;
-    }
-    .avatar-wrapper { position: relative; margin-top: -60px; display: flex; align-items: flex-end; gap: 24px; }
-    .avatar { width: 140px; height: 140px; border-radius: 50%; border: 6px solid #fff; background: var(--panel-3); box-shadow: var(--shadow-sm); object-fit: cover; }
-    .player-title h1 { margin: 0 0 4px; font-size: 1.8rem; font-weight: 900; }
-    .player-title p { margin: 0; color: var(--muted); font-size: 1rem; font-weight: 600; }
-    
-    .tags { display: flex; gap: 8px; margin-top: 10px; }
-    .tag { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 999px; font-size: .75rem; font-weight: 800; }
-    .tag-pro { background: var(--gold-bg); color: var(--gold); border: 1px solid rgba(217,119,6,.2); }
-    .tag-legion { background: #e0f2fe; color: #0369a1; border: 1px solid rgba(3,105,161,.2); }
-    .tag-free { background: #f1f5f9; color: var(--muted); border: 1px solid var(--line); }
-
-    /* --- PROFILE GRID --- */
-    .profile-grid { display: grid; grid-template-columns: 320px 1fr; gap: 24px; }
-
-    /* Cards */
-    .card { background: #fff; border-radius: var(--radius); border: 1px solid var(--line); padding: 24px; box-shadow: var(--shadow-sm); margin-bottom: 24px; }
-    .card-title { margin: 0 0 16px; font-size: 1.1rem; font-weight: 900; display: flex; justify-content: space-between; align-items: center; }
-    
-    /* Left Sidebar: Details */
-    .detail-list { display: flex; flex-direction: column; gap: 12px; }
-    .detail-item { display: flex; justify-content: space-between; padding-bottom: 12px; border-bottom: 1px solid var(--line); font-size: .9rem; }
-    .detail-item:last-child { border-bottom: none; padding-bottom: 0; }
-    .detail-item span { color: var(--muted); }
-    .detail-item strong { font-weight: 800; }
-
-    .parent-info { background: var(--panel-2); border-radius: var(--radius-sm); padding: 16px; margin-top: 16px; border: 1px solid var(--line); }
-    .parent-info h4 { margin: 0 0 8px; font-size: .85rem; color: var(--muted-2); }
-    .parent-info p { margin: 0; font-size: .8rem; color: var(--muted); }
-
-    /* Right Side: Stats & Videos */
-    .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
-    .stat-box { background: var(--panel-2); padding: 16px; border-radius: var(--radius-sm); text-align: center; border: 1px solid var(--line); }
-    .stat-box h3 { margin: 0; font-size: 1.8rem; font-weight: 900; color: var(--red); }
-    .stat-box span { font-size: .8rem; color: var(--muted); font-weight: 700; text-transform: uppercase; }
-
-    /* Video Portfolio */
-    .video-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-    .video-card { background: var(--black); border-radius: var(--radius-sm); aspect-ratio: 16/9; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-    .video-card img { width: 100%; height: 100%; object-fit: cover; opacity: 0.6; transition: .3s; }
-    .video-card:hover img { opacity: 0.4; transform: scale(1.05); }
-    .play-btn { position: absolute; width: 48px; height: 48px; background: var(--red); border-radius: 50%; display: grid; place-items: center; color: #fff; font-size: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
-    
-    .locked-video { border: 2px dashed var(--line-2); background: transparent; flex-direction: column; gap: 8px; color: var(--muted); }
-    .locked-video svg { width: 32px; height: 32px; }
-
-    /* Gamification & Badges */
-    .badge-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 16px; }
-    .badge-item { background: var(--panel-2); border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 16px; text-align: center; }
-    .badge-icon { width: 50px; height: 50px; margin: 0 auto 10px; background: #fff; border-radius: 50%; display: grid; place-items: center; font-size: 24px; box-shadow: var(--shadow-sm); }
-    .badge-item h4 { margin: 0; font-size: .8rem; font-weight: 800; }
-    .badge-item p { margin: 4px 0 0; font-size: .7rem; color: var(--muted); }
-
-    /* Vote Banner */
-    .vote-banner { background: linear-gradient(135deg, #4338ca 0%, #312e81 100%); color: #fff; padding: 20px; border-radius: var(--radius); display: flex; justify-content: space-between; align-items: center; }
-    .vote-banner h3 { margin: 0 0 4px; font-size: 1.2rem; }
-    .vote-banner p { margin: 0; font-size: .9rem; opacity: .8; }
-    .btn-white { background: #fff; color: #312e81; padding: 8px 16px; border-radius: 999px; font-weight: 800; font-size: .85rem; border: none; }
-
-    @media (max-width: 1024px) {
-      .profile-grid { grid-template-columns: 1fr; }
-      .stats-row { grid-template-columns: repeat(2, 1fr); }
-    }
+    :root{--bg:#f5f7fb;--panel:#fff;--soft:#f8fafc;--line:rgba(15,23,42,.12);--text:#111827;--muted:#667085;--red:#b91c1c;--red2:#991b1b;--black:#0f172a;--shadow:0 18px 42px rgba(15,23,42,.08);--r:26px;--rs:18px}
+    *{box-sizing:border-box} body{margin:0;font-family:"Segoe UI","Sylfaen","Noto Sans Georgian","DejaVu Sans",sans-serif;background:linear-gradient(180deg,#fff 0%,var(--bg) 20%,var(--bg) 100%);color:var(--text)} a{text-decoration:none;color:inherit} button{font:inherit;cursor:pointer}
+    .container{width:min(1160px,calc(100% - 32px));margin:0 auto}.header{position:sticky;top:0;z-index:30;background:rgba(255,255,255,.94);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+    .nav{min-height:88px;display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap}.brand{display:flex;align-items:center;gap:12px;font-weight:900;font-size:1.28rem;white-space:nowrap}.logo{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(135deg,#ef4444,#f59e0b);color:#fff;box-shadow:0 10px 22px rgba(239,68,68,.22)}
+    .links{display:flex;gap:24px;flex-wrap:wrap}.links a{font-weight:800;color:#475467}.links a:hover{color:var(--black)}.actions{display:flex;gap:12px;flex-wrap:wrap}.btn{display:inline-flex;align-items:center;justify-content:center;min-height:50px;padding:0 20px;border-radius:999px;border:1px solid transparent;font-weight:800;font-size:.95rem;transition:.2s}
+    .btn-white{background:#fff;border-color:var(--line);box-shadow:0 8px 24px rgba(15,23,42,.06)}.btn-white:hover{color:var(--red);border-color:rgba(185,28,28,.22)}.btn-red{background:linear-gradient(135deg,var(--red),#ef4444);color:#fff;box-shadow:0 14px 30px rgba(185,28,28,.24)}.btn-red:hover{background:linear-gradient(135deg,var(--red2),var(--red))}
+    .loading{min-height:100vh;display:grid;place-items:center;padding:24px}.loading .box,.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}.loading .box{width:min(440px,100%);padding:30px;text-align:center}.loading h1{margin:0 0 10px;font-size:1.7rem}.loading p{margin:0;color:var(--muted)}
+    .page{padding:32px 0 60px}.top{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:22px}.eyebrow{display:inline-flex;align-items:center;padding:11px 16px;border-radius:999px;background:#fff;border:1px solid var(--line);font-weight:800;color:var(--red)}
+    .hero{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(280px,.8fr);gap:22px}.card{padding:28px}.identity{display:flex;gap:18px;align-items:flex-start}.avatar{width:88px;height:88px;border-radius:24px;display:grid;place-items:center;background:linear-gradient(135deg,var(--black),#1f2937);color:#fff;font-size:1.9rem;font-weight:900;flex:0 0 auto}
+    h1{margin:0 0 10px;font-size:2.05rem;line-height:1.03;letter-spacing:-.04em}.lead,.copy,.mini span,.note span{color:var(--muted);line-height:1.6}.badges{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}.badge{padding:9px 14px;border-radius:999px;font-size:.84rem;font-weight:900}.badge.red{background:#fee2e2;color:var(--red)}.badge.gray{background:var(--soft);border:1px solid var(--line);color:var(--black)}
+    .grid2,.stats{display:grid;gap:14px}.grid2{grid-template-columns:repeat(2,minmax(0,1fr));margin-top:20px}.tile,.info,.stat,.mini,.note{background:var(--soft);border:1px solid rgba(15,23,42,.08);border-radius:20px}.tile,.info,.stat{padding:16px 18px}.label{font-size:.82rem;font-weight:700;color:var(--muted);margin-bottom:8px}.value{font-size:1rem;font-weight:900;line-height:1.3}
+    .side h2,.section h2{margin:0 0 8px;font-size:1.28rem;letter-spacing:-.03em}.jump{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0}.jump a{padding:10px 14px;border-radius:999px;background:#fff;border:1px solid var(--line);font-weight:800;font-size:.84rem}.mini-list,.notes{display:grid;gap:12px}.mini,.note{padding:14px 16px}.mini strong,.note strong{display:block;margin-bottom:6px;font-size:.9rem}
+    .sections{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px;margin-top:22px}.portfolio{grid-column:1/-1}.info-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.info a{font-weight:900}.info a:hover{color:var(--red)}.stats{grid-template-columns:repeat(3,minmax(0,1fr))}.stat strong{display:block;font-size:1.6rem;line-height:1;margin-bottom:8px}
+    .port{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(260px,.9fr);gap:18px}.feature{padding:20px;border-radius:22px;background:linear-gradient(180deg,#fff 0%,var(--soft) 100%);border:1px solid rgba(15,23,42,.08)}.feature h3{margin:0 0 8px;font-size:1.06rem}.feature .actions{margin-top:18px}
+    @media (max-width:980px){.hero,.sections,.port,.stats{grid-template-columns:1fr}} @media (max-width:760px){.grid2,.info-grid{grid-template-columns:1fr}.identity{flex-direction:column}h1{font-size:1.8rem}.card{padding:22px}}
   </style>
 </head>
 <body>
-
-  <aside class="sidebar">
-    <div class="sidebar-header">
-      <a href="index.html" class="brand"><span class="logo">TE</span><span>Mishvela Football Georgia</span></a>
-    </div>
-
-    <nav class="sidebar-nav">
-      <a href="user-profile.html#passport" class="nav-item active">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-        ჩემი პასპორტი
-      </a>
-      <a href="user-profile.html#portfolio" class="nav-item">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="2" y1="7" x2="7" y2="7"/><line x1="2" y1="17" x2="7" y2="17"/><line x1="17" y1="17" x2="22" y2="17"/><line x1="17" y1="7" x2="22" y2="7"/></svg>
-        ვიდეო პორტფოლიო
-      </a>
-      <a href="user-profile.html#stats" class="nav-item">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20v-6M6 20V10M18 20V4"/></svg>
-        ჩემი სტატისტიკა
-      </a>
-      <a href="pexburtelebi.html" class="nav-item">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-        ლიდერბორდი (U16)
-      </a>
-      <a href="index.html#coaching" class="nav-item">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-        სასწავლო ბაზა
-      </a>
-      <a href="admin-deshboard.html" class="nav-item">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
-        ადმინ პანელი
-      </a>
-    </nav>
-
-    <div class="premium-banner-nav">
-      <h4>განბლოკე პოტენციალი</h4>
-      <p>ულიმიტო ვიდეოები და პირდაპირი წვდომა სკაუტებთან.</p>
-      <button class="btn-gold">Premium გამოწერა</button>
-    </div>
-  </aside>
-
-  <main class="main-wrap">
-    
-    <header class="top-header">
-      <h2>ციფრული პასპორტი</h2>
-      <div class="header-actions">
-        <a href="gundebi.html" class="btn-white">გუნდები</a>
-        <a href="admin-deshboard.html" class="btn-red">ადმინ პანელი</a>
+  <div id="loading" class="loading"><div class="box"><h1>პროფილი იტვირთება</h1><p>ახლავე შევამოწმებ შენს სესიას და გამოგიჩენ როლის შესაბამის პროფილს.</p></div></div>
+  <div id="app" hidden>
+    <header class="header">
+      <div class="container nav">
+        <a href="index.html" class="brand"><span class="logo">TE</span><span>Mishvela Football Georgia</span></a>
+        <nav class="links"><a href="index.html">მთავარი</a><a href="gundebi.html">გუნდები</a><a href="pexburtelebi.html">ფეხბურთელები</a><a href="index.html#coaching">ქოუჩინგი</a><a href="index.html#camps">ბანაკები</a></nav>
+        <div class="actions"><a id="backTop" href="index.html" class="btn btn-white">უკან დაბრუნება</a><button id="logoutBtn" type="button" class="btn btn-red">გასვლა</button></div>
       </div>
     </header>
-
-    <div class="content-area" id="passport">
-      
-      <div class="profile-cover"></div>
-      <div class="profile-info-bar">
-        <div class="avatar-wrapper">
-          <img src="https://ui-avatars.com/api/?name=Luka+Maisuradze&background=0D8ABC&color=fff&size=200" alt="Avatar" class="avatar">
-          <div class="player-title">
-            <h1>ლუკა მაისურაძე</h1>
-            <p>ვალენსია U16 • ცენტრალური თავდამსხმელი</p>
-            <div class="tags">
-              <span class="tag tag-free">Free ექაუნთი</span>
-              <span class="tag tag-legion">🌍 ლეგიონერი (ესპანეთი)</span>
-              <span class="tag tag-pro" title="იდენტიფიკაცია გავლილია">✅ ვერიფიცირებული</span>
+    <main class="page">
+      <div class="container">
+        <div class="top"><div class="eyebrow" id="eyebrow">ციფრული პროფილი</div><a id="backContent" href="index.html" class="btn btn-white">წინა გვერდზე დაბრუნება</a></div>
+        <section class="hero">
+          <article class="card">
+            <div class="identity">
+              <div class="avatar" id="avatar">MF</div>
+              <div>
+                <div class="badges"><span class="badge red" id="roleBadge">მომხმარებელი</span><span class="badge gray" id="memberSince">აქტიური ანგარიში</span></div>
+                <h1 id="name">პროფილი</h1>
+                <p class="lead" id="lead">აქ გამოჩნდება შენს როლზე მორგებული ინფორმაცია.</p>
+              </div>
             </div>
-          </div>
-        </div>
+            <div class="grid2" id="quick"></div>
+          </article>
+          <aside class="card side">
+            <h2>სწრაფი ნავიგაცია</h2>
+            <p class="copy" id="sideCopy">ამ გვერდიდან შეგიძლია ნახო ძირითადი მონაცემები და დაბრუნდე იმავე გვერდზე, საიდანაც გახსენი პროფილი.</p>
+            <div class="jump"><a href="#passport">პასპორტი</a><a href="#stats">სტატუსი</a><a href="#portfolio">პორტფოლიო</a></div>
+            <div class="mini-list" id="mini"></div>
+          </aside>
+        </section>
+        <section class="sections">
+          <article class="card section" id="passport"><h2>პასპორტი</h2><p class="copy">რეგისტრაციაში შევსებული მონაცემები სწორედ აქ აისახება.</p><div class="info-grid" id="passportGrid"></div></article>
+          <article class="card section" id="stats"><h2>სტატუსი</h2><p class="copy">ეს სექცია მზად არის მომავალი სტატისტიკის, პროგრესისა და რეიტინგებისთვის.</p><div class="stats" id="statsGrid"></div></article>
+          <article class="card section portfolio" id="portfolio"><h2>პორტფოლიო და შემდეგი ნაბიჯები</h2><p class="copy">აქ დაგიგროვდება ვიდეო CV, გუნდის ბმები და მომავალი ფუნქციები.</p><div class="port"><div class="feature"><h3 id="portfolioTitle">პროფილის ცენტრი</h3><p class="copy" id="portfolioCopy">პროფილი უკვე შექმნილია და მზად არის დამატებითი ფუნქციებისთვის.</p><div class="actions" id="portfolioActions"></div></div><div class="notes" id="notes"></div></div></article>
+        </section>
       </div>
-
-      <div class="profile-grid">
-        
-        <div>
-          <div class="card" id="stats">
-            <h3 class="card-title">ფიზიკური მონაცემები</h3>
-            <div class="detail-list">
-              <div class="detail-item"><span>ასაკი</span> <strong>15 წლის (2010)</strong></div>
-              <div class="detail-item"><span>სიმაღლე</span> <strong>178 სმ</strong></div>
-              <div class="detail-item"><span>წონა</span> <strong>68 კგ</strong></div>
-              <div class="detail-item"><span>მუშა ფეხი</span> <strong>მარჯვენა</strong></div>
-              <div class="detail-item"><span>ეროვნება</span> <strong>საქართველო 🇬🇪</strong></div>
-            </div>
-
-            <div class="parent-info">
-              <h4>🛡️ მშობლის/მეურვის პანელი</h4>
-              <p>საკონტაქტო: +995 555 123 456</p>
-              <p style="margin-top: 4px; font-size: .75rem;">(ხილვადია მხოლოდ სკაუტებისთვის)</p>
-            </div>
-          </div>
-
-          <div class="card" id="portfolio">
-            <h3 class="card-title">მიმდინარე რეიტინგი</h3>
-            <div class="detail-list">
-              <div class="detail-item"><span>ეროვნული (U16)</span> <strong style="color:var(--red);">#4 პოზიცია</strong></div>
-              <div class="detail-item"><span>ლეგიონერები</span> <strong>#2 პოზიცია</strong></div>
-              <div class="detail-item"><span>მთლიანი XP</span> <strong>2,450 XP</strong></div>
-            </div>
-          </div>
-        </div>
-
-        <div>
-          
-          <div class="card">
-            <h3 class="card-title">2025/2026 სეზონის სტატისტიკა</h3>
-            <div class="stats-row">
-              <div class="stat-box"><h3>14</h3><span>გოლი</span></div>
-              <div class="stat-box"><h3>6</h3><span>ასისტი</span></div>
-              <div class="stat-box"><h3>1200'</h3><span>ნათამაშები წუთი</span></div>
-              <div class="stat-box"><h3>32.4</h3><span>მაქს. სიჩქარე (კმ/სთ)</span></div>
-            </div>
-          </div>
-
-          <div class="card">
-            <h3 class="card-title">
-              ვიდეო CV (Highlights)
-              <span style="font-size: .8rem; color: var(--muted); font-weight: normal;">3/3 ატვირთული</span>
-            </h3>
-            <div class="video-grid">
-              <div class="video-card">
-                <img src="https://images.unsplash.com/photo-1579952363873-27f3bade9f55?auto=format&fit=crop&w=400&q=80" alt="Goal 1">
-                <div class="play-btn">▶</div>
-              </div>
-              <div class="video-card">
-                <img src="https://images.unsplash.com/photo-1510566337590-2fc1f21d0faa?auto=format&fit=crop&w=400&q=80" alt="Skills">
-                <div class="play-btn">▶</div>
-              </div>
-              <div class="video-card">
-                <img src="https://images.unsplash.com/photo-1431324155629-1a6d0a644265?auto=format&fit=crop&w=400&q=80" alt="Match">
-                <div class="play-btn">▶</div>
-              </div>
-              
-              <div class="video-card locked-video">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                <span style="font-size: .8rem; font-weight: 700;">გახდი Premium</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="vote-banner" style="margin-bottom: 24px;">
-            <div>
-              <h3>🔥 თვის საუკეთესო გოლი!</h3>
-              <p>ლუკას გოლი ნომინირებულია მარტის საუკეთესო გოლის ტიტულზე.</p>
-            </div>
-            <button class="btn-white">ხმის მიცემა</button>
-          </div>
-
-          <div class="card">
-            <h3 class="card-title">მიღწევები და ბეჯები</h3>
-            <div class="badge-grid">
-              <div class="badge-item">
-                <div class="badge-icon">🎯</div>
-                <h4>ზუსტი დამრტყმელი</h4>
-                <p>90%+ სიზუსტე</p>
-              </div>
-              <div class="badge-item">
-                <div class="badge-icon">⚡</div>
-                <h4>სპრინტერი</h4>
-                <p>ტოპ 5% სისწრაფე</p>
-              </div>
-              <div class="badge-item">
-                <div class="badge-icon">🏆</div>
-                <h4>თვის მოთამაშე</h4>
-                <p>ნოემბერი, 2025</p>
-              </div>
-              <div class="badge-item" style="opacity: 0.5; border-style: dashed;">
-                <div class="badge-icon" style="background: transparent;">🔒</div>
-                <h4>ფლეიმეიქერი</h4>
-                <p>გახსენი 10 ასისტით</p>
-              </div>
-            </div>
-          </div>
-
-        </div>
-      </div>
-    </div>
-  </main>
-
+    </main>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="auth-shared.js"></script>
+  <script>
+    const esc=v=>String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+    const safe=(v,f='არ არის დამატებული')=>String(v??'').trim()||f;
+    const age=v=>{const raw=String(v||'').trim();let d,mo,y,m=raw.match(/^(\d{2})\.(\d{2})\.(\d{4})$/);if(m){d=+m[1];mo=+m[2]-1;y=+m[3]}else{m=raw.match(/^(\d{4})-(\d{2})-(\d{2})$/);if(!m)return null;d=+m[3];mo=+m[2]-1;y=+m[1]}const dt=new Date(y,mo,d);if(isNaN(dt)||dt.getDate()!==d||dt.getMonth()!==mo)return null;const t=new Date();let a=t.getFullYear()-y;if(t.getMonth()<mo||(t.getMonth()===mo&&t.getDate()<d))a--;return a};
+    const dateText=v=>{const raw=String(v||'').trim();const m=raw.match(/^(\d{4})-(\d{2})-(\d{2})$/);return m?`${m[3]}.${m[2]}.${m[1]}`:raw};
+    const from=()=>window.siteAuth?.sanitizeInternalPath(new URLSearchParams(location.search).get('from'),'index.html')||'index.html';
+    const here=()=>'user-profile.html'+(location.search||'');
+    const backLabel=p=>{const b=String(p||'').split('?')[0].split('#')[0];if(b==='gundebi.html')return'გუნდების გვერდზე დაბრუნება';if(b==='pexburtelebi.html')return'ფეხბურთელების გვერდზე დაბრუნება';if(b==='team-dinamo-tbilisi.html')return'გუნდის გვერდზე დაბრუნება';if(b==='admin-deshboard.html')return'ადმინ პანელზე დაბრუნება';return'მთავარ გვერდზე დაბრუნება'};
+    const roleLabel=r=>({player:'მოთამაშე',parent:'მშობელი',agent:'აგენტი',admin:'ადმინისტრატორი'})[r]||'მომხმარებელი';
+    const initials=u=>((u.user_metadata?.full_name||u.email||'MF').split(/\s+/).filter(Boolean).slice(0,2).map(s=>s[0].toUpperCase()).join(''))||'MF';
+    const items=arr=>arr.map(i=>`<div class="info"><div class="label">${esc(i.l)}</div>${i.h?`<a href="${esc(i.h)}" class="value">${esc(i.v)}</a>`:`<div class="value">${esc(i.v)}</div>`}</div>`).join('');
+    const stats=arr=>arr.map(i=>`<div class="stat"><div class="label">${esc(i.l)}</div><strong>${esc(i.v)}</strong><div class="copy">${esc(i.c)}</div></div>`).join('');
+    const notes=arr=>arr.map(i=>`<div class="note"><strong>${esc(i.t)}</strong><span>${esc(i.c)}</span></div>`).join('');
+    const mini=arr=>arr.map(i=>`<div class="mini"><strong>${esc(i.t)}</strong><span>${esc(i.c)}</span></div>`).join('');
+    const quick=arr=>arr.map(i=>`<div class="tile"><div class="label">${esc(i.l)}</div><div class="value">${esc(i.v)}</div></div>`).join('');
+    const actions=arr=>arr.map(i=>`<a href="${esc(i.h)}" class="btn ${esc(i.c)}">${esc(i.l)}</a>`).join('');
+    function profileData(role,p,u,back){const common=[{l:'სახელი და გვარი',v:safe(u.user_metadata?.full_name||[u.user_metadata?.first_name,u.user_metadata?.last_name].filter(Boolean).join(' '))},{l:'ელ-ფოსტა',v:safe(u.email)},{l:'ტელეფონი',v:safe(u.user_metadata?.phone_number)},{l:'პირადი ნომერი',v:safe(u.user_metadata?.personal_number)}];
+      if(role==='player')return{eye:'ციფრული საფეხბურთო პასპორტი',lead:'ეს არის შენი მოთამაშის პროფილი. აქ დაგიგროვდება გუნდი, ვიდეო CV და სტატისტიკა.',side:'აქედან შეგიძლია გადახვიდე გუნდებზე, ფეხბურთელებზე ან დაბრუნდე ზუსტად იმავე გვერდზე.',quick:[{l:'ასაკი',v:safe(p.playerAge||age(p.playerBirthDate),'-')},{l:'პოზიცია',v:safe(p.playerPosition)},{l:'გუნდი',v:safe(p.playerTeam,'უგუნდოდ')},{l:'ფეხი',v:safe(p.playerFoot)}],pass:common.concat([{l:'დაბადების თარიღი',v:safe(dateText(p.playerBirthDate))},{l:'ასაკი',v:safe(p.playerAge||age(p.playerBirthDate),'-')},{l:'პოზიცია',v:safe(p.playerPosition)},{l:'უპირატესი ფეხი',v:safe(p.playerFoot)},{l:'მიმდინარე გუნდი',v:safe(p.playerTeam,'უგუნდოდ'),h:p.playerTeamRoute||''},{l:'გუნდის სტატუსი',v:safe(p.playerTeamStatus==='registered'?'დარეგისტრირებული':p.playerTeamStatus==='free-agent'?'უგუნდოდ':p.playerTeamStatus==='custom'?'ახალი გუნდი':p.playerTeamStatus)}]),stat:[{l:'ვიდეო CV',v:'0',c:'ატვირთული highlights აქ გამოჩნდება.'},{l:'სტატისტიკა',v:'მალე',c:'გოლები, ასისტები და წუთები დაემატება.'},{l:'გუნდის ბმა',v:p.playerTeamRoute?'აქტიური':'მოლოდინში',c:'თუ გუნდი არსებობს, პროფილიდან პირდაპირ გადახვალ.'}],port:{t:'მოთამაშის კარიერული ჰაბი',c:'ეს სექცია გახდება შენი ძირითადი სამუშაო სივრცე ვიდეო CV-სთვის, სტატისტიკისთვის და სკაუტინგის ბმებისთვის.',a:[p.playerTeamRoute?{h:p.playerTeamRoute,l:'ჩემი გუნდის გვერდი',c:'btn-red'}:{h:back,l:'წინა გვერდზე დაბრუნება',c:'btn-red'},{h:'pexburtelebi.html',l:'ფეხბურთელების ბაზა',c:'btn-white'},{h:'gundebi.html',l:'გუნდების გვერდი',c:'btn-white'}],n:[{t:'პროფილი',c:'რეგისტრაციისას შევსებული მოთამაშის მონაცემები უკვე ჩანს.'},{t:'დაბრუნება',c:'ზედა ღილაკი დაგაბრუნებს იმავე გვერდზე.'},{t:'შემდეგი ნაბიჯი',c:'შემდეგ ეტაპზე აქ შეგვიძლია ვიდეო CV-ს ატვირთვაც მივაბათ.'}]}}; 
+      if(role==='parent')return{eye:'მშობლის პროფილი',lead:'ეს არის მშობლის სამუშაო სივრცე, სადაც ბავშვის მონაცემები და მომავალი პროგრესის მოდულები შეგროვდება.',side:'აქედან დაინახავ ბავშვის ასაკს, პოზიციას და დაბრუნდები იმავე გვერდზე, საიდანაც გახსენი პროფილი.',quick:[{l:'ბავშვი',v:safe(p.childName)},{l:'ბავშვის ასაკი',v:safe(p.childAge||age(p.childBirthDate),'-')},{l:'პოზიცია',v:safe(p.childPosition)},{l:'ფეხი',v:safe(p.childFoot)}],pass:common.concat([{l:'ბავშვის სახელი',v:safe(p.childName)},{l:'ბავშვის დაბადების თარიღი',v:safe(dateText(p.childBirthDate))},{l:'ბავშვის ასაკი',v:safe(p.childAge||age(p.childBirthDate),'-')},{l:'ბავშვის პოზიცია',v:safe(p.childPosition)},{l:'ბავშვის ფეხი',v:safe(p.childFoot)},{l:'კავშირი ბავშვთან',v:safe(p.parentRelation)}]),stat:[{l:'პროგრესი',v:'მალე',c:'შვილის პროგრესის მონიტორინგი აქ დაემატება.'},{l:'ვიდეოები',v:'0',c:'ვიდეო CV-ები და ატვირთვები აქ გამოჩნდება.'},{l:'რეიტინგი',v:'მალე',c:'ასაკობრივი რეიტინგები აქ აისახება.'}],port:{t:'მშობლის პანელი',c:'ეს სივრცე განკუთვნილია შვილის პროგრესის, ვიდეოების და მომავალში გამოწერების ან გადახდების მართვისთვის.',a:[{h:back,l:'წინა გვერდზე დაბრუნება',c:'btn-red'},{h:'gundebi.html',l:'გუნდების ნახვა',c:'btn-white'},{h:'pexburtelebi.html',l:'ტალანტების ბაზა',c:'btn-white'}],n:[{t:'აქტიური პროფილი',c:'მშობლის საკონტაქტო მონაცემები უკვე შენახულია.'},{t:'ბავშვის მონაცემები',c:'რეგისტრაციაში შეყვანილი ინფორმაცია ავტომატურად გამოჩნდა პროფილში.'},{t:'შემდეგი ნაბიჯი',c:'შემდეგ ეტაპზე ბავშვის სტატისტიკაც აქვე დაემატება.'}]}}; 
+      return{eye:'აგენტის პროფილი',lead:'ეს არის აგენტის პროფილი, სადაც მოთამაშეების პორტფოლიო და მომავალი შეთავაზებები გაერთიანდება.',side:'აქედან დაინახავ სააგენტოს ძირითად ინფორმაციას და დაბრუნდები საწყის გვერდზე.',quick:[{l:'სააგენტო',v:safe(p.agencyName)},{l:'მოთამაშეები',v:safe(p.playersManaged,'0')},{l:'რეგიონი',v:safe(p.agencyRegion)},{l:'მიმართულება',v:safe(p.agentFocus)}],pass:common.concat([{l:'სააგენტო / ბრენდი',v:safe(p.agencyName)},{l:'რამდენ მოთამაშეს წარმოადგენს',v:safe(p.playersManaged,'0')},{l:'რეგიონი / ბაზარი',v:safe(p.agencyRegion)},{l:'ძირითადი მიმართულება',v:safe(p.agentFocus)}]),stat:[{l:'მოთამაშეები',v:safe(p.playersManaged,'0'),c:'რეგისტრაციაში მითითებული რაოდენობა.'},{l:'აქტიური კავშირები',v:'0',c:'კლუბებთან და სკაუტებთან ბმები აქ დაემატება.'},{l:'შეთავაზებები',v:'მალე',c:'აგენტის სამუშაო მოდულები აქ გამოჩნდება.'}],port:{t:'აგენტის სამუშაო სივრცე',c:'შემდეგ ეტაპზე შეგვიძლია ამ პროფილზე მოთამაშეების ცალკე დამატება, შეთავაზებები და კლუბებთან ბმებიც მივაბათ.',a:[{h:back,l:'წინა გვერდზე დაბრუნება',c:'btn-red'},{h:'pexburtelebi.html',l:'ფეხბურთელების ბაზა',c:'btn-white'},{h:'gundebi.html',l:'გუნდების ბაზა',c:'btn-white'}],n:[{t:'სააგენტო',c:'აგენტის ძირითადი მონაცემები უკვე შენახულია.'},{t:'ნავიგაცია',c:'სხვა გვერდებზე გადასვლა ზედა მენიუდან შეგიძლია.'},{t:'შემდეგი ნაბიჯი',c:'შემდეგ ეტაპზე მოთამაშეების მიბმასაც დავამატებთ.'}]}}}
+    async function init(){const back=from(),label=backLabel(back);['backTop','backContent'].forEach(id=>{const el=document.getElementById(id);el.href=back;el.textContent=label}); const auth=window.siteAuth||{}; const {user}=await auth.requireAuth({redirect:here()}); if(!user)return; const role=auth.getUserRole?auth.getUserRole(user):'player'; if(role==='admin'){location.href='admin-deshboard.html';return;} const p=user.user_metadata?.profile||{}; const d=profileData(role,p,user,back); document.getElementById('eyebrow').textContent=d.eye; document.getElementById('roleBadge').textContent=roleLabel(role); document.getElementById('memberSince').textContent='გაწევრიანდა '+new Date(user.created_at).toLocaleDateString('ka-GE'); document.getElementById('avatar').textContent=initials(user); document.getElementById('name').textContent=(auth.getUserDisplayName?auth.getUserDisplayName(user):user.email); document.getElementById('lead').textContent=d.lead; document.getElementById('sideCopy').textContent=d.side; document.getElementById('quick').innerHTML=quick(d.quick); document.getElementById('passportGrid').innerHTML=items(d.pass); document.getElementById('statsGrid').innerHTML=stats(d.stat); document.getElementById('portfolioTitle').textContent=d.port.t; document.getElementById('portfolioCopy').textContent=d.port.c; document.getElementById('portfolioActions').innerHTML=actions(d.port.a); document.getElementById('notes').innerHTML=notes(d.port.n); document.getElementById('mini').innerHTML=mini([{t:'როლი',c:roleLabel(role)+' პროფილი უკვე შექმნილია.'},{t:'კონტაქტი',c:safe(user.email)+' / '+safe(user.user_metadata?.phone_number,'ტელეფონი არ არის დამატებული')},{t:'დაბრუნება',c:'ღილაკი დაგაბრუნებს იმავე გვერდზე, საიდანაც გახსენი პროფილი.'}]); document.getElementById('logoutBtn').addEventListener('click',()=>window.siteAuth?.signOut?window.siteAuth.signOut({redirect:back||'index.html'}):location.href=(back||'index.html')); document.title=document.getElementById('name').textContent+' | Mishvela Football Georgia'; document.getElementById('loading').hidden=true; document.getElementById('app').hidden=false;}
+    init().catch(err=>{document.querySelector('#loading .box').innerHTML=`<h1>პროფილის ჩატვირთვა ვერ შესრულდა</h1><p>${esc(err?.message||'სცადე ხელახლა შესვლა ან გვერდის განახლება.')}</p>`});
+  </script>
 </body>
 </html>

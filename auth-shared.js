@@ -51,6 +51,13 @@
     return getProfileRouteForRole(getUserRole(user));
   }
 
+  function getCurrentPagePath() {
+    return sanitizeInternalPath(
+      window.location.pathname.split('/').pop() || 'index.html',
+      'index.html'
+    );
+  }
+
   function sanitizeInternalPath(path, fallbackPath) {
     const fallback = fallbackPath || 'index.html';
     const value = String(path || '').trim();
@@ -74,17 +81,71 @@
     return value;
   }
 
+  function stripAuthHash(path) {
+    const value = sanitizeInternalPath(path, '');
+    if (!value) {
+      return '';
+    }
+
+    const hashIndex = value.indexOf('#');
+    if (hashIndex === -1) {
+      return value;
+    }
+
+    const base = value.slice(0, hashIndex);
+    const hash = value.slice(hashIndex + 1).toLowerCase();
+
+    if (hash === 'login' || hash === 'register') {
+      return base || 'index.html';
+    }
+
+    return value;
+  }
+
   function getRedirectParam() {
     const params = new URLSearchParams(window.location.search);
-    return sanitizeInternalPath(params.get('redirect'), '');
+    return stripAuthHash(params.get('redirect'));
   }
 
   function buildLoginHref(redirectPath) {
-    return 'login.html?redirect=' + encodeURIComponent(redirectPath) + '#login';
+    const target = stripAuthHash(redirectPath) || 'index.html';
+    return 'login.html?redirect=' + encodeURIComponent(target) + '#login';
   }
 
   function buildRegisterHref(redirectPath) {
-    return 'login.html?redirect=' + encodeURIComponent(redirectPath) + '#register';
+    const target = stripAuthHash(redirectPath) || 'index.html';
+    return 'login.html?redirect=' + encodeURIComponent(target) + '#register';
+  }
+
+  function buildProfileHref(profileRoute, fromPath) {
+    const safeProfileRoute = sanitizeInternalPath(profileRoute, DEFAULT_PROFILE_ROUTE);
+    const safeFromPath = stripAuthHash(fromPath);
+
+    if (!safeFromPath) {
+      return safeProfileRoute;
+    }
+
+    const parts = safeProfileRoute.split('#');
+    const base = parts[0];
+    const hash = parts[1] ? ('#' + parts[1]) : '';
+    const separator = base.includes('?') ? '&' : '?';
+
+    return base + separator + 'from=' + encodeURIComponent(safeFromPath) + hash;
+  }
+
+  function resolvePostAuthTarget(user, preferredRedirect) {
+    const explicitTarget = stripAuthHash(preferredRedirect || getRedirectParam());
+    const profileTarget = getProfileRouteForUser(user);
+
+    if (!explicitTarget) {
+      return profileTarget;
+    }
+
+    if (explicitTarget.split('#')[0].toLowerCase() === 'login.html') {
+      return profileTarget;
+    }
+
+    return explicitTarget;
   }
 
   function getUserDisplayName(user) {
@@ -129,9 +190,7 @@
       return;
     }
 
-    const currentPath = settings.currentPath || (
-      window.location.pathname.split('/').pop() || 'index.html'
-    );
+    const currentPath = settings.currentPath || getCurrentPagePath();
     const loginHref = settings.loginHref || buildLoginHref(currentPath);
     const registerHref = settings.registerHref || buildRegisterHref(currentPath);
     const loginClass = settings.loginClass || 'btn btn-white';
@@ -159,7 +218,10 @@
       return;
     }
 
-    const profileHref = getProfileRouteForUser(user);
+    const profileHref = buildProfileHref(
+      getProfileRouteForUser(user),
+      currentPath
+    );
     const displayName = getUserDisplayName(user);
 
     target.innerHTML = [
@@ -198,8 +260,10 @@
 
   window.siteAuth = {
     buildLoginHref: buildLoginHref,
+    buildProfileHref: buildProfileHref,
     buildRegisterHref: buildRegisterHref,
     getClient: getClient,
+    getCurrentPagePath: getCurrentPagePath,
     getProfileRouteForRole: getProfileRouteForRole,
     getProfileRouteForUser: getProfileRouteForUser,
     getRedirectParam: getRedirectParam,
@@ -207,6 +271,7 @@
     getUserRole: getUserRole,
     renderAuthNav: renderAuthNav,
     requireAuth: requireAuth,
+    resolvePostAuthTarget: resolvePostAuthTarget,
     sanitizeInternalPath: sanitizeInternalPath,
     signOut: signOut
   };

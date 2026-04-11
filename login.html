@@ -430,7 +430,7 @@
         <a href="index.html#coaching">ქოუჩინგი</a>
         <a href="index.html#camps">ბანაკები</a>
       </nav>
-      <div class="nav-actions">
+      <div class="nav-actions" id="loginAuthNav">
         <a href="#login" class="btn btn-white">შესვლა</a>
         <a href="#register" class="btn btn-red">რეგისტრაცია</a>
       </div>
@@ -499,7 +499,7 @@
             <label class="form-label" for="roleSelect">როლი სისტემაში</label>
             <select id="roleSelect" class="form-input" required>
               <option value="" selected disabled>აირჩიეთ როლი...</option>
-              <option value="player">მოთამაშე +18</option>
+              <option value="player">მოთამაშე</option>
               <option value="parent">მშობელი</option>
               <option value="agent">აგენტი</option>
             </select>
@@ -564,6 +564,7 @@
     const loginSubmitButton = loginForm.querySelector('button[type="submit"]');
     const registerSubmitButton = registerForm.querySelector('button[type="submit"]');
     const currentYear = new Date().getFullYear();
+    const currentDateIso = new Date().toISOString().split('T')[0];
     const supabaseClient = window.siteAuth?.getClient
       ? window.siteAuth.getClient()
       : null;
@@ -576,15 +577,14 @@
     const roleConfigurations = {
       player: {
         title: 'მოთამაშის რეგისტრაცია',
-        description: 'მოთამაშის რეგისტრაცია დაშვებულია მხოლოდ 18+ ასაკისთვის. დაბადების თარიღის შეყვანის შემდეგ ასაკი ავტომატურად გამოითვლება.',
+        description: 'მოთამაშის დაბადების თარიღის არჩევის შემდეგ ასაკი ავტომატურად გამოითვლება და გუნდის გვერდზე შესაბამის ასაკობრივ კატეგორიაში გამოჩნდება.',
         fields: [
           {
             id: 'playerBirthDate',
             label: 'დაბადების თარიღი',
             type: 'birthdate',
             ageTarget: 'playerAge',
-            placeholder: '01.01.2005',
-            helper: 'შეიყვანე ფორმატში 01.01.2005. მოთამაშისთვის მხოლოდ 18 წლის და ზემოთ ასაკი დაიშვება.'
+            helper: 'აირჩიე თარიღი კალენდრიდან. დაბადების წლის მიხედვით მოთამაშე თავის ასაკობრივ ჯგუფში გადავა, მაგალითად 2018 -> U8.'
           },
           {
             id: 'playerAge',
@@ -607,8 +607,7 @@
             label: 'ბავშვის დაბადების თარიღი',
             type: 'birthdate',
             ageTarget: 'childAge',
-            placeholder: '01.01.2013',
-            helper: 'შეიყვანე ფორმატში 01.01.2013. ასაკი ავტომატურად გამოჩნდება.'
+            helper: 'აირჩიე თარიღი კალენდრიდან. ბავშვის ასაკი ავტომატურად გამოჩნდება.'
           },
           {
             id: 'childAge',
@@ -634,6 +633,11 @@
     };
 
     function formatBirthDateInput(value) {
+      const raw = String(value || '').trim();
+      if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) {
+        return raw;
+      }
+
       const digits = String(value || '').replace(/\D/g, '').slice(0, 8);
       const parts = [];
 
@@ -651,6 +655,43 @@
     }
 
     function parseBirthDate(value) {
+      const raw = String(value || '').trim();
+
+      if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) {
+        const [yearPart, monthPart, dayPart] = raw.split('-');
+        const day = Number(dayPart);
+        const month = Number(monthPart);
+        const year = Number(yearPart);
+
+        if (!day || !month || !year || year < 1900 || year > currentYear) {
+          return null;
+        }
+
+        const date = new Date(year, month - 1, day);
+        if (
+          Number.isNaN(date.getTime()) ||
+          date.getFullYear() !== year ||
+          date.getMonth() !== month - 1 ||
+          date.getDate() !== day
+        ) {
+          return null;
+        }
+
+        const today = new Date();
+        if (date > today) {
+          return null;
+        }
+
+        return {
+          formatted: `${String(day).padStart(2, '0')}.${String(month).padStart(2, '0')}.${year}`,
+          iso: raw,
+          date,
+          year,
+          month,
+          day
+        };
+      }
+
       const formatted = formatBirthDateInput(value);
       if (!/^\d{2}\.\d{2}\.\d{4}$/.test(formatted)) {
         return null;
@@ -682,11 +723,54 @@
 
       return {
         formatted,
+        iso: `${yearPart}-${monthPart}-${dayPart}`,
         date,
         year,
         month,
         day
       };
+    }
+
+    function getAgeCategoryByBirthYear(year) {
+      if (!Number.isFinite(year)) {
+        return '';
+      }
+
+      const diff = currentYear - year;
+      if (diff <= 8) {
+        return 'u8';
+      }
+      if (diff === 9) {
+        return 'u9';
+      }
+      if (diff === 10) {
+        return 'u10';
+      }
+      if (diff === 11) {
+        return 'u11';
+      }
+      if (diff === 12) {
+        return 'u12';
+      }
+      if (diff === 13) {
+        return 'u13';
+      }
+      if (diff === 14) {
+        return 'u14';
+      }
+      if (diff === 15) {
+        return 'u15';
+      }
+      if (diff === 16) {
+        return 'u16';
+      }
+      if (diff === 17) {
+        return 'u17';
+      }
+      if (diff <= 19) {
+        return 'u19';
+      }
+      return 'pro';
     }
 
     function calculateAgeFromBirthDate(value) {
@@ -729,7 +813,7 @@
         return `
           <div class="form-group">
             <label class="form-label" for="${field.id}">${field.label}</label>
-            <input id="${field.id}" name="${field.id}" type="text" class="form-input" placeholder="${field.placeholder || '01.01.2005'}" inputmode="numeric" pattern="\\d{2}\\.\\d{2}\\.\\d{4}" maxlength="10" data-birthdate="true"${ageTarget} autocomplete="bday" required>
+            <input id="${field.id}" name="${field.id}" type="date" class="form-input" min="1900-01-01" max="${currentDateIso}" data-birthdate="true"${ageTarget} autocomplete="bday" required>
             ${helper}
           </div>
         `;
@@ -871,7 +955,7 @@
         return {};
       }
 
-      return config.fields.reduce((payload, field) => {
+      const payload = config.fields.reduce((payload, field) => {
         const input = document.getElementById(field.id);
         if (input) {
           payload[field.id] = String(input.value || '').trim();
@@ -880,12 +964,21 @@
       }, {});
 
       if (role === 'player') {
+        const playerBirth = parseBirthDate(payload.playerBirthDate);
         const teamSelection = resolveTeamSelection(document.getElementById('playerTeam')?.value);
+        payload.playerBirthYear = playerBirth ? String(playerBirth.year) : '';
+        payload.playerAgeCategory = playerBirth ? getAgeCategoryByBirthYear(playerBirth.year) : '';
         payload.playerTeam = teamSelection.name;
         payload.playerTeamRegistered = String(teamSelection.registered);
         payload.playerTeamRoute = teamSelection.route || '';
         payload.playerTeamSlug = teamSelection.slug || '';
         payload.playerTeamStatus = teamSelection.kind;
+      }
+
+      if (role === 'parent') {
+        const childBirth = parseBirthDate(payload.childBirthDate);
+        payload.childBirthYear = childBirth ? String(childBirth.year) : '';
+        payload.childAgeCategory = childBirth ? getAgeCategoryByBirthYear(childBirth.year) : '';
       }
 
       return payload;
@@ -905,6 +998,10 @@
 
     function sanitizeBirthDateField(input) {
       if (!input || !input.dataset || !input.dataset.birthdate) {
+        return;
+      }
+
+      if (input.type === 'date') {
         return;
       }
 
@@ -1191,14 +1288,8 @@
         const teamSelection = resolveTeamSelection(playerTeamInput?.value);
 
         if (!playerBirthDateInput?.value || playerAge === null) {
-          setStatus(registerStatus, 'შეიყვანე დაბადების თარიღი ფორმატში 01.01.2005, რომ მოთამაშის ასაკი სწორად განისაზღვროს.', 'error');
+          setStatus(registerStatus, 'აირჩიე მოთამაშის დაბადების თარიღი კალენდრიდან, რომ ასაკი და კატეგორია სწორად განისაზღვროს.', 'error');
           playerBirthDateInput?.focus();
-          return false;
-        }
-
-        if (playerAge < 18) {
-          setStatus(registerStatus, 'მოთამაშის რეგისტრაცია დაშვებულია მხოლოდ 18 წლის და ზემოთ ასაკისთვის.', 'error');
-          playerBirthDateInput.focus();
           return false;
         }
 
@@ -1219,7 +1310,7 @@
 
         syncComputedAge(childBirthDateInput);
         if (!childAgeInput?.value) {
-          setStatus(registerStatus, 'შეიყვანე ბავშვის დაბადების თარიღი ფორმატში 01.01.2013, რომ ასაკი ავტომატურად გამოითვალოს.', 'error');
+          setStatus(registerStatus, 'აირჩიე ბავშვის დაბადების თარიღი კალენდრიდან, რომ ასაკი ავტომატურად გამოითვალოს.', 'error');
           childBirthDateInput?.focus();
           return false;
         }
@@ -1229,12 +1320,15 @@
     }
 
     function redirectToTarget(user, fallbackHash = '') {
-      const explicitTarget = sanitizeRedirect();
-      const target = explicitTarget || (
-        window.siteAuth?.getProfileRouteForUser
-          ? window.siteAuth.getProfileRouteForUser(user)
-          : 'user-profile.html'
-      );
+      const target = window.siteAuth?.resolvePostAuthTarget
+        ? window.siteAuth.resolvePostAuthTarget(user, sanitizeRedirect())
+        : (
+          sanitizeRedirect() || (
+            window.siteAuth?.getProfileRouteForUser
+              ? window.siteAuth.getProfileRouteForUser(user)
+              : 'user-profile.html'
+          )
+        );
       const normalizedTarget = fallbackHash && !target.includes('#')
         ? `${target}${fallbackHash}`
         : target;
@@ -1449,6 +1543,18 @@
       renderRoleFields(roleSelect.value);
       sanitizeDigitsField(document.getElementById('personalNumber'));
       sanitizeDigitsField(document.getElementById('phoneNumber'));
+      if (window.siteAuth?.renderAuthNav) {
+        window.siteAuth.renderAuthNav('#loginAuthNav', {
+          currentPath: 'login.html',
+          loginHref: '#login',
+          registerHref: '#register',
+          loginClass: 'btn btn-white',
+          registerClass: 'btn btn-red',
+          profileClass: 'btn btn-red',
+          logoutClass: 'btn btn-white',
+          afterLogout: 'login.html'
+        });
+      }
       if (!supabaseClient) {
         setStatus(loginStatus, 'Supabase კავშირი ჯერ არ არის მზად.', 'error');
         setStatus(registerStatus, 'Supabase კავშირი ჯერ არ არის მზად.', 'error');

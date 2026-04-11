@@ -632,7 +632,7 @@
         <a href="#camps">ბანაკები</a>
       </nav>
 
-      <div class="nav-actions">
+      <div class="nav-actions" id="homeAuthNav">
         <a href="login.html?redirect=index.html%23login#login" class="btn btn-secondary">შესვლა</a>
         <a href="login.html?redirect=index.html%23register#register" class="btn btn-primary">რეგისტრაცია</a>
       </div>
@@ -1109,7 +1109,7 @@
           <h4>პროგრამები</h4>
           <a href="pexburtelebi.html">ფეხბურთელები</a>
           <a href="gundebi.html">გუნდები</a>
-          <a href="user-profile.html">ჩემი პროფილი</a>
+          <a href="user-profile.html?from=index.html">ჩემი პროფილი</a>
           <a href="admin-deshboard.html">ადმინ პანელი</a>
         </div>
 
@@ -1129,5 +1129,19 @@
     </div>
   </footer>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="auth-shared.js"></script>
+  <script>
+    if (window.siteAuth?.renderAuthNav) {
+      window.siteAuth.renderAuthNav('#homeAuthNav', {
+        currentPath: 'index.html',
+        loginClass: 'btn btn-secondary',
+        registerClass: 'btn btn-primary',
+        profileClass: 'btn btn-primary',
+        logoutClass: 'btn btn-secondary',
+        afterLogout: 'index.html'
+      });
+    }
+  </script>
 </body>
 </html>

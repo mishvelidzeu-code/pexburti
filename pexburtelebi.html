@@ -336,7 +336,7 @@
         <a href="index.html#coaching">ქოუჩინგი</a>
         <a href="index.html#camps">ბანაკები</a>
       </nav>
-      <div class="nav-actions">
+      <div class="nav-actions" id="playersAuthNav">
         <a href="login.html?redirect=pexburtelebi.html%23login#login" class="btn btn-white">შესვლა</a>
         <a href="login.html?redirect=pexburtelebi.html%23register#register" class="btn btn-red">რეგისტრაცია</a>
       </div>
@@ -394,6 +394,8 @@
     </div>
   </section>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="auth-shared.js"></script>
   <script>
     // 30 სატესტო ფეხბურთელი, დაგენერირებული ასაკებით U8-დან U17-მდე
     const players = [
@@ -457,7 +459,7 @@
               </div>
             </div>
             
-            <a href="user-profile.html" class="btn-enter">პროფილი</a>
+            <a href="user-profile.html?from=pexburtelebi.html" class="btn-enter">პროფილი</a>
           </div>
         </article>
       `;
@@ -510,6 +512,17 @@
     // გაშვება
     renderPlayers();
     applyFilters();
+
+    if (window.siteAuth?.renderAuthNav) {
+      window.siteAuth.renderAuthNav('#playersAuthNav', {
+        currentPath: 'pexburtelebi.html',
+        loginClass: 'btn btn-white',
+        registerClass: 'btn btn-red',
+        profileClass: 'btn btn-red',
+        logoutClass: 'btn btn-white',
+        afterLogout: 'pexburtelebi.html'
+      });
+    }
   </script>
 </body>
 </html>
