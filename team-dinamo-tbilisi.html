@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>დინამო თბილისი | Mishvela Football Georgia</title>
+  <meta name="description" content="დინამო თბილისის სატესტო გუნდის გვერდი Mishvela Football Georgia-ზე.">
+  <style>
+    :root{
+      --bg:#ffffff;
+      --panel:#ffffff;
+      --panel-2:#f8fafc;
+      --panel-3:#eef2f6;
+      --text:#0b1220;
+      --muted:#344054;
+      --muted-2:#1f2937;
+      --line:rgba(16,24,40,0.18);
+      --red:#b91c1c;
+      --red-2:#991b1b;
+      --black:#020617;
+      --shadow:0 18px 45px rgba(15,23,42,.12);
+      --radius:26px;
+      --container:1220px;
+    }
+
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      font-family:"Segoe UI", "Sylfaen", "Noto Sans Georgian", "DejaVu Sans", sans-serif;
+      background:var(--bg);
+      color:var(--text);
+      font-size:14px;
+      line-height:1.55;
+    }
+
+    a{text-decoration:none;color:inherit}
+    .container{width:min(var(--container), calc(100% - 32px));margin-inline:auto}
+
+    .header{
+      position:sticky;
+      top:0;
+      z-index:1000;
+      background:rgba(255,255,255,.98);
+      backdrop-filter:blur(16px);
+      border-bottom:1px solid var(--line);
+    }
+    .nav{
+      min-height:78px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:18px;
+    }
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      font-size:.95rem;
+      font-weight:900;
+      letter-spacing:-.03em;
+    }
+    .logo{
+      width:42px;
+      height:42px;
+      border-radius:14px;
+      display:grid;
+      place-items:center;
+      background:#ea580c;
+      color:#fff;
+      font-weight:900;
+      box-shadow:0 10px 24px rgba(234,88,12,.28);
+    }
+    .nav-links{
+      display:flex;
+      align-items:center;
+      gap:22px;
+      color:var(--muted-2);
+      font-size:13px;
+      font-weight:800;
+      letter-spacing:-.01em;
+    }
+    .nav-links a:hover,
+    .nav-links a.active{color:var(--red)}
+    .nav-actions{
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-height:52px;
+      padding:0 20px;
+      border-radius:999px;
+      border:1px solid transparent;
+      font-size:13px;
+      font-weight:800;
+      transition:.25s ease;
+      white-space:nowrap;
+      cursor:pointer;
+    }
+    .btn:hover{transform:translateY(-2px)}
+    .btn-red{
+      background:var(--red);
+      color:#fff;
+      border-color:var(--red);
+      box-shadow:0 12px 28px rgba(185,28,28,.28);
+    }
+    .btn-red:hover{background:var(--red-2)}
+    .btn-white{
+      background:#fff;
+      color:var(--text);
+      border-color:var(--line);
+    }
+    .btn-white:hover{background:#eef2f6}
+    .btn-black{
+      background:var(--black);
+      color:#fff;
+      border-color:var(--black);
+      box-shadow:0 12px 28px rgba(2,6,23,.22);
+    }
+
+    .hero{
+      position:relative;
+      overflow:hidden;
+      border-bottom:1px solid var(--line);
+      background:
+        radial-gradient(circle at top right, rgba(185,28,28,.14), transparent 28%),
+        linear-gradient(180deg, #ffffff 0%, #fff6f6 100%);
+    }
+    .hero-grid{
+      display:grid;
+      grid-template-columns:minmax(0, 1.15fr) minmax(340px, .85fr);
+      gap:24px;
+      align-items:center;
+      padding:34px 0 30px;
+    }
+    .eyebrow{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      color:var(--red-2);
+      text-transform:uppercase;
+      letter-spacing:.16em;
+      font-size:11px;
+      font-weight:800;
+      margin-bottom:16px;
+    }
+    .eyebrow::before{
+      content:"";
+      width:9px;
+      height:9px;
+      border-radius:999px;
+      background:var(--red);
+      box-shadow:0 0 0 6px rgba(185,28,28,.16);
+    }
+    h1{
+      margin:0;
+      font-size:clamp(2rem, 4vw, 3.35rem);
+      line-height:.98;
+      letter-spacing:-.05em;
+      font-weight:950;
+    }
+    .lead{
+      margin:14px 0 0;
+      max-width:720px;
+      color:var(--muted);
+      font-size:.92rem;
+    }
+    .hero-actions{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+      margin-top:20px;
+    }
+    .hero-stats{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+      margin-top:18px;
+    }
+    .hero-stat{
+      min-width:160px;
+      border-radius:18px;
+      padding:12px 14px;
+      background:#fff;
+      border:1px solid var(--line);
+      box-shadow:var(--shadow);
+    }
+    .hero-stat strong{
+      display:block;
+      font-size:1rem;
+      font-weight:900;
+      margin-bottom:2px;
+    }
+    .hero-stat span{
+      display:block;
+      color:var(--muted);
+      font-size:.8rem;
+    }
+    .team-cover{
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:30px;
+      padding:24px;
+      box-shadow:var(--shadow);
+    }
+    .team-badge{
+      display:flex;
+      align-items:center;
+      gap:16px;
+      margin-bottom:18px;
+    }
+    .shield{
+      width:92px;
+      height:104px;
+      display:grid;
+      place-items:center;
+      clip-path:polygon(50% 0, 92% 10%, 92% 48%, 50% 100%, 8% 48%, 8% 10%);
+      background:linear-gradient(135deg, #1d4ed8 0%, #1e3a8a 100%);
+      color:#fff;
+      font-size:1.5rem;
+      font-weight:900;
+      box-shadow:0 18px 34px rgba(30,58,138,.24);
+    }
+    .team-badge strong{
+      display:block;
+      font-size:1.15rem;
+      font-weight:900;
+      letter-spacing:-.02em;
+    }
+    .team-badge span{
+      display:block;
+      margin-top:4px;
+      color:var(--muted);
+      font-size:.82rem;
+    }
+    .quick-list{
+      display:grid;
+      gap:10px;
+      margin:0;
+      padding:0;
+      list-style:none;
+    }
+    .quick-list li{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      padding-bottom:10px;
+      border-bottom:1px solid rgba(16,24,40,.08);
+      font-size:.84rem;
+    }
+    .quick-list span{color:var(--muted)}
+    .quick-list strong{font-size:.85rem}
+
+    .section{
+      padding:26px 0 56px;
+    }
+    .section-heading{
+      display:flex;
+      align-items:end;
+      justify-content:space-between;
+      gap:16px;
+      margin-bottom:18px;
+    }
+    .section-heading h2{
+      margin:0;
+      font-size:1.55rem;
+      line-height:1;
+      letter-spacing:-.04em;
+      font-weight:950;
+    }
+    .section-heading p{
+      margin:8px 0 0;
+      color:var(--muted);
+      font-size:.88rem;
+      max-width:760px;
+    }
+    .cards{
+      display:grid;
+      grid-template-columns:repeat(3, minmax(0, 1fr));
+      gap:18px;
+    }
+    .card{
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:28px;
+      padding:22px;
+      box-shadow:var(--shadow);
+    }
+    .card h3{
+      margin:0 0 10px;
+      font-size:1rem;
+      font-weight:900;
+      letter-spacing:-.02em;
+    }
+    .card p{
+      margin:0;
+      color:var(--muted);
+      font-size:.86rem;
+    }
+
+    .connected-banner{
+      margin-bottom:18px;
+      border-radius:22px;
+      padding:16px 18px;
+      border:1px solid rgba(185,28,28,.16);
+      background:#fff7f7;
+      box-shadow:var(--shadow);
+    }
+    .connected-banner strong{
+      display:block;
+      margin-bottom:4px;
+      color:var(--red-2);
+      font-size:.94rem;
+      font-weight:900;
+    }
+    .connected-banner span{
+      display:block;
+      color:var(--muted);
+      font-size:.84rem;
+    }
+
+    .roster-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));
+      gap:18px;
+    }
+    .player-card{
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:26px;
+      padding:18px;
+      box-shadow:var(--shadow);
+      display:grid;
+      gap:12px;
+    }
+    .player-head{
+      display:flex;
+      align-items:center;
+      gap:12px;
+    }
+    .player-avatar{
+      width:52px;
+      height:52px;
+      border-radius:18px;
+      display:grid;
+      place-items:center;
+      background:#eff6ff;
+      color:#1e3a8a;
+      font-weight:900;
+      font-size:1rem;
+    }
+    .player-head strong{
+      display:block;
+      font-size:.96rem;
+      font-weight:900;
+    }
+    .player-head span{
+      display:block;
+      color:var(--muted);
+      font-size:.78rem;
+      margin-top:2px;
+    }
+    .player-meta{
+      display:grid;
+      gap:8px;
+    }
+    .player-meta div{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      padding-bottom:8px;
+      border-bottom:1px solid rgba(16,24,40,.08);
+      font-size:.8rem;
+    }
+    .player-meta span{color:var(--muted)}
+    .player-meta strong{font-size:.82rem}
+    .player-tag{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:6px 10px;
+      border-radius:999px;
+      background:#fee2e2;
+      color:var(--red-2);
+      font-size:.72rem;
+      font-weight:800;
+    }
+
+    .contact-box{
+      display:grid;
+      grid-template-columns:minmax(0, 1fr) auto;
+      gap:18px;
+      align-items:center;
+      border-radius:28px;
+      border:1px solid rgba(185,28,28,.16);
+      background:#fff;
+      box-shadow:var(--shadow);
+      padding:24px;
+    }
+    .contact-box h3{
+      margin:0 0 8px;
+      font-size:1.1rem;
+      font-weight:900;
+      letter-spacing:-.02em;
+    }
+    .contact-box p{
+      margin:0;
+      color:var(--muted);
+      font-size:.88rem;
+      max-width:720px;
+    }
+
+    @media (max-width:980px){
+      .hero-grid,
+      .cards,
+      .contact-box{
+        grid-template-columns:1fr;
+      }
+    }
+    @media (max-width:760px){
+      .nav-links{display:none}
+      .nav-actions .btn-white{display:none}
+      .hero-grid{
+        padding:22px 0 24px;
+      }
+      .team-cover,
+      .card,
+      .contact-box{
+        padding:20px;
+      }
+      .hero-stats{
+        gap:10px;
+      }
+      .hero-stat{
+        min-width:calc(50% - 5px);
+        flex:1 1 calc(50% - 5px);
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="container nav">
+      <a href="index.html" class="brand">
+        <span class="logo">TE</span>
+        <span>Mishvela Football Georgia</span>
+      </a>
+
+      <nav class="nav-links">
+        <a href="index.html">მთავარი</a>
+        <a href="gundebi.html" class="active">გუნდები</a>
+        <a href="pexburtelebi.html">ფეხბურთელები</a>
+        <a href="index.html#coaching">ქოუჩინგი</a>
+        <a href="index.html#camps">ბანაკები</a>
+      </nav>
+
+      <div class="nav-actions" id="teamAuthNav">
+        <a href="login.html?redirect=team-dinamo-tbilisi.html%23login#login" class="btn btn-white">შესვლა</a>
+        <a href="login.html?redirect=team-dinamo-tbilisi.html%23register#register" class="btn btn-red">რეგისტრაცია</a>
+      </div>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="container hero-grid">
+      <div>
+        <div class="eyebrow">სატესტო გუნდის გვერდი</div>
+        <h1 id="teamName">დინამო თბილისი</h1>
+        <p class="lead">
+          ეს არის სატესტო გუნდური პროფილი. თუ მოთამაშის რეგისტრაციაში აირჩიე ზუსტად
+          <strong>დინამო თბილისი</strong>, ეს გვერდი მას უკვე დაკავშირებულ მოთამაშედ აჩვენებს.
+        </p>
+
+        <div class="hero-actions">
+          <a href="#roster" class="btn btn-red">შემადგენლობა</a>
+          <a href="#contact" class="btn btn-black">კონტაქტი</a>
+        </div>
+
+        <div class="hero-stats">
+          <div class="hero-stat">
+            <strong id="teamAge">PRO</strong>
+            <span>ძირითადი კატეგორია</span>
+          </div>
+          <div class="hero-stat">
+            <strong id="teamPlayers">24</strong>
+            <span>მოთამაშე შემადგენლობაში</span>
+          </div>
+          <div class="hero-stat">
+            <strong id="teamCity">თბილისი</strong>
+            <span>ბაზა და ქალაქი</span>
+          </div>
+          <div class="hero-stat">
+            <strong id="teamCoach">გ. აბრამიძე</strong>
+            <span>მთავარი მწვრთნელი</span>
+          </div>
+        </div>
+      </div>
+
+      <aside class="team-cover">
+        <div class="team-badge">
+          <div class="shield">DT</div>
+          <div>
+            <strong>დინამო თბილისი</strong>
+            <span>სატესტო გუნდის პროფილი Mishvela Football Georgia-ზე</span>
+          </div>
+        </div>
+
+        <ul class="quick-list">
+          <li><span>სტატუსი</span><strong>დარეგისტრირებული გუნდი</strong></li>
+          <li><span>გვერდის ტიპი</span><strong>სატესტო ინტეგრაცია</strong></li>
+          <li><span>მიბმის ლოგიკა</span><strong>რეგისტრაციიდან ზუსტი დამთხვევა</strong></li>
+          <li><span>მომავალი ნაბიჯი</span><strong>რეალური roster და DB ბმა</strong></li>
+        </ul>
+      </aside>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-heading">
+        <div>
+          <h2>რატომ არის ეს გვერდი მნიშვნელოვანი</h2>
+          <p>
+            ეს ბლოკი უკვე აჩვენებს იმ flow-ს, რაც გვჭირდება: რეგისტრაციაში არჩეული გუნდი,
+            გუნდების სიაში არსებული ჩანაწერი და ცალკე team page ახლა ერთმანეთთან მიბმულია.
+          </p>
+        </div>
+      </div>
+
+      <div class="cards">
+        <article class="card">
+          <h3>Autocomplete რეგისტრაციაში</h3>
+          <p>მოთამაშე როცა წერს გუნდის სახელს, მსგავსი ჩანაწერები ამოდის და ზუსტი გუნდი შეიძლება პირდაპირ აირჩიოს.</p>
+        </article>
+        <article class="card">
+          <h3>ზუსტი დამთხვევა</h3>
+          <p>თუ ჩანაწერი ემთხვევა უკვე არსებულ გუნდს, პროფილი ინახავს რომელი გუნდი აირჩია და საჭიროებისას გუნდის გვერდსაც უკავშირდება.</p>
+        </article>
+        <article class="card">
+          <h3>თავისუფალი არჩევანი</h3>
+          <p>მოთამაშეს შეუძლია მიუთითოს `უგუნდოდ` ან ჩაწეროს ახალი, ჯერ დაურეგისტრირებელი გუნდი.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="roster">
+    <div class="container">
+      <div class="section-heading">
+        <div>
+          <h2>შემადგენლობა</h2>
+          <p>
+            ქვემოთ არის სატესტო roster. თუ ავტორიზებული მოთამაშე ამ გუნდს დაუკავშირდა რეგისტრაციაში,
+            მისი ბარათიც ამავე სიაში გამოჩნდება.
+          </p>
+        </div>
+      </div>
+
+      <div id="connectedBanner" class="connected-banner" hidden>
+        <strong>შენი პროფილი დაკავშირებულია დინამო თბილისთან</strong>
+        <span id="connectedBannerText">რეგისტრაციისას არჩეული გუნდის მიხედვით შენი ბარათი დაემატა ამ roster-ს.</span>
+      </div>
+
+      <div class="roster-grid" id="rosterGrid"></div>
+    </div>
+  </section>
+
+  <section class="section" id="contact">
+    <div class="container">
+      <div class="contact-box">
+        <div>
+          <h3>კონტაქტი და შემდეგი ნაბიჯი</h3>
+          <p>
+            ეს გუნდის გვერდი სატესტოა. შემდეგ ეტაპზე აქ შეგვიძლია რეალური საკონტაქტო ფორმა,
+            აკადემიის განრიგი, ასაკობრივი გუნდები და მოთამაშეების ბაზიდან ამოღებული live roster დავამატოთ.
+          </p>
+        </div>
+        <div class="nav-actions">
+          <a href="gundebi.html" class="btn btn-white">ყველა გუნდი</a>
+          <a href="login.html?redirect=team-dinamo-tbilisi.html%23register#register" class="btn btn-red">დარეგისტრირდი</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="teams-shared.js"></script>
+  <script src="auth-shared.js"></script>
+  <script>
+    const fallbackTeam = {
+      mark: 'DT',
+      name: 'დინამო თბილისი',
+      city: 'თბილისი, საქართველო',
+      age: 'pro',
+      ageLabel: 'PRO',
+      players: 24,
+      coach: 'გ. აბრამიძე',
+      route: 'team-dinamo-tbilisi.html',
+      slug: 'dinamo-tbilisi'
+    };
+
+    const team = window.siteTeams?.findTeamByName
+      ? (window.siteTeams.findTeamByName('დინამო თბილისი') || fallbackTeam)
+      : fallbackTeam;
+
+    const sampleRoster = [
+      { name: 'ლუკა კაპანაძე', position: 'ნახევარმცველი', foot: 'მარჯვენა', age: '19', tag: 'სატესტო roster' },
+      { name: 'ნიკა თოფურია', position: 'დამცველი', foot: 'ორივე', age: '20', tag: 'სატესტო roster' },
+      { name: 'სანდრო გელაშვილი', position: 'თავდამსხმელი', foot: 'მარცხენა', age: '18', tag: 'სატესტო roster' },
+      { name: 'გიორგი მაისურაძე', position: 'მეკარე', foot: 'მარჯვენა', age: '21', tag: 'სატესტო roster' }
+    ];
+
+    const rosterGrid = document.getElementById('rosterGrid');
+    const connectedBanner = document.getElementById('connectedBanner');
+    const connectedBannerText = document.getElementById('connectedBannerText');
+
+    function normalizeTeamText(value) {
+      if (window.siteTeams?.normalizeText) {
+        return window.siteTeams.normalizeText(value);
+      }
+
+      return String(value || '').trim().toLowerCase().replace(/\s+/g, ' ');
+    }
+
+    function getInitials(name) {
+      return String(name || '')
+        .trim()
+        .split(/\s+/)
+        .slice(0, 2)
+        .map((part) => part[0] || '')
+        .join('')
+        .toUpperCase() || 'MF';
+    }
+
+    function createPlayerCard(player) {
+      return `
+        <article class="player-card">
+          <div class="player-head">
+            <div class="player-avatar">${getInitials(player.name)}</div>
+            <div>
+              <strong>${player.name}</strong>
+              <span>${player.tag}</span>
+            </div>
+          </div>
+          <div class="player-meta">
+            <div><span>პოზიცია</span><strong>${player.position}</strong></div>
+            <div><span>უპირატესი ფეხი</span><strong>${player.foot}</strong></div>
+            <div><span>ასაკი</span><strong>${player.age}</strong></div>
+          </div>
+          <span class="player-tag">${player.tag}</span>
+        </article>
+      `;
+    }
+
+    function renderRoster(extraPlayer) {
+      const players = extraPlayer ? [extraPlayer, ...sampleRoster] : sampleRoster;
+      rosterGrid.innerHTML = players.map(createPlayerCard).join('');
+    }
+
+    async function hydratePage() {
+      document.getElementById('teamName').textContent = team.name;
+      document.getElementById('teamAge').textContent = team.ageLabel;
+      document.getElementById('teamPlayers').textContent = String(team.players);
+      document.getElementById('teamCity').textContent = team.city.split(',')[0];
+      document.getElementById('teamCoach').textContent = team.coach;
+
+      renderRoster();
+
+      if (window.siteAuth?.renderAuthNav) {
+        window.siteAuth.renderAuthNav('#teamAuthNav', {
+          currentPath: 'team-dinamo-tbilisi.html',
+          loginClass: 'btn btn-white',
+          registerClass: 'btn btn-red',
+          profileClass: 'btn btn-white',
+          logoutClass: 'btn btn-red',
+          afterLogout: 'team-dinamo-tbilisi.html'
+        });
+      }
+
+      const client = window.siteAuth?.getClient ? window.siteAuth.getClient() : null;
+      if (!client) {
+        return;
+      }
+
+      const { data } = await client.auth.getSession();
+      const user = data?.session?.user || null;
+      if (!user) {
+        return;
+      }
+
+      const role = window.siteAuth?.getUserRole ? window.siteAuth.getUserRole(user) : String(user?.user_metadata?.role || '');
+      const profile = user.user_metadata?.profile || {};
+      const selectedTeam = String(profile.playerTeam || '').trim();
+      const selectedTeamRoute = String(profile.playerTeamRoute || '').trim();
+      const isLinkedPlayer = role === 'player' && (
+        selectedTeamRoute === team.route ||
+        normalizeTeamText(selectedTeam) === normalizeTeamText(team.name)
+      );
+
+      if (!isLinkedPlayer) {
+        return;
+      }
+
+      const displayName = window.siteAuth?.getUserDisplayName
+        ? window.siteAuth.getUserDisplayName(user)
+        : (user.email || 'შენი პროფილი');
+
+      renderRoster({
+        name: displayName,
+        position: profile.playerPosition || 'მოთამაშე',
+        foot: profile.playerFoot || 'არ არის მითითებული',
+        age: profile.playerAge || 'არ არის მითითებული',
+        tag: 'შენი პროფილი'
+      });
+
+      connectedBanner.hidden = false;
+      connectedBannerText.textContent = `${displayName} უკვე გამოჩნდა დინამო თბილისის სატესტო roster-ში, რადგან რეგისტრაციაში ეს გუნდი დაემთხვა არსებულ ჩანაწერს.`;
+    }
+
+    hydratePage();
+  </script>
+</body>
+</html>

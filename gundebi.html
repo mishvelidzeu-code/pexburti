@@ -80,7 +80,9 @@
       align-items:center;
       gap:22px;
       color:var(--muted-2);
-      font-size:12px;
+      font-size:13px;
+      font-weight:800;
+      letter-spacing:-.01em;
     }
     .nav-links a:hover,
     .nav-links a.active{color:var(--red)}
@@ -345,25 +347,26 @@
       color:var(--muted-2);
     }
     .filters{
-      display:flex;
-      flex-wrap:wrap;
-      gap:12px;
+      display:grid;
+      grid-template-columns:repeat(16, minmax(0, 1fr));
+      gap:8px;
       margin-bottom:24px;
     }
     .filter-btn{
       display:inline-flex;
       align-items:center;
       justify-content:center;
-      min-height:44px;
-      padding:0 18px;
+      min-height:40px;
+      padding:0 8px;
       border-radius:999px;
       border:1px solid var(--line);
       background:#fff;
       color:var(--muted-2);
-      font-size:.84rem;
+      font-size:.75rem;
       font-weight:800;
       cursor:pointer;
       transition:.25s ease;
+      white-space:nowrap;
     }
     .filter-btn:hover{
       border-color:rgba(185,28,28,.34);
@@ -504,6 +507,17 @@
       .toolbar{
         grid-template-columns:1fr;
       }
+      .filters{
+        display:flex;
+        flex-wrap:nowrap;
+        overflow-x:auto;
+        padding-bottom:6px;
+        scrollbar-width:thin;
+      }
+      .filter-btn{
+        flex:0 0 auto;
+        min-width:64px;
+      }
       .hero{
         border-bottom:none;
       }
@@ -586,7 +600,7 @@
             <span>ქალაქი და რეგიონი</span>
           </div>
           <div class="hero-stat">
-            <strong>4</strong>
+            <strong>14</strong>
             <span>ასაკობრივი ჯგუფი</span>
           </div>
           <div class="hero-stat">
@@ -616,7 +630,7 @@
           </div>
           <div class="hero-mini-card">
             <span class="chip">ფილტრი</span>
-            <strong>PRO, U21, U19, U17</strong>
+            <strong>PRO, U21, U19, U17-U6</strong>
             <span>სწრაფი გადართვა ასაკობრივ კატეგორიებზე</span>
           </div>
         </div>
@@ -643,6 +657,17 @@
         <button class="filter-btn" type="button" data-filter="u21">U21</button>
         <button class="filter-btn" type="button" data-filter="u19">U19</button>
         <button class="filter-btn" type="button" data-filter="u17">U17</button>
+        <button class="filter-btn" type="button" data-filter="u16">U16</button>
+        <button class="filter-btn" type="button" data-filter="u15">U15</button>
+        <button class="filter-btn" type="button" data-filter="u14">U14</button>
+        <button class="filter-btn" type="button" data-filter="u13">U13</button>
+        <button class="filter-btn" type="button" data-filter="u12">U12</button>
+        <button class="filter-btn" type="button" data-filter="u11">U11</button>
+        <button class="filter-btn" type="button" data-filter="u10">U10</button>
+        <button class="filter-btn" type="button" data-filter="u9">U9</button>
+        <button class="filter-btn" type="button" data-filter="u8">U8</button>
+        <button class="filter-btn" type="button" data-filter="u7">U7</button>
+        <button class="filter-btn" type="button" data-filter="u6">U6</button>
       </div>
 
       <div class="teams-grid" id="teamsGrid"></div>
@@ -664,28 +689,29 @@
     </div>
   </section>
 
+  <script src="teams-shared.js"></script>
   <script>
-    const teams = [
+    const teams = window.siteTeams?.getTeams ? window.siteTeams.getTeams() : [
       { mark: 'DT', name: 'დინამო თბილისი', city: 'თბილისი, საქართველო', age: 'pro', ageLabel: 'PRO', players: 24, coach: 'გ. აბრამიძე' },
       { mark: 'TQ', name: 'ტორპედო ქუთაისი', city: 'ქუთაისი, საქართველო', age: 'pro', ageLabel: 'PRO', players: 23, coach: 'ლ. კალანდაძე' },
-      { mark: 'SB', name: 'საბურთალო თბილისი', city: 'თბილისი, საქართველო', age: 'u19', ageLabel: 'U19', players: 26, coach: 'ნ. ჯავახიშვილი' },
-      { mark: 'DB', name: 'დინამო ბათუმი', city: 'ბათუმი, საქართველო', age: 'pro', ageLabel: 'PRO', players: 25, coach: 'რ. შანიძე' },
-      { mark: 'DG', name: 'დილა გორი', city: 'გორი, საქართველო', age: 'u21', ageLabel: 'U21', players: 21, coach: 'თ. ნოზაძე' },
-      { mark: 'KF', name: 'კოლხეთი ფოთი', city: 'ფოთი, საქართველო', age: 'u17', ageLabel: 'U17', players: 20, coach: 'ბ. ქარჩავა' },
-      { mark: 'SZ', name: 'სამგურალი წყალტუბო', city: 'წყალტუბო, საქართველო', age: 'pro', ageLabel: 'PRO', players: 24, coach: 'ს. ფაღავა' },
-      { mark: 'GG', name: 'გაგრა თბილისი', city: 'თბილისი, საქართველო', age: 'u19', ageLabel: 'U19', players: 22, coach: 'ო. ჭელიძე' },
-      { mark: 'TL', name: 'თელავი', city: 'თელავი, საქართველო', age: 'pro', ageLabel: 'PRO', players: 23, coach: 'გ. დიასამიძე' },
-      { mark: 'SM', name: 'სამტრედია', city: 'სამტრედია, საქართველო', age: 'u21', ageLabel: 'U21', players: 21, coach: 'ი. მელქაძე' },
-      { mark: 'SQ', name: 'შუქურა ქობულეთი', city: 'ქობულეთი, საქართველო', age: 'u19', ageLabel: 'U19', players: 22, coach: 'ლ. დუმბაძე' },
-      { mark: 'MM', name: 'მერანი მარტვილი', city: 'მარტვილი, საქართველო', age: 'u17', ageLabel: 'U17', players: 19, coach: 'ა. ჭანტურია' },
-      { mark: 'VJ', name: 'ვიტ ჯორჯია', city: 'თბილისი, საქართველო', age: 'u21', ageLabel: 'U21', players: 23, coach: 'შ. მერაბიშვილი' },
-      { mark: 'LT', name: 'ლოკომოტივი თბილისი', city: 'თბილისი, საქართველო', age: 'u19', ageLabel: 'U19', players: 24, coach: 'დ. გაბიტაშვილი' },
-      { mark: 'RS', name: 'რუსთავი', city: 'რუსთავი, საქართველო', age: 'pro', ageLabel: 'PRO', players: 24, coach: 'ვ. მაისურაძე' },
-      { mark: 'CS', name: 'ჩიხურა საჩხერე', city: 'საჩხერე, საქართველო', age: 'u21', ageLabel: 'U21', players: 20, coach: 'რ. კიკნაძე' },
-      { mark: 'SP', name: 'სპაერი', city: 'თბილისი, საქართველო', age: 'pro', ageLabel: 'PRO', players: 22, coach: 'დ. ჩხეტიანი' },
-      { mark: 'IB', name: 'იბერია 1999', city: 'თბილისი, საქართველო', age: 'u19', ageLabel: 'U19', players: 25, coach: 'გ. ზაქარეიშვილი' },
-      { mark: 'GR', name: 'გარეჯი საგარეჯო', city: 'საგარეჯო, საქართველო', age: 'u17', ageLabel: 'U17', players: 18, coach: 'მ. ხუციშვილი' },
-      { mark: 'SN', name: 'სიონი ბოლნისი', city: 'ბოლნისი, საქართველო', age: 'pro', ageLabel: 'PRO', players: 24, coach: 'ზ. მუმლაძე' }
+      { mark: 'SB', name: 'საბურთალო თბილისი', city: 'თბილისი, საქართველო', age: 'u21', ageLabel: 'U21', players: 22, coach: 'ნ. ჯავახიშვილი' },
+      { mark: 'DB', name: 'დინამო ბათუმი', city: 'ბათუმი, საქართველო', age: 'u19', ageLabel: 'U19', players: 21, coach: 'რ. შანიძე' },
+      { mark: 'DG', name: 'დილა გორი', city: 'გორი, საქართველო', age: 'u17', ageLabel: 'U17', players: 20, coach: 'თ. ნოზაძე' },
+      { mark: 'KF', name: 'კოლხეთი ფოთი', city: 'ფოთი, საქართველო', age: 'u16', ageLabel: 'U16', players: 19, coach: 'ბ. ქარჩავა' },
+      { mark: 'SZ', name: 'სამგურალი წყალტუბო', city: 'წყალტუბო, საქართველო', age: 'u15', ageLabel: 'U15', players: 18, coach: 'ს. ფაღავა' },
+      { mark: 'GG', name: 'გაგრა თბილისი', city: 'თბილისი, საქართველო', age: 'u14', ageLabel: 'U14', players: 18, coach: 'ო. ჭელიძე' },
+      { mark: 'TL', name: 'თელავი', city: 'თელავი, საქართველო', age: 'u13', ageLabel: 'U13', players: 17, coach: 'გ. დიასამიძე' },
+      { mark: 'SM', name: 'სამტრედია', city: 'სამტრედია, საქართველო', age: 'u12', ageLabel: 'U12', players: 17, coach: 'ი. მელქაძე' },
+      { mark: 'SQ', name: 'შუქურა ქობულეთი', city: 'ქობულეთი, საქართველო', age: 'u11', ageLabel: 'U11', players: 16, coach: 'ლ. დუმბაძე' },
+      { mark: 'MM', name: 'მერანი მარტვილი', city: 'მარტვილი, საქართველო', age: 'u10', ageLabel: 'U10', players: 16, coach: 'ა. ჭანტურია' },
+      { mark: 'VJ', name: 'ვიტ ჯორჯია', city: 'თბილისი, საქართველო', age: 'u9', ageLabel: 'U9', players: 15, coach: 'შ. მერაბიშვილი' },
+      { mark: 'LT', name: 'ლოკომოტივი თბილისი', city: 'თბილისი, საქართველო', age: 'u8', ageLabel: 'U8', players: 15, coach: 'დ. გაბიტაშვილი' },
+      { mark: 'RS', name: 'რუსთავი', city: 'რუსთავი, საქართველო', age: 'u7', ageLabel: 'U7', players: 14, coach: 'ვ. მაისურაძე' },
+      { mark: 'CS', name: 'ჩიხურა საჩხერე', city: 'საჩხერე, საქართველო', age: 'u6', ageLabel: 'U6', players: 14, coach: 'რ. კიკნაძე' },
+      { mark: 'SP', name: 'სპაერი', city: 'თბილისი, საქართველო', age: 'u21', ageLabel: 'U21', players: 22, coach: 'დ. ჩხეტიანი' },
+      { mark: 'IB', name: 'იბერია 1999', city: 'თბილისი, საქართველო', age: 'u19', ageLabel: 'U19', players: 21, coach: 'გ. ზაქარეიშვილი' },
+      { mark: 'GR', name: 'გარეჯი საგარეჯო', city: 'საგარეჯო, საქართველო', age: 'u17', ageLabel: 'U17', players: 19, coach: 'მ. ხუციშვილი' },
+      { mark: 'SN', name: 'სიონი ბოლნისი', city: 'ბოლნისი, საქართველო', age: 'u16', ageLabel: 'U16', players: 18, coach: 'ზ. მუმლაძე' }
     ];
 
     const teamsGrid = document.getElementById('teamsGrid');
@@ -727,13 +753,16 @@
     }
 
     function createTeamCard(team, index) {
+      const defaultLoginHref = 'login.html?redirect=gundebi.html%23login#login';
+      const viewHref = team.route || defaultLoginHref;
+      const contactHref = team.route ? `${team.route}#contact` : defaultLoginHref;
       return `
         <article class="team-card" data-age="${team.age}" data-search="${`${team.name} ${team.city} ${team.ageLabel} სატესტო`.toLowerCase()}">
           <div class="team-top">
             <div class="team-emblem">${createEmblem(team, index)}</div>
             <div class="team-head">
               <div class="team-badge">სატესტო გუნდი</div>
-              <h3 class="team-name">${team.name}</h3>
+              <h3 class="team-name">${team.route ? `<a href="${viewHref}">${team.name}</a>` : team.name}</h3>
               <div class="team-location">${team.city}</div>
             </div>
           </div>
@@ -743,8 +772,8 @@
             <div class="meta-row"><span>მთავარი მწვრთნელი</span><strong>${team.coach}</strong></div>
           </div>
           <div class="team-footer">
-          <a href="login.html?redirect=gundebi.html%23login#login" class="btn btn-red">ნახვა</a>
-          <a href="login.html?redirect=gundebi.html%23login#login" class="btn btn-white">კონტაქტი</a>
+          <a href="${viewHref}" class="btn btn-red">ნახვა</a>
+          <a href="${contactHref}" class="btn btn-white">კონტაქტი</a>
           </div>
         </article>
       `;

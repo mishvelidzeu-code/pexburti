@@ -82,8 +82,9 @@
       align-items:center;
       gap:22px;
       color:var(--muted-2);
-      font-size:12px;
-      font-weight:700;
+      font-size:13px;
+      font-weight:800;
+      letter-spacing:-.01em;
     }
     .nav-links a:hover,
     .nav-links a.active{color:var(--red)}
@@ -258,6 +259,77 @@
       color:var(--muted);
       font-size:.76rem;
       font-weight:700;
+    }
+    .form-hint a{
+      color:var(--red);
+      font-weight:800;
+      text-decoration:underline;
+    }
+    .form-hint a:hover{color:var(--red-2)}
+    .team-picker{
+      position:relative;
+    }
+    .team-suggestions{
+      position:absolute;
+      top:calc(100% + 8px);
+      left:0;
+      right:0;
+      z-index:24;
+      display:grid;
+      gap:6px;
+      padding:10px;
+      border-radius:18px;
+      border:1px solid var(--line);
+      background:#ffffff;
+      box-shadow:0 18px 38px rgba(15,23,42,.12);
+    }
+    .team-option{
+      width:100%;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      padding:12px 14px;
+      border:none;
+      border-radius:14px;
+      background:#f8fafc;
+      color:var(--text);
+      text-align:left;
+      cursor:pointer;
+      transition:.2s ease;
+    }
+    .team-option:hover{
+      background:#fff1f2;
+    }
+    .team-option-main{
+      display:grid;
+      gap:3px;
+      min-width:0;
+    }
+    .team-option-main strong{
+      font-size:.84rem;
+      font-weight:900;
+      color:var(--muted-2);
+      line-height:1.25;
+    }
+    .team-option-main span{
+      font-size:.75rem;
+      color:var(--muted);
+      line-height:1.3;
+    }
+    .team-option-tag{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-width:56px;
+      padding:6px 10px;
+      border-radius:999px;
+      background:#fee2e2;
+      color:var(--red-2);
+      font-size:.72rem;
+      font-weight:800;
+      white-space:nowrap;
+      flex:0 0 auto;
     }
     .form-check{
       display:flex;
@@ -476,6 +548,7 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="teams-shared.js"></script>
   <script src="auth-shared.js"></script>
   <script>
     const roleSelect = document.getElementById('roleSelect');
@@ -503,16 +576,15 @@
     const roleConfigurations = {
       player: {
         title: 'მოთამაშის რეგისტრაცია',
-        description: 'მოთამაშის რეგისტრაცია დაშვებულია მხოლოდ 18+ ასაკისთვის. დაბადების წლის არჩევის შემდეგ ასაკი ავტომატურად გამოითვლება.',
+        description: 'მოთამაშის რეგისტრაცია დაშვებულია მხოლოდ 18+ ასაკისთვის. დაბადების თარიღის შეყვანის შემდეგ ასაკი ავტომატურად გამოითვლება.',
         fields: [
           {
-            id: 'playerBirthYear',
-            label: 'დაბადების წელი',
-            type: 'year-select',
-            startYear: currentYear - 18,
-            endYear: 1960,
+            id: 'playerBirthDate',
+            label: 'დაბადების თარიღი',
+            type: 'birthdate',
             ageTarget: 'playerAge',
-            helper: 'მოთამაშისთვის მხოლოდ 18 წლის და ზემოთ ასაკი დაიშვება.'
+            placeholder: '01.01.2005',
+            helper: 'შეიყვანე ფორმატში 01.01.2005. მოთამაშისთვის მხოლოდ 18 წლის და ზემოთ ასაკი დაიშვება.'
           },
           {
             id: 'playerAge',
@@ -521,23 +593,22 @@
             placeholder: 'ავტომატურად გამოითვლება'
           },
           { id: 'playerPosition', label: 'პოზიცია', type: 'select', options: ['მეკარე', 'დამცველი', 'ნახევარმცველი', 'თავდამსხმელი'] },
-          { id: 'playerTeam', label: 'მიმდინარე გუნდი', type: 'text', placeholder: 'მაგ: საბურთალო თბილისი' },
+          { id: 'playerTeam', label: 'მიმდინარე გუნდი', type: 'team-autocomplete', placeholder: 'მაგ: დინამო თბილისი ან უგუნდოდ', helper: 'ჩაწერისას გამოჩნდება მსგავსი გუნდები. შეგიძლია აირჩიო დარეგისტრირებული გუნდი, მიუთითო უგუნდოდ ან ჩაწერო ახალი გუნდი.' },
           { id: 'playerFoot', label: 'უპირატესი ფეხი', type: 'select', options: ['მარჯვენა', 'მარცხენა', 'ორივე'] }
         ]
       },
       parent: {
         title: 'მშობლის რეგისტრაცია',
-        description: 'ზედა ველები ეკუთვნის მშობელს. ბავშვის დაბადების წელს აირჩევ და ასაკს სისტემა ავტომატურად გამოთვლის.',
+        description: 'ზედა ველები ეკუთვნის მშობელს. ბავშვის დაბადების თარიღს შეიყვან და ასაკს სისტემა ავტომატურად გამოთვლის.',
         fields: [
           { id: 'childName', label: 'ბავშვის სახელი და გვარი', type: 'text', placeholder: 'მაგ: ლუკა გიორგაძე' },
           {
-            id: 'childBirthYear',
-            label: 'ბავშვის დაბადების წელი',
-            type: 'year-select',
-            startYear: currentYear - 4,
-            endYear: currentYear - 25,
+            id: 'childBirthDate',
+            label: 'ბავშვის დაბადების თარიღი',
+            type: 'birthdate',
             ageTarget: 'childAge',
-            helper: 'ასაკი ავტომატურად გამოჩნდება.'
+            placeholder: '01.01.2013',
+            helper: 'შეიყვანე ფორმატში 01.01.2013. ასაკი ავტომატურად გამოჩნდება.'
           },
           {
             id: 'childAge',
@@ -546,6 +617,7 @@
             placeholder: 'ავტომატურად გამოითვლება'
           },
           { id: 'childPosition', label: 'ბავშვის პოზიცია', type: 'select', options: ['მეკარე', 'დამცველი', 'ნახევარმცველი', 'თავდამსხმელი', 'ჯერ არ არის განსაზღვრული'] },
+          { id: 'childFoot', label: 'ბავშვის უპირატესი ფეხი', type: 'select', options: ['მარჯვენა', 'მარცხენა', 'ორივე', 'ჯერ არ არის განსაზღვრული'] },
           { id: 'parentRelation', label: 'კავშირი ბავშვთან', type: 'select', options: ['დედა', 'მამა', 'მეურვე'] }
         ]
       },
@@ -561,30 +633,79 @@
       }
     };
 
-    function buildYearOptions(startYear, endYear) {
-      const years = [];
-      const start = Number(startYear);
-      const end = Number(endYear);
+    function formatBirthDateInput(value) {
+      const digits = String(value || '').replace(/\D/g, '').slice(0, 8);
+      const parts = [];
 
-      if (!Number.isFinite(start) || !Number.isFinite(end)) {
-        return '';
+      if (digits.length > 0) {
+        parts.push(digits.slice(0, 2));
+      }
+      if (digits.length > 2) {
+        parts.push(digits.slice(2, 4));
+      }
+      if (digits.length > 4) {
+        parts.push(digits.slice(4, 8));
       }
 
-      const step = start >= end ? -1 : 1;
-      for (let year = start; step > 0 ? year <= end : year >= end; year += step) {
-        years.push(`<option value="${year}">${year}</option>`);
-      }
-
-      return years.join('');
+      return parts.join('.');
     }
 
-    function calculateAgeFromYear(year) {
-      const parsedYear = Number(year);
-      if (!parsedYear) {
+    function parseBirthDate(value) {
+      const formatted = formatBirthDateInput(value);
+      if (!/^\d{2}\.\d{2}\.\d{4}$/.test(formatted)) {
         return null;
       }
 
-      return currentYear - parsedYear;
+      const [dayPart, monthPart, yearPart] = formatted.split('.');
+      const day = Number(dayPart);
+      const month = Number(monthPart);
+      const year = Number(yearPart);
+
+      if (!day || !month || !year || year < 1900 || year > currentYear) {
+        return null;
+      }
+
+      const date = new Date(year, month - 1, day);
+      if (
+        Number.isNaN(date.getTime()) ||
+        date.getFullYear() !== year ||
+        date.getMonth() !== month - 1 ||
+        date.getDate() !== day
+      ) {
+        return null;
+      }
+
+      const today = new Date();
+      if (date > today) {
+        return null;
+      }
+
+      return {
+        formatted,
+        date,
+        year,
+        month,
+        day
+      };
+    }
+
+    function calculateAgeFromBirthDate(value) {
+      const parsed = parseBirthDate(value);
+      if (!parsed) {
+        return null;
+      }
+
+      const today = new Date();
+      let age = today.getFullYear() - parsed.year;
+      const hasBirthdayPassed =
+        today.getMonth() > parsed.month - 1 ||
+        (today.getMonth() === parsed.month - 1 && today.getDate() >= parsed.day);
+
+      if (!hasBirthdayPassed) {
+        age -= 1;
+      }
+
+      return age;
     }
 
     function renderField(field) {
@@ -601,21 +722,39 @@
         `;
       }
 
-      if (field.type === 'select' || field.type === 'year-select') {
-        const options = field.type === 'year-select'
-          ? buildYearOptions(field.startYear, field.endYear)
-          : field.options.map((option) => `<option value="${option}">${option}</option>`).join('');
-        const placeholder = field.type === 'year-select'
-          ? 'აირჩიეთ წელი...'
-          : 'აირჩიეთ...';
+      if (field.type === 'birthdate') {
         const ageTarget = field.ageTarget
           ? ` data-age-target="${field.ageTarget}"`
           : '';
         return `
           <div class="form-group">
             <label class="form-label" for="${field.id}">${field.label}</label>
-            <select id="${field.id}" name="${field.id}" class="form-input"${ageTarget} required>
-              <option value="" selected disabled>${placeholder}</option>
+            <input id="${field.id}" name="${field.id}" type="text" class="form-input" placeholder="${field.placeholder || '01.01.2005'}" inputmode="numeric" pattern="\\d{2}\\.\\d{2}\\.\\d{4}" maxlength="10" data-birthdate="true"${ageTarget} autocomplete="bday" required>
+            ${helper}
+          </div>
+        `;
+      }
+
+      if (field.type === 'team-autocomplete') {
+        return `
+          <div class="form-group">
+            <label class="form-label" for="${field.id}">${field.label}</label>
+            <div class="team-picker">
+              <input id="${field.id}" name="${field.id}" type="text" class="form-input" placeholder="${field.placeholder || ''}" autocomplete="off" spellcheck="false" data-team-input="true" required>
+              <div id="${field.id}Suggestions" class="team-suggestions" hidden></div>
+            </div>
+            <div id="${field.id}Hint" class="form-hint" data-default-helper="${field.helper || ''}">${field.helper || ''}</div>
+          </div>
+        `;
+      }
+
+      if (field.type === 'select') {
+        const options = field.options.map((option) => `<option value="${option}">${option}</option>`).join('');
+        return `
+          <div class="form-group">
+            <label class="form-label" for="${field.id}">${field.label}</label>
+            <select id="${field.id}" name="${field.id}" class="form-input" required>
+              <option value="" selected disabled>აირჩიეთ...</option>
               ${options}
             </select>
             ${helper}
@@ -658,7 +797,7 @@
         return;
       }
 
-      const age = calculateAgeFromYear(source.value);
+      const age = calculateAgeFromBirthDate(source.value);
       target.value = age === null ? '' : String(age);
     }
 
@@ -689,7 +828,11 @@
         ${rows.join('')}
       `;
 
-      roleFields.querySelectorAll('select[data-age-target]').forEach(syncComputedAge);
+      roleFields.querySelectorAll('[data-age-target]').forEach(syncComputedAge);
+
+      if (role === 'player') {
+        initializeTeamAutocomplete(document.getElementById('playerTeam'));
+      }
     }
 
     function setStatus(element, message = '', state = 'info') {
@@ -735,6 +878,17 @@
         }
         return payload;
       }, {});
+
+      if (role === 'player') {
+        const teamSelection = resolveTeamSelection(document.getElementById('playerTeam')?.value);
+        payload.playerTeam = teamSelection.name;
+        payload.playerTeamRegistered = String(teamSelection.registered);
+        payload.playerTeamRoute = teamSelection.route || '';
+        payload.playerTeamSlug = teamSelection.slug || '';
+        payload.playerTeamStatus = teamSelection.kind;
+      }
+
+      return payload;
     }
 
     function sanitizeDigitsField(input) {
@@ -747,6 +901,248 @@
       input.value = Number.isFinite(maxLength) && maxLength > 0
         ? digits.slice(0, maxLength)
         : digits;
+    }
+
+    function sanitizeBirthDateField(input) {
+      if (!input || !input.dataset || !input.dataset.birthdate) {
+        return;
+      }
+
+      input.value = formatBirthDateInput(input.value);
+    }
+
+    function escapeHtml(value) {
+      return String(value || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function normalizeTeamText(value) {
+      if (window.siteTeams?.normalizeText) {
+        return window.siteTeams.normalizeText(value);
+      }
+
+      return String(value || '').trim().toLowerCase().replace(/\s+/g, ' ');
+    }
+
+    function resolveTeamSelection(rawValue) {
+      const value = String(rawValue || '').trim();
+      if (!value) {
+        return {
+          name: '',
+          city: '',
+          route: '',
+          slug: '',
+          registered: false,
+          kind: 'empty'
+        };
+      }
+
+      if (normalizeTeamText(value) === normalizeTeamText('უგუნდოდ')) {
+        return {
+          name: 'უგუნდოდ',
+          city: 'თავისუფალი მოთამაშე',
+          route: '',
+          slug: '',
+          registered: false,
+          kind: 'free-agent'
+        };
+      }
+
+      const matchedTeam = window.siteTeams?.findTeamByName
+        ? window.siteTeams.findTeamByName(value)
+        : null;
+
+      if (matchedTeam) {
+        return {
+          ...matchedTeam,
+          registered: true,
+          kind: 'registered'
+        };
+      }
+
+      return {
+        name: value,
+        city: 'ახალი, ჯერ დაურეგისტრირებელი გუნდი',
+        route: '',
+        slug: '',
+        registered: false,
+        kind: 'custom'
+      };
+    }
+
+    function getTeamSuggestions(rawValue) {
+      const value = String(rawValue || '').trim();
+      const normalized = normalizeTeamText(value);
+      const suggestions = [];
+      const seen = new Set();
+
+      const pushSuggestion = (item) => {
+        const key = normalizeTeamText(item?.name);
+        if (!key || seen.has(key)) {
+          return;
+        }
+
+        seen.add(key);
+        suggestions.push(item);
+      };
+
+      if (!normalized || normalizeTeamText('უგუნდოდ').includes(normalized)) {
+        pushSuggestion({
+          name: 'უგუნდოდ',
+          city: 'გუნდის გარეშე პროფილი',
+          route: '',
+          slug: '',
+          registered: false,
+          kind: 'free-agent'
+        });
+      }
+
+      const registeredTeams = window.siteTeams?.searchTeams
+        ? window.siteTeams.searchTeams(value, 6)
+        : [];
+
+      registeredTeams.forEach((team) => {
+        pushSuggestion({
+          ...team,
+          registered: true,
+          kind: 'registered'
+        });
+      });
+
+      const exactSelection = resolveTeamSelection(value);
+      if (value && exactSelection.kind === 'custom') {
+        pushSuggestion(exactSelection);
+      }
+
+      return suggestions.slice(0, 7);
+    }
+
+    function hideTeamSuggestions(input) {
+      const panel = document.getElementById(`${input?.id || ''}Suggestions`);
+      if (!panel) {
+        return;
+      }
+
+      panel.hidden = true;
+      panel.innerHTML = '';
+    }
+
+    function updateTeamFieldHint(input) {
+      if (!input) {
+        return resolveTeamSelection('');
+      }
+
+      const hint = document.getElementById(`${input.id}Hint`);
+      const selection = resolveTeamSelection(input.value);
+      if (!hint) {
+        return selection;
+      }
+
+      const defaultHelper = hint.dataset.defaultHelper || '';
+
+      if (selection.kind === 'empty') {
+        hint.textContent = defaultHelper;
+        return selection;
+      }
+
+      if (selection.kind === 'registered') {
+        input.value = selection.name;
+        hint.innerHTML = selection.route
+          ? `ეს გუნდი უკვე დარეგისტრირებულია. <a href="${selection.route}" target="_blank" rel="noopener">ნახე გუნდის სატესტო გვერდი</a>.`
+          : 'ეს გუნდი უკვე დარეგისტრირებულია და ჩანაწერი ავტომატურად დაემთხვევა ბაზაში არსებულ გუნდს.';
+        return selection;
+      }
+
+      if (selection.kind === 'free-agent') {
+        input.value = selection.name;
+        hint.textContent = 'მოთამაშე ჩაიწერება როგორც უგუნდო და გუნდთან მიბმა არ მოხდება.';
+        return selection;
+      }
+
+      hint.textContent = 'ეს გუნდი ჯერ არ არის დარეგისტრირებული. ჩანაწერი შეინახება როგორც ახალი ტექსტური გუნდი.';
+      return selection;
+    }
+
+    function renderTeamSuggestions(input, showWhenEmpty = false) {
+      if (!input) {
+        return;
+      }
+
+      const panel = document.getElementById(`${input.id}Suggestions`);
+      if (!panel) {
+        return;
+      }
+
+      const value = String(input.value || '').trim();
+      if (!showWhenEmpty && !value) {
+        hideTeamSuggestions(input);
+        return;
+      }
+
+      const suggestions = getTeamSuggestions(value);
+      if (!suggestions.length) {
+        hideTeamSuggestions(input);
+        return;
+      }
+
+      panel.innerHTML = suggestions.map((option) => {
+        const tag = option.kind === 'registered'
+          ? (option.ageLabel || 'TEAM')
+          : option.kind === 'free-agent'
+            ? 'FREE'
+            : 'NEW';
+        const subline = option.kind === 'custom'
+          ? 'დაემატება როგორც ხელით შეყვანილი გუნდი'
+          : option.city;
+
+        return `
+          <button type="button" class="team-option" data-team-value="${escapeHtml(option.name)}">
+            <span class="team-option-main">
+              <strong>${escapeHtml(option.name)}</strong>
+              <span>${escapeHtml(subline)}</span>
+            </span>
+            <span class="team-option-tag">${escapeHtml(tag)}</span>
+          </button>
+        `;
+      }).join('');
+
+      panel.hidden = false;
+
+      panel.querySelectorAll('.team-option').forEach((button) => {
+        button.addEventListener('mousedown', (event) => {
+          event.preventDefault();
+          input.value = button.dataset.teamValue || '';
+          hideTeamSuggestions(input);
+          updateTeamFieldHint(input);
+          setStatus(registerStatus);
+        });
+      });
+    }
+
+    function initializeTeamAutocomplete(input) {
+      if (!input || input.dataset.teamReady === 'true') {
+        return;
+      }
+
+      input.dataset.teamReady = 'true';
+      input.addEventListener('focus', () => renderTeamSuggestions(input, true));
+      input.addEventListener('blur', () => {
+        window.setTimeout(() => {
+          hideTeamSuggestions(input);
+          updateTeamFieldHint(input);
+        }, 120);
+      });
+      input.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') {
+          hideTeamSuggestions(input);
+        }
+      });
+
+      updateTeamFieldHint(input);
     }
 
     function validateRegisterForm() {
@@ -789,30 +1185,42 @@
       }
 
       if (role === 'player') {
-        const playerBirthYearInput = document.getElementById('playerBirthYear');
-        const playerAge = calculateAgeFromYear(playerBirthYearInput?.value);
+        const playerBirthDateInput = document.getElementById('playerBirthDate');
+        const playerTeamInput = document.getElementById('playerTeam');
+        const playerAge = calculateAgeFromBirthDate(playerBirthDateInput?.value);
+        const teamSelection = resolveTeamSelection(playerTeamInput?.value);
 
-        if (!playerBirthYearInput?.value || playerAge === null) {
-          setStatus(registerStatus, 'აირჩიე დაბადების წელი, რომ მოთამაშის ასაკი სწორად განისაზღვროს.', 'error');
-          playerBirthYearInput?.focus();
+        if (!playerBirthDateInput?.value || playerAge === null) {
+          setStatus(registerStatus, 'შეიყვანე დაბადების თარიღი ფორმატში 01.01.2005, რომ მოთამაშის ასაკი სწორად განისაზღვროს.', 'error');
+          playerBirthDateInput?.focus();
           return false;
         }
 
         if (playerAge < 18) {
           setStatus(registerStatus, 'მოთამაშის რეგისტრაცია დაშვებულია მხოლოდ 18 წლის და ზემოთ ასაკისთვის.', 'error');
-          playerBirthYearInput.focus();
+          playerBirthDateInput.focus();
           return false;
+        }
+
+        if (!teamSelection.name) {
+          setStatus(registerStatus, 'აირჩიე მიმდინარე გუნდი, მიუთითე უგუნდოდ ან ჩაწერე ახალი გუნდი.', 'error');
+          playerTeamInput?.focus();
+          return false;
+        }
+
+        if (teamSelection.kind === 'registered' || teamSelection.kind === 'free-agent') {
+          playerTeamInput.value = teamSelection.name;
         }
       }
 
       if (role === 'parent') {
-        const childBirthYearInput = document.getElementById('childBirthYear');
+        const childBirthDateInput = document.getElementById('childBirthDate');
         const childAgeInput = document.getElementById('childAge');
 
-        syncComputedAge(childBirthYearInput);
+        syncComputedAge(childBirthDateInput);
         if (!childAgeInput?.value) {
-          setStatus(registerStatus, 'ბავშვის დაბადების წელი აირჩიე, რომ ასაკი ავტომატურად გამოითვალოს.', 'error');
-          childBirthYearInput?.focus();
+          setStatus(registerStatus, 'შეიყვანე ბავშვის დაბადების თარიღი ფორმატში 01.01.2013, რომ ასაკი ავტომატურად გამოითვალოს.', 'error');
+          childBirthDateInput?.focus();
           return false;
         }
       }
@@ -872,7 +1280,16 @@
         sanitizeDigitsField(target);
       }
 
-      if (target.matches('select[data-age-target]')) {
+      if (target.matches('[data-birthdate]')) {
+        sanitizeBirthDateField(target);
+      }
+
+      if (target.matches('[data-team-input]')) {
+        renderTeamSuggestions(target);
+        updateTeamFieldHint(target);
+      }
+
+      if (target.matches('[data-age-target]')) {
         syncComputedAge(target);
       }
     });
@@ -883,7 +1300,15 @@
         return;
       }
 
-      if (target.matches('select[data-age-target]')) {
+      if (target.matches('[data-birthdate]')) {
+        sanitizeBirthDateField(target);
+      }
+
+      if (target.matches('[data-team-input]')) {
+        updateTeamFieldHint(target);
+      }
+
+      if (target.matches('[data-age-target]')) {
         syncComputedAge(target);
       }
     });
