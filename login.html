@@ -188,6 +188,11 @@
       border-color:var(--red);
       box-shadow:0 0 0 4px rgba(185,28,28,.12);
     }
+    .form-input[readonly]{
+      background:#eef2f6;
+      color:var(--muted-2);
+      cursor:not-allowed;
+    }
     .forgot-password{
       display:block;
       text-align:right;
@@ -248,6 +253,38 @@
       color:var(--muted);
       font-size:.84rem;
     }
+    .form-hint{
+      margin-top:6px;
+      color:var(--muted);
+      font-size:.76rem;
+      font-weight:700;
+    }
+    .form-check{
+      display:flex;
+      align-items:flex-start;
+      gap:10px;
+      margin:2px 0 18px;
+    }
+    .form-check input{
+      width:18px;
+      height:18px;
+      margin-top:2px;
+      accent-color:var(--red);
+      cursor:pointer;
+      flex:0 0 auto;
+    }
+    .form-check label{
+      color:var(--muted);
+      font-size:.84rem;
+      font-weight:700;
+      line-height:1.5;
+    }
+    .form-check a{
+      color:var(--red);
+      font-weight:800;
+      text-decoration:underline;
+    }
+    .form-check a:hover{color:var(--red-2)}
 
     .auth-switch{
       text-align:center;
@@ -367,11 +404,22 @@
           <div class="form-row">
             <div class="form-group">
               <label class="form-label" for="firstName">სახელი</label>
-              <input id="firstName" type="text" class="form-input" placeholder="თქვენი სახელი" required>
+              <input id="firstName" type="text" class="form-input" placeholder="თქვენი სახელი" autocomplete="given-name" required>
             </div>
             <div class="form-group">
               <label class="form-label" for="lastName">გვარი</label>
-              <input id="lastName" type="text" class="form-input" placeholder="თქვენი გვარი" required>
+              <input id="lastName" type="text" class="form-input" placeholder="თქვენი გვარი" autocomplete="family-name" required>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="personalNumber">პირადი ნომერი</label>
+              <input id="personalNumber" type="text" class="form-input" placeholder="11 ციფრი" inputmode="numeric" pattern="[0-9]{11}" minlength="11" maxlength="11" data-digits-only="11" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="phoneNumber">ტელეფონის ნომერი</label>
+              <input id="phoneNumber" type="tel" class="form-input" placeholder="599123456" inputmode="numeric" pattern="[0-9]{9,12}" minlength="9" maxlength="12" data-digits-only="12" autocomplete="tel" required>
             </div>
           </div>
 
@@ -379,7 +427,7 @@
             <label class="form-label" for="roleSelect">როლი სისტემაში</label>
             <select id="roleSelect" class="form-input" required>
               <option value="" selected disabled>აირჩიეთ როლი...</option>
-              <option value="player">მოთამაშე</option>
+              <option value="player">მოთამაშე +18</option>
               <option value="parent">მშობელი</option>
               <option value="agent">აგენტი</option>
             </select>
@@ -396,12 +444,24 @@
 
           <div class="form-group">
             <label class="form-label" for="registerEmail">ელ-ფოსტა</label>
-            <input id="registerEmail" type="email" class="form-input" placeholder="სახელი@domain.com" required>
+            <input id="registerEmail" type="email" class="form-input" placeholder="სახელი@domain.com" autocomplete="email" required>
           </div>
 
           <div class="form-group">
             <label class="form-label" for="registerPassword">პაროლი</label>
-            <input id="registerPassword" type="password" class="form-input" placeholder="მინიმუმ 8 სიმბოლო" minlength="8" required>
+            <input id="registerPassword" type="password" class="form-input" placeholder="მინიმუმ 8 სიმბოლო" minlength="8" autocomplete="new-password" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="confirmPassword">გაიმეორე პაროლი</label>
+            <input id="confirmPassword" type="password" class="form-input" placeholder="პაროლი უნდა დაემთხვეს" minlength="8" autocomplete="new-password" required>
+          </div>
+
+          <div class="form-check">
+            <input id="acceptTerms" type="checkbox" required>
+            <label for="acceptTerms">
+              ვეთანხმები <a href="terms.html" target="_blank" rel="noopener">წესებს და პირობებს</a>
+            </label>
           </div>
 
           <div id="registerStatus" class="form-status" data-state="info" hidden></div>
@@ -416,10 +476,8 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="auth-shared.js"></script>
   <script>
-    const SUPABASE_URL = 'https://exbakxkfbglnsdescimj.supabase.co';
-    const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_EGyaVD9bOtD5PHJbT5qPpw_9P4MHhwE';
-
     const roleSelect = document.getElementById('roleSelect');
     const roleNote = document.getElementById('roleNote');
     const roleFields = document.getElementById('roleFields');
@@ -432,16 +490,36 @@
     const forgotPasswordLink = document.getElementById('forgotPasswordLink');
     const loginSubmitButton = loginForm.querySelector('button[type="submit"]');
     const registerSubmitButton = registerForm.querySelector('button[type="submit"]');
-    const supabaseClient = window.supabase?.createClient
-      ? window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY)
+    const currentYear = new Date().getFullYear();
+    const supabaseClient = window.siteAuth?.getClient
+      ? window.siteAuth.getClient()
       : null;
+
+    const defaultRoleNote = {
+      title: 'აირჩიეთ როლი',
+      description: 'არჩეული როლის მიხედვით ფორმა ავტომატურად გაჩვენებს შესაბამის სავალდებულო ველებს.'
+    };
 
     const roleConfigurations = {
       player: {
         title: 'მოთამაშის რეგისტრაცია',
-        description: 'შეავსე შენი სათამაშო პროფილი, ასაკი და ამჟამინდელი საფეხბურთო ინფორმაცია.',
+        description: 'მოთამაშის რეგისტრაცია დაშვებულია მხოლოდ 18+ ასაკისთვის. დაბადების წლის არჩევის შემდეგ ასაკი ავტომატურად გამოითვლება.',
         fields: [
-          { id: 'playerAge', label: 'ასაკი', type: 'number', placeholder: 'მაგ: 16', min: '6', max: '40' },
+          {
+            id: 'playerBirthYear',
+            label: 'დაბადების წელი',
+            type: 'year-select',
+            startYear: currentYear - 18,
+            endYear: 1960,
+            ageTarget: 'playerAge',
+            helper: 'მოთამაშისთვის მხოლოდ 18 წლის და ზემოთ ასაკი დაიშვება.'
+          },
+          {
+            id: 'playerAge',
+            label: 'ასაკი',
+            type: 'computed-age',
+            placeholder: 'ავტომატურად გამოითვლება'
+          },
           { id: 'playerPosition', label: 'პოზიცია', type: 'select', options: ['მეკარე', 'დამცველი', 'ნახევარმცველი', 'თავდამსხმელი'] },
           { id: 'playerTeam', label: 'მიმდინარე გუნდი', type: 'text', placeholder: 'მაგ: საბურთალო თბილისი' },
           { id: 'playerFoot', label: 'უპირატესი ფეხი', type: 'select', options: ['მარჯვენა', 'მარცხენა', 'ორივე'] }
@@ -449,10 +527,24 @@
       },
       parent: {
         title: 'მშობლის რეგისტრაცია',
-        description: 'მიუთითე ბავშვის საბაზისო მონაცემები და შენი კავშირი, რომ სწორი პროფილი შეიქმნას.',
+        description: 'ზედა ველები ეკუთვნის მშობელს. ბავშვის დაბადების წელს აირჩევ და ასაკს სისტემა ავტომატურად გამოთვლის.',
         fields: [
           { id: 'childName', label: 'ბავშვის სახელი და გვარი', type: 'text', placeholder: 'მაგ: ლუკა გიორგაძე' },
-          { id: 'childAge', label: 'ბავშვის ასაკი', type: 'number', placeholder: 'მაგ: 12', min: '4', max: '25' },
+          {
+            id: 'childBirthYear',
+            label: 'ბავშვის დაბადების წელი',
+            type: 'year-select',
+            startYear: currentYear - 4,
+            endYear: currentYear - 25,
+            ageTarget: 'childAge',
+            helper: 'ასაკი ავტომატურად გამოჩნდება.'
+          },
+          {
+            id: 'childAge',
+            label: 'ბავშვის ასაკი',
+            type: 'computed-age',
+            placeholder: 'ავტომატურად გამოითვლება'
+          },
           { id: 'childPosition', label: 'ბავშვის პოზიცია', type: 'select', options: ['მეკარე', 'დამცველი', 'ნახევარმცველი', 'თავდამსხმელი', 'ჯერ არ არის განსაზღვრული'] },
           { id: 'parentRelation', label: 'კავშირი ბავშვთან', type: 'select', options: ['დედა', 'მამა', 'მეურვე'] }
         ]
@@ -469,39 +561,112 @@
       }
     };
 
+    function buildYearOptions(startYear, endYear) {
+      const years = [];
+      const start = Number(startYear);
+      const end = Number(endYear);
+
+      if (!Number.isFinite(start) || !Number.isFinite(end)) {
+        return '';
+      }
+
+      const step = start >= end ? -1 : 1;
+      for (let year = start; step > 0 ? year <= end : year >= end; year += step) {
+        years.push(`<option value="${year}">${year}</option>`);
+      }
+
+      return years.join('');
+    }
+
+    function calculateAgeFromYear(year) {
+      const parsedYear = Number(year);
+      if (!parsedYear) {
+        return null;
+      }
+
+      return currentYear - parsedYear;
+    }
+
     function renderField(field) {
-      if (field.type === 'select') {
-        const options = field.options.map((option) => `<option value="${option}">${option}</option>`).join('');
+      const helper = field.helper
+        ? `<div class="form-hint">${field.helper}</div>`
+        : '';
+
+      if (field.type === 'computed-age') {
         return `
           <div class="form-group">
             <label class="form-label" for="${field.id}">${field.label}</label>
-            <select id="${field.id}" name="${field.id}" class="form-input" required>
-              <option value="" selected disabled>აირჩიეთ...</option>
+            <input id="${field.id}" name="${field.id}" type="text" class="form-input" placeholder="${field.placeholder || ''}" readonly aria-readonly="true">
+          </div>
+        `;
+      }
+
+      if (field.type === 'select' || field.type === 'year-select') {
+        const options = field.type === 'year-select'
+          ? buildYearOptions(field.startYear, field.endYear)
+          : field.options.map((option) => `<option value="${option}">${option}</option>`).join('');
+        const placeholder = field.type === 'year-select'
+          ? 'აირჩიეთ წელი...'
+          : 'აირჩიეთ...';
+        const ageTarget = field.ageTarget
+          ? ` data-age-target="${field.ageTarget}"`
+          : '';
+        return `
+          <div class="form-group">
+            <label class="form-label" for="${field.id}">${field.label}</label>
+            <select id="${field.id}" name="${field.id}" class="form-input"${ageTarget} required>
+              <option value="" selected disabled>${placeholder}</option>
               ${options}
             </select>
+            ${helper}
           </div>
         `;
       }
 
       const min = field.min ? ` min="${field.min}"` : '';
       const max = field.max ? ` max="${field.max}"` : '';
+      const minlength = field.minLength ? ` minlength="${field.minLength}"` : '';
+      const maxlength = field.maxLength ? ` maxlength="${field.maxLength}"` : '';
+      const pattern = field.pattern ? ` pattern="${field.pattern}"` : '';
+      const inputmode = field.inputmode ? ` inputmode="${field.inputmode}"` : '';
+      const autocomplete = field.autocomplete ? ` autocomplete="${field.autocomplete}"` : '';
+      const digitsOnly = field.digitsOnly ? ` data-digits-only="${field.digitsOnly}"` : '';
       return `
         <div class="form-group">
           <label class="form-label" for="${field.id}">${field.label}</label>
-          <input id="${field.id}" name="${field.id}" type="${field.type}" class="form-input" placeholder="${field.placeholder || ''}"${min}${max} required>
+          <input id="${field.id}" name="${field.id}" type="${field.type}" class="form-input" placeholder="${field.placeholder || ''}"${min}${max}${minlength}${maxlength}${pattern}${inputmode}${autocomplete}${digitsOnly} required>
+          ${helper}
         </div>
       `;
+    }
+
+    function resetRoleState() {
+      roleNote.innerHTML = `
+        <strong>${defaultRoleNote.title}</strong>
+        <span>${defaultRoleNote.description}</span>
+      `;
+      roleFields.innerHTML = '<div class="role-empty">როლის არჩევის შემდეგ აქ გამოჩნდება შესაბამისი კითხვები.</div>';
+    }
+
+    function syncComputedAge(source) {
+      if (!source || !source.dataset || !source.dataset.ageTarget) {
+        return;
+      }
+
+      const target = document.getElementById(source.dataset.ageTarget);
+      if (!target) {
+        return;
+      }
+
+      const age = calculateAgeFromYear(source.value);
+      target.value = age === null ? '' : String(age);
     }
 
     function renderRoleFields(role) {
       const config = roleConfigurations[role];
 
       if (!config) {
-        roleNote.innerHTML = `
-          <strong>აირჩიეთ როლი</strong>
-          <span>არჩეული როლის მიხედვით ფორმა ავტომატურად გაჩვენებს შესაბამის ველებს.</span>
-        `;
-        roleFields.innerHTML = '<div class="role-empty">როლის არჩევის შემდეგ აქ გამოჩნდება შესაბამისი კითხვები.</div>';
+        resetRoleState();
         return;
       }
 
@@ -523,6 +688,8 @@
         </div>
         ${rows.join('')}
       `;
+
+      roleFields.querySelectorAll('select[data-age-target]').forEach(syncComputedAge);
     }
 
     function setStatus(element, message = '', state = 'info') {
@@ -550,22 +717,9 @@
     }
 
     function sanitizeRedirect() {
-      const params = new URLSearchParams(window.location.search);
-      const redirect = (params.get('redirect') || '').trim();
-
-      if (!redirect) {
-        return 'index.html';
-      }
-
-      if (/^(https?:|\/\/|javascript:|data:)/i.test(redirect)) {
-        return 'index.html';
-      }
-
-      if (!/^[a-zA-Z0-9._/-]+\.html(?:[?#][^\s]*)?$/i.test(redirect)) {
-        return 'index.html';
-      }
-
-      return redirect;
+      return window.siteAuth?.getRedirectParam
+        ? window.siteAuth.getRedirectParam()
+        : '';
     }
 
     function getRolePayload(role) {
@@ -577,15 +731,105 @@
       return config.fields.reduce((payload, field) => {
         const input = document.getElementById(field.id);
         if (input) {
-          payload[field.id] = input.value.trim();
+          payload[field.id] = String(input.value || '').trim();
         }
         return payload;
       }, {});
     }
 
-    function redirectToTarget(fallbackHash = '') {
-      const target = sanitizeRedirect();
-      const normalizedTarget = fallbackHash && !target.includes('#') ? `${target}${fallbackHash}` : target;
+    function sanitizeDigitsField(input) {
+      if (!input || !input.dataset || !input.dataset.digitsOnly) {
+        return;
+      }
+
+      const maxLength = Number(input.dataset.digitsOnly);
+      const digits = String(input.value || '').replace(/\D/g, '');
+      input.value = Number.isFinite(maxLength) && maxLength > 0
+        ? digits.slice(0, maxLength)
+        : digits;
+    }
+
+    function validateRegisterForm() {
+      if (!registerForm.reportValidity()) {
+        return false;
+      }
+
+      const personalNumberInput = document.getElementById('personalNumber');
+      const phoneNumberInput = document.getElementById('phoneNumber');
+      const passwordInput = document.getElementById('registerPassword');
+      const confirmPasswordInput = document.getElementById('confirmPassword');
+      const termsCheckbox = document.getElementById('acceptTerms');
+      const role = roleSelect.value;
+
+      const personalNumber = String(personalNumberInput.value || '').replace(/\D/g, '');
+      const phoneNumber = String(phoneNumberInput.value || '').replace(/\D/g, '');
+
+      if (personalNumber.length !== 11) {
+        setStatus(registerStatus, 'პირადი ნომერი უნდა შედგებოდეს ზუსტად 11 ციფრისგან.', 'error');
+        personalNumberInput.focus();
+        return false;
+      }
+
+      if (phoneNumber.length < 9) {
+        setStatus(registerStatus, 'ტელეფონის ნომერი შეიყვანე სწორად.', 'error');
+        phoneNumberInput.focus();
+        return false;
+      }
+
+      if (passwordInput.value !== confirmPasswordInput.value) {
+        setStatus(registerStatus, 'ორივე პაროლი უნდა ემთხვეოდეს ერთმანეთს.', 'error');
+        confirmPasswordInput.focus();
+        return false;
+      }
+
+      if (!termsCheckbox.checked) {
+        setStatus(registerStatus, 'რეგისტრაციამდე აუცილებელია წესებს და პირობებს დაეთანხმო.', 'error');
+        termsCheckbox.focus();
+        return false;
+      }
+
+      if (role === 'player') {
+        const playerBirthYearInput = document.getElementById('playerBirthYear');
+        const playerAge = calculateAgeFromYear(playerBirthYearInput?.value);
+
+        if (!playerBirthYearInput?.value || playerAge === null) {
+          setStatus(registerStatus, 'აირჩიე დაბადების წელი, რომ მოთამაშის ასაკი სწორად განისაზღვროს.', 'error');
+          playerBirthYearInput?.focus();
+          return false;
+        }
+
+        if (playerAge < 18) {
+          setStatus(registerStatus, 'მოთამაშის რეგისტრაცია დაშვებულია მხოლოდ 18 წლის და ზემოთ ასაკისთვის.', 'error');
+          playerBirthYearInput.focus();
+          return false;
+        }
+      }
+
+      if (role === 'parent') {
+        const childBirthYearInput = document.getElementById('childBirthYear');
+        const childAgeInput = document.getElementById('childAge');
+
+        syncComputedAge(childBirthYearInput);
+        if (!childAgeInput?.value) {
+          setStatus(registerStatus, 'ბავშვის დაბადების წელი აირჩიე, რომ ასაკი ავტომატურად გამოითვალოს.', 'error');
+          childBirthYearInput?.focus();
+          return false;
+        }
+      }
+
+      return true;
+    }
+
+    function redirectToTarget(user, fallbackHash = '') {
+      const explicitTarget = sanitizeRedirect();
+      const target = explicitTarget || (
+        window.siteAuth?.getProfileRouteForUser
+          ? window.siteAuth.getProfileRouteForUser(user)
+          : 'user-profile.html'
+      );
+      const normalizedTarget = fallbackHash && !target.includes('#')
+        ? `${target}${fallbackHash}`
+        : target;
       window.location.href = normalizedTarget;
     }
 
@@ -618,6 +862,32 @@
       setStatus(registerStatus);
     });
 
+    registerForm.addEventListener('input', (event) => {
+      const target = event.target;
+      if (!target || !target.matches) {
+        return;
+      }
+
+      if (target.matches('[data-digits-only]')) {
+        sanitizeDigitsField(target);
+      }
+
+      if (target.matches('select[data-age-target]')) {
+        syncComputedAge(target);
+      }
+    });
+
+    registerForm.addEventListener('change', (event) => {
+      const target = event.target;
+      if (!target || !target.matches) {
+        return;
+      }
+
+      if (target.matches('select[data-age-target]')) {
+        syncComputedAge(target);
+      }
+    });
+
     loginForm.addEventListener('submit', async (event) => {
       event.preventDefault();
       setStatus(loginStatus);
@@ -633,7 +903,7 @@
       setLoading(loginSubmitButton, true, 'შესვლა', 'მიმდინარეობს...');
 
       try {
-        const { error } = await supabaseClient.auth.signInWithPassword({
+        const { data, error } = await supabaseClient.auth.signInWithPassword({
           email,
           password
         });
@@ -642,8 +912,8 @@
           throw error;
         }
 
-        setStatus(loginStatus, 'წარმატებით შეხვედი. ახლავე გადაგამისამართებ.', 'success');
-        setTimeout(() => redirectToTarget(), 700);
+        setStatus(loginStatus, 'წარმატებით შეხვედი. პროფილი უკვე მზად არის. ახლავე გადაგამისამართებ.', 'success');
+        setTimeout(() => redirectToTarget(data.user), 700);
       } catch (error) {
         setStatus(loginStatus, error.message || 'შესვლა ვერ შესრულდა. მონაცემები გადაამოწმე.', 'error');
       } finally {
@@ -659,6 +929,10 @@
       }
       setStatus(registerStatus);
 
+      if (!validateRegisterForm()) {
+        return;
+      }
+
       if (!supabaseClient) {
         setStatus(registerStatus, 'Supabase ვერ ჩაიტვირთა. ინტერნეტი ან კავშირი გადაამოწმე.', 'error');
         return;
@@ -666,6 +940,8 @@
 
       const firstName = document.getElementById('firstName').value.trim();
       const lastName = document.getElementById('lastName').value.trim();
+      const personalNumber = document.getElementById('personalNumber').value.trim();
+      const phoneNumber = document.getElementById('phoneNumber').value.trim();
       const email = document.getElementById('registerEmail').value.trim();
       const password = document.getElementById('registerPassword').value;
       const role = roleSelect.value;
@@ -682,6 +958,10 @@
               first_name: firstName,
               last_name: lastName,
               full_name: `${firstName} ${lastName}`.trim(),
+              personal_number: personalNumber,
+              phone_number: phoneNumber,
+              accepted_terms: true,
+              accepted_terms_at: new Date().toISOString(),
               role,
               profile: rolePayload
             }
@@ -693,16 +973,16 @@
         }
 
         registerForm.reset();
-        renderRoleFields('');
+        resetRoleState();
 
         if (data.session) {
-          setStatus(registerStatus, 'ანგარიში შეიქმნა და უკვე ავტორიზებული ხარ. ახლავე გადაგამისამართებ.', 'success');
-          setTimeout(() => redirectToTarget(), 700);
+          setStatus(registerStatus, 'ანგარიში შეიქმნა და არჩეული როლის მიხედვით პროფილიც მომზადდა. ახლავე გადაგამისამართებ.', 'success');
+          setTimeout(() => redirectToTarget(data.user), 700);
           return;
         }
 
         toggleForm('login');
-        setStatus(loginStatus, 'ანგარიში შეიქმნა. ელ-ფოსტაზე გადაამოწმე დადასტურების წერილი, შემდეგ შედი სისტემაში.', 'info');
+        setStatus(loginStatus, 'ანგარიში შეიქმნა და როლის შესაბამისი პროფილიც მზადაა. ელ-ფოსტაზე გადაამოწმე დადასტურების წერილი, შემდეგ შედი სისტემაში.', 'info');
       } catch (error) {
         setStatus(registerStatus, error.message || 'რეგისტრაცია ვერ შესრულდა. სცადე თავიდან.', 'error');
       } finally {
@@ -742,6 +1022,8 @@
     window.addEventListener('DOMContentLoaded', () => {
       syncFormFromLocation();
       renderRoleFields(roleSelect.value);
+      sanitizeDigitsField(document.getElementById('personalNumber'));
+      sanitizeDigitsField(document.getElementById('phoneNumber'));
       if (!supabaseClient) {
         setStatus(loginStatus, 'Supabase კავშირი ჯერ არ არის მზად.', 'error');
         setStatus(registerStatus, 'Supabase კავშირი ჯერ არ არის მზად.', 'error');
