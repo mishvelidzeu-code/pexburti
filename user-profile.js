@@ -26,6 +26,43 @@
 
   const here = () => 'user-profile.html' + (location.search || '');
 
+  function showApp() {
+    const loading = document.getElementById('loading');
+    const app = document.getElementById('app');
+
+    if (loading) {
+      loading.hidden = true;
+      loading.style.display = 'none';
+    }
+
+    if (app) {
+      app.hidden = false;
+      app.style.display = 'block';
+    }
+
+    window.scrollTo(0, 0);
+  }
+
+  function showLoadingError(message) {
+    const loading = document.getElementById('loading');
+    const loadingBox = document.querySelector('#loading .box');
+    const app = document.getElementById('app');
+
+    if (app) {
+      app.hidden = true;
+      app.style.display = 'none';
+    }
+
+    if (loading) {
+      loading.hidden = false;
+      loading.style.display = 'grid';
+    }
+
+    if (loadingBox) {
+      loadingBox.innerHTML = `<h1>პროფილის ჩატვირთვა ვერ შესრულდა</h1><p>${esc(message || 'სცადე ხელახლა შესვლა ან გვერდის განახლება.')}</p>`;
+    }
+  }
+
   const backLabel = (path) => {
     const base = String(path || '').split('?')[0].split('#')[0];
     if (base === 'gundebi.html') return 'გუნდების გვერდზე დაბრუნება';
@@ -887,7 +924,7 @@
       location.href = back || 'index.html';
     });
 
-    document.title = `${view.name} | Mishvela Football Georgia`;
+    document.title = `${view.name} | DM Football Georgia`;
     document.getElementById('loading').hidden = true;
     document.getElementById('app').hidden = false;
   }

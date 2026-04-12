@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>მოთამაშის პროფილი | DM Football Georgia</title>
+  <style>
+    :root{
+      --bg:#f4f7fb;
+      --panel:#ffffff;
+      --soft:#f8fafc;
+      --line:rgba(15,23,42,.12);
+      --text:#0f172a;
+      --muted:#667085;
+      --red:#b91c1c;
+      --red-2:#991b1b;
+      --black:#111827;
+      --shadow:0 18px 48px rgba(15,23,42,.09);
+      --radius:30px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:"Segoe UI","Sylfaen","Noto Sans Georgian","DejaVu Sans",sans-serif;
+      background:linear-gradient(180deg,#ffffff 0%,var(--bg) 22%,var(--bg) 100%);
+      color:var(--text);
+    }
+    a{text-decoration:none;color:inherit}
+    [hidden]{display:none !important}
+    .container{width:min(1160px,calc(100% - 32px));margin:0 auto}
+    .header{
+      position:sticky;
+      top:0;
+      z-index:50;
+      background:rgba(255,255,255,.95);
+      backdrop-filter:blur(14px);
+      border-bottom:1px solid var(--line);
+    }
+    .nav{
+      min-height:82px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      flex-wrap:wrap;
+    }
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      font-size:1rem;
+      font-weight:900;
+      letter-spacing:-.03em;
+    }
+    .logo{
+      width:42px;
+      height:42px;
+      display:grid;
+      place-items:center;
+      border-radius:14px;
+      background:#ea580c;
+      color:#fff;
+      box-shadow:0 10px 24px rgba(234,88,12,.28);
+      font-weight:900;
+    }
+    .nav-links{
+      display:flex;
+      align-items:center;
+      gap:22px;
+      font-size:13px;
+      font-weight:800;
+      color:#475467;
+    }
+    .nav-links a:hover,
+    .nav-links a.active{color:var(--red)}
+    .nav-actions{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-height:50px;
+      padding:0 20px;
+      border-radius:999px;
+      border:1px solid transparent;
+      font-size:13px;
+      font-weight:800;
+      transition:.22s ease;
+      white-space:nowrap;
+    }
+    .btn:hover{transform:translateY(-2px)}
+    .btn-red{
+      background:var(--red);
+      color:#fff;
+      border-color:var(--red);
+      box-shadow:0 12px 28px rgba(185,28,28,.25);
+    }
+    .btn-red:hover{background:var(--red-2)}
+    .btn-white{
+      background:#fff;
+      color:var(--text);
+      border-color:var(--line);
+    }
+    .btn-white:hover{background:#eef2f6}
+    .page{padding:34px 0 70px}
+    .eyebrow{
+      display:inline-flex;
+      align-items:center;
+      padding:11px 16px;
+      border-radius:999px;
+      background:#fff;
+      border:1px solid var(--line);
+      font-size:.82rem;
+      font-weight:900;
+      color:var(--red);
+    }
+    .profile-shell{
+      display:grid;
+      gap:22px;
+      margin-top:18px;
+    }
+    .profile-hero{
+      display:grid;
+      grid-template-columns:minmax(260px,340px) minmax(0,1fr);
+      gap:24px;
+      padding:26px;
+      border-radius:var(--radius);
+      background:#fff;
+      border:1px solid var(--line);
+      box-shadow:var(--shadow);
+    }
+    .photo-wrap{
+      position:relative;
+      border-radius:28px;
+      overflow:hidden;
+      min-height:430px;
+      background:linear-gradient(180deg,#e2e8f0 0%,#cbd5e1 100%);
+    }
+    .photo-wrap img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+    }
+    .photo-badge{
+      position:absolute;
+      left:18px;
+      bottom:18px;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:10px 14px;
+      border-radius:999px;
+      background:rgba(15,23,42,.78);
+      color:#fff;
+      font-size:.76rem;
+      font-weight:900;
+      border:1px solid rgba(255,255,255,.12);
+    }
+    .profile-copy{
+      display:grid;
+      align-content:start;
+      gap:16px;
+    }
+    h1{
+      margin:0;
+      font-size:2.2rem;
+      line-height:1;
+      letter-spacing:-.05em;
+    }
+    .lead{
+      margin:0;
+      color:var(--muted);
+      font-size:.96rem;
+      line-height:1.75;
+      max-width:760px;
+    }
+    .chips{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+    }
+    .chip{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-height:40px;
+      padding:0 14px;
+      border-radius:999px;
+      background:#fff7f7;
+      border:1px solid rgba(185,28,28,.14);
+      color:var(--red-2);
+      font-size:.78rem;
+      font-weight:900;
+    }
+    .chip.dark{
+      background:#111827;
+      border-color:#111827;
+      color:#fff;
+    }
+    .info-grid{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:14px;
+    }
+    .info-card,
+    .note-card{
+      border-radius:22px;
+      padding:18px;
+      background:var(--soft);
+      border:1px solid rgba(15,23,42,.08);
+    }
+    .info-card span,
+    .note-card span{
+      display:block;
+      font-size:.78rem;
+      font-weight:800;
+      color:var(--muted);
+      margin-bottom:8px;
+    }
+    .info-card strong,
+    .note-card strong{
+      display:block;
+      font-size:1rem;
+      font-weight:900;
+      line-height:1.35;
+    }
+    .profile-sections{
+      display:grid;
+      grid-template-columns:1.15fr .85fr;
+      gap:22px;
+    }
+    .panel{
+      border-radius:28px;
+      padding:24px;
+      background:#fff;
+      border:1px solid var(--line);
+      box-shadow:var(--shadow);
+    }
+    .panel h2{
+      margin:0 0 10px;
+      font-size:1.35rem;
+      letter-spacing:-.03em;
+    }
+    .panel p{
+      margin:0;
+      color:var(--muted);
+      line-height:1.75;
+      font-size:.92rem;
+    }
+    .stats-grid{
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:12px;
+      margin-top:16px;
+    }
+    .stat{
+      border-radius:20px;
+      padding:16px;
+      background:var(--soft);
+      border:1px solid rgba(15,23,42,.08);
+    }
+    .stat span{
+      display:block;
+      font-size:.78rem;
+      font-weight:800;
+      color:var(--muted);
+      margin-bottom:8px;
+    }
+    .stat strong{
+      display:block;
+      font-size:1.3rem;
+      line-height:1;
+    }
+    .action-row{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-top:10px;
+    }
+    .fallback{
+      max-width:720px;
+      margin:34px auto 0;
+      padding:28px;
+      border-radius:28px;
+      text-align:center;
+      background:#fff;
+      border:1px solid var(--line);
+      box-shadow:var(--shadow);
+    }
+    @media (max-width:980px){
+      .profile-hero,
+      .profile-sections,
+      .stats-grid{
+        grid-template-columns:1fr;
+      }
+      .photo-wrap{min-height:360px}
+    }
+    @media (max-width:760px){
+      .nav-links{display:none}
+      .profile-hero,
+      .panel,
+      .photo-wrap{
+        border-radius:24px;
+      }
+      .page{padding:24px 0 60px}
+      .profile-hero{padding:20px}
+      .info-grid{grid-template-columns:1fr}
+      h1{font-size:1.9rem}
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="container nav">
+      <a href="index.html" class="brand">
+        <span class="logo">TE</span>
+        <span>DM Football Georgia</span>
+      </a>
+      <nav class="nav-links">
+        <a href="index.html">მთავარი</a>
+        <a href="gundebi.html">გუნდები</a>
+        <a href="pexburtelebi.html" class="active">ფეხბურთელები</a>
+        <a href="index.html#coaching">ქოუჩინგი</a>
+        <a href="index.html#camps">ბანაკები</a>
+      </nav>
+      <div class="nav-actions" id="playerAuthNav">
+        <a href="login.html?redirect=player-profile.html%23login#login" class="btn btn-white">შესვლა</a>
+        <a href="login.html?redirect=player-profile.html%23register#register" class="btn btn-red">რეგისტრაცია</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="page">
+    <div class="container">
+      <div id="playerView" class="profile-shell" hidden>
+        <div class="eyebrow" id="eyebrow">კვირის არჩევანი</div>
+        <section class="profile-hero">
+          <div class="photo-wrap">
+            <img id="playerImage" src="" alt="">
+            <div class="photo-badge" id="photoBadge">U17 • დინამო თბილისი</div>
+          </div>
+
+          <div class="profile-copy">
+            <div class="chips" id="heroChips"></div>
+            <h1 id="playerName">მოთამაშის პროფილი</h1>
+            <p id="playerLead" class="lead"></p>
+
+            <div class="info-grid" id="playerInfo"></div>
+
+            <div class="action-row">
+              <a id="backLink" href="index.html" class="btn btn-white">უკან დაბრუნება</a>
+              <a href="pexburtelebi.html" class="btn btn-red">სხვა ფეხბურთელები</a>
+            </div>
+          </div>
+        </section>
+
+        <section class="profile-sections">
+          <article class="panel">
+            <h2>მოთამაშის მოკლე აღწერა</h2>
+            <p id="playerSummary"></p>
+            <div class="stats-grid" id="playerStats"></div>
+          </article>
+
+          <aside class="panel">
+            <h2>შემდეგი ნაბიჯი</h2>
+            <div class="note-card">
+              <span>ფოკუსი</span>
+              <strong id="playerFocus"></strong>
+            </div>
+            <div class="note-card" style="margin-top:12px;">
+              <span>რეკომენდაცია</span>
+              <strong id="playerRecommendation"></strong>
+            </div>
+          </aside>
+        </section>
+      </div>
+
+      <div id="playerFallback" class="fallback" hidden>
+        <h1 style="font-size:1.7rem;margin:0 0 10px;">ფეხბურთელი ვერ მოიძებნა</h1>
+        <p style="margin:0 0 18px;color:#667085;line-height:1.7;">შესაძლოა ბმული მოძველებულია ან მოთამაშის პროფილი ჯერ არ არის დამატებული.</p>
+        <a href="pexburtelebi.html" class="btn btn-red">ფეხბურთელების გვერდზე დაბრუნება</a>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="players-shared.js"></script>
+  <script src="auth-shared.js"></script>
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const fallbackBack = 'pexburtelebi.html';
+    const backPath = window.siteAuth?.sanitizeInternalPath(params.get('from'), fallbackBack) || fallbackBack;
+    const player = window.getPlayerById ? window.getPlayerById(params.get('player')) : null;
+
+    function positionFocus(position) {
+      if (position === 'gk') return 'რეაქციის სისწრაფე, პირველი პასი და საჯარიმოს მართვა.';
+      if (position === 'df') return 'პოზიციონირება, ორთაბრძოლა და ბურთის პირველი ამოტანა.';
+      if (position === 'mf') return 'ხედვა, ტემპის მართვა და თამაშის კითხვის სიზუსტე.';
+      return 'ფინიში, მოძრაობა ხაზებს შორის და სივრცის დროული გამოყენება.';
+    }
+
+    function playerRecommendation(playerData) {
+      return `${playerData.team}-ის გარემოში ${playerData.posLabel.toLowerCase()}სთვის პრიორიტეტია სტაბილური სათამაშო წუთები, ვიდეო CV-ის შევსება და რეგულარული სტატისტიკის დამატება.`;
+    }
+
+    if (player) {
+      document.title = `${player.name} | DM Football Georgia`;
+      document.getElementById('playerView').hidden = false;
+      document.getElementById('backLink').href = backPath;
+      document.getElementById('playerImage').src = player.img;
+      document.getElementById('playerImage').alt = player.name;
+      document.getElementById('playerName').textContent = player.name;
+      document.getElementById('playerLead').textContent = `${player.team}, ${player.city}. ${player.summary}`;
+      document.getElementById('photoBadge').textContent = `${player.categoryLabel} • ${player.team}`;
+      document.getElementById('eyebrow').textContent = `${player.categoryLabel} ასაკობრივი`;
+      document.getElementById('playerSummary').textContent = `${player.name} არის ${player.posLabel.toLowerCase()}, რომელიც ამ ეტაპზე თამაშობს ${player.team}-ში. მისი ასაკობრივი სტატუსია ${player.categoryLabel}, ხოლო სამუშაო ფეხია ${player.foot}. პროფილი მზად არის ვიდეო CV-ის, სტატისტიკისა და სკაუტინგის დეტალების დასამატებლად.`;
+      document.getElementById('playerFocus').textContent = positionFocus(player.pos);
+      document.getElementById('playerRecommendation').textContent = playerRecommendation(player);
+
+      document.getElementById('heroChips').innerHTML = [
+        `<span class="chip">${player.posLabel}</span>`,
+        `<span class="chip">${player.categoryLabel}</span>`,
+        `<span class="chip dark">${player.team}</span>`
+      ].join('');
+
+      document.getElementById('playerInfo').innerHTML = [
+        { label: 'ასაკი', value: `${player.age} წლის` },
+        { label: 'პოზიცია', value: player.posLabel },
+        { label: 'ფეხი', value: player.foot },
+        { label: 'ქალაქი', value: player.city }
+      ].map((item) => `
+        <div class="info-card">
+          <span>${item.label}</span>
+          <strong>${item.value}</strong>
+        </div>
+      `).join('');
+
+      document.getElementById('playerStats').innerHTML = [
+        { label: 'კატეგორია', value: player.categoryLabel },
+        { label: 'კლუბი', value: player.team },
+        { label: 'მიზანი', value: 'სკაუტინგი' }
+      ].map((item) => `
+        <div class="stat">
+          <span>${item.label}</span>
+          <strong>${item.value}</strong>
+        </div>
+      `).join('');
+    } else {
+      document.getElementById('playerFallback').hidden = false;
+    }
+
+    if (window.siteAuth?.renderAuthNav) {
+      window.siteAuth.renderAuthNav('#playerAuthNav', {
+        currentPath: `player-profile.html${window.location.search || ''}`,
+        loginClass: 'btn btn-white',
+        registerClass: 'btn btn-red',
+        profileClass: 'btn btn-red',
+        logoutClass: 'btn btn-white',
+        afterLogout: backPath || 'pexburtelebi.html'
+      });
+    }
+  </script>
+</body>
+</html>

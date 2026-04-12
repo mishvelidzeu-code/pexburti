@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ავტორიზაცია | Mishvela Football Georgia</title>
-  <meta name="description" content="შესვლა და რეგისტრაცია Mishvela Football Georgia-სთვის.">
+  <title>ავტორიზაცია | DM Football Georgia</title>
+  <meta name="description" content="შესვლა და რეგისტრაცია DM Football Georgia-სთვის.">
   <style>
     :root {
       --bg:#ffffff;
@@ -133,17 +133,85 @@
       display:flex;
       align-items:center;
       justify-content:center;
-      padding:40px 20px;
+      padding:34px 20px 54px;
+    }
+    .auth-scene{
+      position:relative;
+      width:min(1180px,100%);
+      min-height:760px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
     }
     .auth-box{
+      position:relative;
+      z-index:2;
       width:100%;
-      max-width:480px;
+      max-width:500px;
       background:#fff;
       border:1px solid var(--line);
       border-radius:28px;
       padding:36px 32px;
       box-shadow:var(--shadow);
     }
+    .auth-float{
+      position:absolute;
+      z-index:1;
+      width:220px;
+      padding:16px;
+      border-radius:24px;
+      background:#fff;
+      border:1px solid var(--line);
+      box-shadow:0 18px 38px rgba(15,23,42,.11);
+    }
+    .auth-float strong{
+      display:block;
+      margin:10px 0 6px;
+      font-size:1rem;
+      font-weight:900;
+      line-height:1.2;
+      letter-spacing:-.02em;
+      color:var(--muted-2);
+    }
+    .auth-float p{
+      margin:0;
+      color:var(--muted);
+      font-size:.83rem;
+      line-height:1.6;
+    }
+    .auth-float .mini-pill{
+      display:inline-flex;
+      align-items:center;
+      min-height:34px;
+      padding:0 12px;
+      border-radius:999px;
+      border:1px solid rgba(15,23,42,.12);
+      background:#fff;
+      color:var(--muted-2);
+      font-size:.74rem;
+      font-weight:900;
+    }
+    .auth-float.featured{
+      width:292px;
+      padding:20px;
+      background:linear-gradient(180deg,#cb2020 0%,#a71313 100%);
+      border-color:rgba(185,28,28,.22);
+      color:#fff;
+      box-shadow:0 22px 46px rgba(185,28,28,.2);
+    }
+    .auth-float.featured .mini-pill{
+      border-color:rgba(255,255,255,.18);
+      background:rgba(255,255,255,.14);
+      color:#fff;
+    }
+    .auth-float.featured strong,
+    .auth-float.featured p{
+      color:#fff;
+    }
+    .float-player{top:74px;left:24px}
+    .float-parent{top:122px;right:32px}
+    .float-agent{bottom:112px;left:52px}
+    .float-exposure{bottom:84px;right:40px}
     .auth-header{
       text-align:center;
       margin-bottom:28px;
@@ -414,6 +482,46 @@
         display:none;
       }
     }
+    @media (max-width:1060px){
+      .auth-scene{
+        min-height:auto;
+        padding:170px 0 160px;
+      }
+      .auth-float{
+        width:198px;
+      }
+      .auth-float.featured{
+        width:250px;
+      }
+      .float-player{top:28px;left:0}
+      .float-parent{top:74px;right:0}
+      .float-agent{bottom:46px;left:0}
+      .float-exposure{bottom:22px;right:0}
+    }
+    @media (max-width:820px){
+      .auth-scene{
+        display:grid;
+        gap:14px;
+        min-height:auto;
+        padding:0;
+      }
+      .auth-box{
+        order:1;
+        max-width:none;
+      }
+      .auth-float{
+        position:static;
+        width:100%;
+        box-shadow:0 14px 28px rgba(15,23,42,.08);
+      }
+      .auth-float.featured{
+        width:100%;
+      }
+      .float-player{order:2}
+      .float-parent{order:3}
+      .float-agent{order:4}
+      .float-exposure{order:5}
+    }
   </style>
 </head>
 <body>
@@ -421,7 +529,7 @@
     <div class="container nav">
       <a href="index.html" class="brand">
         <span class="logo">TE</span>
-        <span>Mishvela Football Georgia</span>
+        <span>DM Football Georgia</span>
       </a>
       <nav class="nav-links">
         <a href="index.html">მთავარი</a>
@@ -438,7 +546,32 @@
   </header>
 
   <div class="auth-wrapper">
-    <div class="auth-box">
+    <div class="auth-scene">
+      <div class="auth-float featured float-player">
+        <span class="mini-pill">მოთამაშე</span>
+        <strong>აჩვენე შენი თავი სწორ ფორმატში</strong>
+        <p>ვიდეო CV, მიმდინარე გუნდი, ასაკობრივი კატეგორია და პროგრესი ერთ პროფილში.</p>
+      </div>
+
+      <div class="auth-float float-parent">
+        <span class="mini-pill">მშობელი</span>
+        <strong>მართავს არასრულწლოვანი მოთამაშის გვერდს</strong>
+        <p>ამატებს ბავშვს, ირჩევს გუნდს, აკონტროლებს სტატისტიკას და სეზონურ გადასვლებს.</p>
+      </div>
+
+      <div class="auth-float float-agent">
+        <span class="mini-pill">აგენტი</span>
+        <strong>აკავშირებს ტალანტს და შესაძლებლობას</strong>
+        <p>მართავს კონტაქტებს, ხედავს მოთამაშეებს და ქმნის უფრო სუფთა საკომუნიკაციო არხს კლუბებთან.</p>
+      </div>
+
+      <div class="auth-float float-exposure">
+        <span class="mini-pill">Exposure</span>
+        <strong>სწორად გამოჩენა ზრდის შანსს</strong>
+        <p>პროფილი, გუნდი, სტატისტიკა და ვიდეო ერთად უფრო დამაჯერებელ პირველ შთაბეჭდილებას ქმნის.</p>
+      </div>
+
+      <div class="auth-box">
       <section id="loginSection">
         <div class="auth-header">
           <h1>სისტემაში შესვლა</h1>
@@ -544,6 +677,7 @@
           უკვე გაქვს ანგარიში?<a href="#login">შესვლა</a>
         </div>
       </section>
+      </div>
     </div>
   </div>
 
