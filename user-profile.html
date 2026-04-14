@@ -8,7 +8,7 @@
     :root{--bg:#f5f7fb;--panel:#fff;--soft:#f8fafc;--line:rgba(15,23,42,.12);--text:#111827;--muted:#667085;--red:#b91c1c;--red2:#991b1b;--black:#0f172a;--shadow:0 18px 42px rgba(15,23,42,.08);--r:26px;--rs:18px}
     *{box-sizing:border-box} body{margin:0;font-family:"Segoe UI","Sylfaen","Noto Sans Georgian","DejaVu Sans",sans-serif;background:linear-gradient(180deg,#fff 0%,var(--bg) 20%,var(--bg) 100%);color:var(--text);overflow-x:hidden} a{text-decoration:none;color:inherit} button{font:inherit;cursor:pointer} [hidden]{display:none !important} #loading[hidden],#app[hidden]{display:none !important}
     .container{width:min(1160px,calc(100% - 32px));margin:0 auto}.header{position:sticky;top:0;z-index:30;background:rgba(255,255,255,.94);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
-    .nav{min-height:88px;display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap}.brand{display:flex;align-items:center;gap:12px;font-weight:900;font-size:1.28rem;white-space:nowrap}.logo{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(135deg,#ef4444,#f59e0b);color:#fff;box-shadow:0 10px 22px rgba(239,68,68,.22)}
+    .nav{min-height:88px;display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap}.brand{display:flex;align-items:center;gap:12px;font-weight:900;font-size:1.28rem;white-space:nowrap}.logo{width:58px;height:58px;display:block;object-fit:contain;flex:0 0 auto}
     .links{display:flex;gap:24px;flex-wrap:wrap}.links a{font-weight:800;color:#475467}.links a:hover{color:var(--black)}.actions{display:flex;gap:12px;flex-wrap:wrap}.btn{display:inline-flex;align-items:center;justify-content:center;min-height:50px;padding:0 20px;border-radius:999px;border:1px solid transparent;font-weight:800;font-size:.95rem;transition:.2s}
     .btn-white{background:#fff;border-color:var(--line);box-shadow:0 8px 24px rgba(15,23,42,.06)}.btn-white:hover{color:var(--red);border-color:rgba(185,28,28,.22)}.btn-red{background:linear-gradient(135deg,var(--red),#ef4444);color:#fff;box-shadow:0 14px 30px rgba(185,28,28,.24)}.btn-red:hover{background:linear-gradient(135deg,var(--red2),var(--red))}
     .loading{min-height:100vh;display:grid;place-items:center;padding:24px}.loading .box,.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}.loading .box{width:min(440px,100%);padding:30px;text-align:center}.loading h1{margin:0 0 10px;font-size:1.7rem}.loading p{margin:0;color:var(--muted)}
@@ -28,7 +28,7 @@
   <div id="app" hidden>
     <header class="header">
       <div class="container nav">
-        <a href="index.html" class="brand"><span class="logo">TE</span><span>Mishvela Football Georgia</span></a>
+        <a href="index.html" class="brand"><img src="logo.webp" alt="DM Football Georgia" class="logo"><span>Mishvela Football Georgia</span></a>
         <nav class="links"><a href="index.html">მთავარი</a><a href="gundebi.html">გუნდები</a><a href="pexburtelebi.html">ფეხბურთელები</a><a href="index.html#coaching">ქოუჩინგი</a><a href="index.html#camps">ბანაკები</a></nav>
         <div class="actions"><a id="backTop" href="index.html" class="btn btn-white">უკან დაბრუნება</a><button id="logoutBtn" type="button" class="btn btn-red">გასვლა</button></div>
       </div>
