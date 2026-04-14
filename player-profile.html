@@ -55,13 +55,9 @@
     .logo{
       width:42px;
       height:42px;
-      display:grid;
-      place-items:center;
-      border-radius:14px;
-      background:#ea580c;
-      color:#fff;
-      box-shadow:0 10px 24px rgba(234,88,12,.28);
-      font-weight:900;
+      display:block;
+      object-fit:contain;
+      flex:0 0 auto;
     }
     .nav-links{
       display:flex;
@@ -318,7 +314,7 @@
   <header class="header">
     <div class="container nav">
       <a href="index.html" class="brand">
-        <span class="logo">TE</span>
+        <img src="logo.webp" alt="DM Football Georgia" class="logo">
         <span>DM Football Georgia</span>
       </a>
       <nav class="nav-links">
