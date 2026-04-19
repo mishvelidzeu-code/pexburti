@@ -763,24 +763,84 @@
       display: grid;
       grid-template-columns: repeat(5, 1fr);
       gap: 16px;
-      margin-top: 48px;
+      margin-top: 28px;
+    }
+    .progress-showcase {
+      display: grid;
+      gap: 34px;
+    }
+    .progress-top {
+      display: grid;
+      grid-template-columns: minmax(400px, 1.14fr) minmax(360px, 0.86fr);
+      gap: 44px;
+      align-items: center;
+    }
+    .progress-side-image {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .progress-side-image img {
+      width: min(100%, 500px);
+      display: block;
+      filter: drop-shadow(0 28px 46px rgba(15,23,42,.18));
+    }
+    .progress-copy {
+      text-align: left;
+      max-width: 520px;
+      justify-self: start;
+    }
+    .progress-copy h2 {
+      line-height: 1.02;
+      margin: 0;
+    }
+    .progress-heading-main {
+      display: block;
+      white-space: nowrap;
+      font-size: clamp(1.95rem, 3.25vw, 3.15rem);
+      color: var(--text);
+    }
+    .progress-heading-brand {
+      display: block;
+      margin-top: 10px;
+      white-space: nowrap;
+      font-size: clamp(1.05rem, 1.85vw, 1.45rem);
+      color: var(--red);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+    .progress-copy .lead {
+      margin: 24px 0 0;
+      max-width: 500px;
+      font-size: 1.04rem;
+      line-height: 1.85;
     }
     .brand-box {
       border-radius: 16px;
       padding: 24px 16px;
-      background: #fff;
-      border: 1px solid var(--line);
+      background: linear-gradient(135deg, #c81e1e 0%, #991b1b 100%);
+      border: 1px solid rgba(185,28,28,0.18);
       text-align: center;
-      font-weight: 700;
+      font-weight: 800;
       font-size: 0.95rem;
-      box-shadow: var(--shadow-sm);
+      color: #fff;
+      box-shadow: 0 18px 34px rgba(185,28,28,0.18);
       transition: all 0.3s ease;
       cursor: default;
+      position: relative;
+      overflow: hidden;
+    }
+    .brand-box::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0) 48%);
+      pointer-events: none;
     }
     .brand-box:hover {
       transform: translateY(-5px);
-      box-shadow: var(--shadow-hover);
-      border-color: rgba(185,28,28,0.2);
+      box-shadow: 0 22px 42px rgba(185,28,28,0.24);
+      border-color: rgba(255,255,255,0.22);
     }
     .grid-2, .grid-3, .grid-4 { display: grid; gap: 24px; }
     .grid-2 { grid-template-columns: repeat(2, 1fr); }
@@ -872,54 +932,12 @@
     ul.clean li { margin: 12px 0; padding-left: 8px; }
     ul.clean li::marker { color: var(--red); }
 
-    .split-showcase {
-      display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 40px;
+    .split-showcase,
+    #coaching,
+    #steps,
+    #camps {
+      display: none !important;
     }
-
-    .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; margin-top: 48px; }
-    .step {
-      border-radius: var(--radius); padding: 36px 28px;
-      background: #fff; border: 1px solid var(--line);
-      box-shadow: var(--shadow-sm); 
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-    .step:hover {
-      transform: translateY(-5px);
-      box-shadow: var(--shadow-hover);
-    }
-    .step-number {
-      width: 54px; height: 54px; display: grid; place-items: center;
-      border-radius: 16px; margin-bottom: 24px; font-weight: 900; font-size: 20px;
-      background: linear-gradient(135deg, #b91c1c 0%, #7f1d1d 100%); 
-      color: #fff;
-      box-shadow: 0 10px 20px rgba(185,28,28,.2);
-    }
-
-    .camp-wrap {
-      border-radius: 40px; overflow: hidden;
-      background: #fff; border: 1px solid var(--line);
-      box-shadow: var(--shadow);
-    }
-    .camp-grid { display: grid; grid-template-columns: 1.1fr 0.9fr; }
-    .camp-copy { padding: 60px; display: flex; flex-direction: column; justify-content: center; }
-    .camp-visual {
-      padding: 40px; display: grid; gap: 20px;
-      background: var(--bg-alt); align-content: center;
-    }
-    .camp-shot {
-      border-radius: 20px; padding: 30px; min-height: 180px;
-      background: #fff; border: 1px solid var(--line);
-      box-shadow: var(--shadow-sm);
-      position: relative; overflow: hidden;
-      display: flex; flex-direction: column; justify-content: flex-end;
-      transition: transform 0.3s ease;
-    }
-    .camp-shot:hover { transform: scale(1.02); }
-    .camp-shot:nth-child(1) { background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.2) 100%), url('https://images.unsplash.com/photo-1518605368461-1e1e38ce8042?auto=format&fit=crop&q=80&w=800') center/cover; color: #fff; border: none; }
-    .camp-shot:nth-child(2) { background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.2) 100%), url('https://images.unsplash.com/photo-1431324155629-1a6104635a2b?auto=format&fit=crop&q=80&w=800') center/cover; color: #fff; border: none; }
-    .camp-shot:nth-child(3) { background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.2) 100%), url('https://images.unsplash.com/photo-1517466787929-bc90951d0974?auto=format&fit=crop&q=80&w=800') center/cover; color: #fff; border: none; }
-    .camp-shot .pill { align-self: flex-start; background: rgba(255,255,255,0.15); color: #fff; border: 1px solid rgba(255,255,255,0.3); backdrop-filter: blur(8px); margin-bottom: 12px;}
-    .camp-shot .small { color: rgba(255,255,255,0.85); margin-top: 8px;}
 
     .cta-box {
       border-radius: 40px; padding: 80px 40px;
@@ -986,7 +1004,7 @@
         order: 3;
         width: 100%;
       }
-      .hero-grid, .grid-4, .grid-3, .grid-2, .camp-grid, .steps, .split-showcase {
+      .hero-grid, .grid-4, .grid-3, .grid-2 {
         grid-template-columns: 1fr 1fr;
       }
       .brand-strip { grid-template-columns: repeat(3, 1fr); }
@@ -999,8 +1017,32 @@
 
     @media (max-width: 760px) {
       .nav-links, .nav-actions .btn-secondary { display: none; }
-      .hero-grid, .grid-4, .grid-3, .grid-2, .camp-grid, .footer-grid, .steps, .brand-strip, .split-showcase {
+      .hero-grid, .grid-4, .grid-3, .grid-2, .footer-grid, .brand-strip, .progress-top {
         grid-template-columns: 1fr;
+      }
+      .progress-copy {
+        text-align: center;
+        max-width: 100%;
+        justify-self: center;
+        order: -1;
+      }
+      .progress-copy h2 {
+        font-size: inherit;
+      }
+      .progress-heading-main {
+        white-space: normal;
+        font-size: clamp(1.9rem, 7vw, 3rem);
+      }
+      .progress-heading-brand {
+        white-space: normal;
+        font-size: clamp(1rem, 4.2vw, 1.3rem);
+      }
+      .progress-copy .lead {
+        margin-inline: auto;
+        max-width: 640px;
+      }
+      .progress-side-image img {
+        width: min(100%, 300px);
       }
       .section { padding: 64px 0; }
       .month-club-top { flex-direction: column; }
@@ -1013,7 +1055,7 @@
       .pitch-player img { width: 40px; height: 40px; }
       .pitch-badge { padding: 4px 8px; }
       .pitch-badge strong { font-size: 0.6rem; }
-      .camp-copy, .camp-visual, .cta-box { padding: 30px; }
+      .cta-box { padding: 30px; }
       h1 { font-size: 2.2rem; }
     }
   </style>
@@ -1034,6 +1076,7 @@
         <a href="coaching.html">ქოუჩინგი</a>
         <a href="banakebi.html">ბანაკები</a>
         <a href="cxrilebi.html">ცხრილები</a>
+        <a href="gamokitkhvebi.html">გამოკითხვები</a>
       </nav>
 
       <div class="nav-actions" id="homeAuthNav">
@@ -1314,13 +1357,23 @@
   </section>
 
   <section class="section-sm bg-alt">
-    <div class="container center">
-      <div class="eyebrow">რატომ ეს სისტემა</div>
-      <h2>ფეხბურთელში <br>სწრაფ პროგრესს ქმნის</h2>
-      <p class="lead" style="margin:24px auto 0;">
-        ერთ პლატფორმაში გაერთიანებულია ვარჯიშები, ტაქტიკური განვითარება,
-        პროფესიონალური აზროვნება, მენტორობა და კარიერული შესაძლებლობები.
-      </p>
+    <div class="container progress-showcase">
+      <div class="progress-top">
+        <div class="progress-side-image">
+          <img src="2.webp" alt="აპის პრევიუ">
+        </div>
+        <div class="progress-copy">
+          <div class="eyebrow">რატომ ეს სისტემა</div>
+          <h2>
+            <span class="progress-heading-main">გადმოიწერე ჩვენი აპი</span>
+            <span class="progress-heading-brand">DM Football Georgia</span>
+          </h2>
+          <p class="lead">
+            ერთ პლატფორმაში გაერთიანებულია ვარჯიშები, ტაქტიკური განვითარება,
+            პროფესიონალური აზროვნება, მენტორობა და კარიერული შესაძლებლობები.
+          </p>
+        </div>
+      </div>
 
       <div class="brand-strip">
         <div class="brand-box">ინდივიდუალური<br>ვარჯიში</div>
@@ -1388,7 +1441,7 @@
     </div>
   </section>
 
-  <section id="stories" class="section bg-alt">
+  <section id="stories" class="section bg-alt" hidden>
     <div class="container">
       <div class="eyebrow">წარმატების ისტორიები</div>
       <h2>რეალური მოთამაშეები. <br>რეალური პროგრესი.</h2>
@@ -1568,20 +1621,17 @@
         <h2 style="font-size: 2.6rem;">გაქვს კითხვა? <br>ესაუბრე ჩვენს გუნდს</h2>
         <p class="lead" style="margin:24px auto 0;">
           თუ გინდა გაარკვიო რომელი პროგრამა ან ბანაკია შენთვის საუკეთესო,
-          დაგეგმე ზარი ან მოგვწერე პირდაპირ.
+          მოგვწერე ელფოსტაზე და დაგეხმარებით სწორ არჩევანში.
         </p>
 
         <div class="btn-row" style="justify-content:center; margin-top: 48px;">
-          <a href="#" class="btn btn-primary" style="padding: 0 32px;">WhatsApp</a>
-          <a href="#" class="btn btn-secondary" style="background: #fff;">Instagram</a>
-          <a href="#" class="btn btn-secondary" style="background: #fff;">ვიდეო ზარი</a>
-          <a href="#" class="btn btn-secondary" style="background: #fff;">ელფოსტა</a>
+          <a href="#" class="btn btn-primary" style="padding: 0 32px;">ელფოსტა</a>
         </div>
       </div>
     </div>
   </section>
 
-  <section class="section">
+  <section id="faq" class="section" hidden>
     <div class="container center">
       <div class="eyebrow">ხშირი კითხვები</div>
       <h2>ყველაფერი, რაც უნდა იცოდე</h2>
@@ -1603,7 +1653,7 @@
     </div>
   </section>
 
-  <section id="cta" class="section bg-alt">
+  <section id="cta" class="section bg-alt" hidden>
     <div class="container center">
       <div class="eyebrow">დაიწყე დღესვე</div>
       <h2 style="font-size: 2.8rem;">ივარჯიშე როგორც პროფესიონალი. <br>ითამაშე უკეთესად. გაიზარდე სწრაფად.</h2>
@@ -1636,9 +1686,10 @@
         <div>
           <h4>განვითარება</h4>
           <a href="#features">როგორ გავხდე უკეთესი ფეხბურთელი</a>
-          <a href="#stories">როგორ ავიმაღლო თავდაჯერებულობა</a>
+          <a href="coaching.html">ქოუჩინგი და mindset</a>
           <a href="coaching.html">ქოუჩინგი და პერსონალური გეგმა</a>
           <a href="banakebi.html">ბანაკები და შეფასება</a>
+          <a href="gamokitkhvebi.html">გამოკითხვები</a>
         </div>
 
         <div>
@@ -1646,6 +1697,7 @@
           <a href="pexburtelebi.html">ფეხბურთელები</a>
           <a href="gundebi.html">გუნდები</a>
           <a href="cxrilebi.html">ცხრილები</a>
+          <a href="gamokitkhvebi.html">გამოკითხვები</a>
           <a href="user-profile.html?from=index.html">ჩემი პროფილი</a>
         </div>
 
@@ -1653,6 +1705,7 @@
           <h4>ინფორმაცია</h4>
           <a href="coaching.html">ქოუჩინგი</a>
           <a href="banakebi.html">ბანაკები</a>
+          <a href="gamokitkhvebi.html">გამოკითხვები</a>
           <a href="login.html?redirect=index.html%23login#login">შესვლა</a>
           <a href="login.html?redirect=index.html%23register#register">რეგისტრაცია</a>
         </div>

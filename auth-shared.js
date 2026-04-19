@@ -276,15 +276,41 @@
     });
   }
 
+  function clearSupabaseBrowserSession() {
+    [window.localStorage, window.sessionStorage].forEach(function (storage) {
+      if (!storage) {
+        return;
+      }
+
+      try {
+        Object.keys(storage).forEach(function (key) {
+          if (
+            String(key).startsWith('sb-') ||
+            String(key).includes('supabase.auth.token')
+          ) {
+            storage.removeItem(key);
+          }
+        });
+      } catch (error) {
+        // Ignore storage cleanup issues and continue redirecting the user out.
+      }
+    });
+  }
+
   async function signOut(options) {
     const settings = options || {};
     const client = getClient();
 
-    if (client) {
-      await client.auth.signOut();
+    try {
+      if (client) {
+        await client.auth.signOut({ scope: 'local' });
+      }
+    } catch (error) {
+      console.warn('Sign out fallback was used.', error);
     }
 
-    window.location.href = sanitizeInternalPath(settings.redirect, 'index.html');
+    clearSupabaseBrowserSession();
+    window.location.replace(sanitizeInternalPath(settings.redirect, 'index.html'));
   }
 
   async function renderAuthNav(container, options) {
@@ -322,6 +348,10 @@
         '<a href="', registerHref, '" class="', registerClass, '">რეგისტრაცია</a>'
       ].join('');
       return;
+    }
+
+    if (window.siteRegisteredPlayers?.syncFromAuthUser) {
+      window.siteRegisteredPlayers.syncFromAuthUser(user);
     }
 
     const profileHref = buildProfileHref(
@@ -385,8 +415,11 @@
     }
 
     if (logoutButton) {
-      logoutButton.addEventListener('click', function () {
-        signOut({ redirect: settings.afterLogout || 'index.html' });
+      logoutButton.addEventListener('click', async function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        logoutButton.disabled = true;
+        await signOut({ redirect: settings.afterLogout || 'index.html' });
       });
     }
   }
