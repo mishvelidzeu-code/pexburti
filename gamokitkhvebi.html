@@ -431,6 +431,7 @@
   <script src="auth-shared.js"></script>
   <script>
     const searchInput = document.getElementById('pollSearchInput');
+    const searchHelper = document.getElementById('pollSearchHelper');
     const resultsGrid = document.getElementById('pollResultsGrid');
     const resultsState = document.getElementById('pollResultsState');
     const resultsMeta = document.getElementById('pollResultsMeta');
@@ -459,6 +460,17 @@
             ? window.siteRegisteredPlayers.normalizeText(value)
             : String(value || '').trim().toLowerCase().replace(/\s+/g, ' ')
         );
+    }
+
+    function setPollHelper(message) {
+      if (!searchHelper) {
+        return;
+      }
+      if (!message) {
+        searchHelper.textContent = 'ჩაწერე სახელი ან გვარი. თუ მსგავსი ფეხბურთელი არ არის რეგისტრირებული, აქვე გამოჩნდება შესაბამისი შეტყობინება.';
+        return;
+      }
+      searchHelper.textContent = message;
     }
 
     function getInitials(name) {
@@ -657,16 +669,11 @@
       const publicCandidates = window.siteRegisteredPlayers?.fetchPublicCandidates
         ? await window.siteRegisteredPlayers.fetchPublicCandidates(client)
         : [];
-      const localCandidates = window.siteRegisteredPlayers?.getStoredCandidates
-        ? window.siteRegisteredPlayers.getStoredCandidates()
+      registeredCandidates = Array.isArray(publicCandidates)
+        ? publicCandidates.filter(function (candidate) {
+          return Boolean(String(candidate?.playerId || '').trim());
+        })
         : [];
-      const currentCandidate = currentUser && window.siteRegisteredPlayers?.buildCandidateFromAuthUser
-        ? window.siteRegisteredPlayers.buildCandidateFromAuthUser(currentUser)
-        : null;
-
-      registeredCandidates = window.siteRegisteredPlayers?.mergeCandidates
-        ? window.siteRegisteredPlayers.mergeCandidates(localCandidates, currentCandidate ? [currentCandidate] : [], publicCandidates)
-        : [...localCandidates, ...(currentCandidate ? [currentCandidate] : []), ...publicCandidates];
 
       registeredCandidates = registeredCandidates
         .filter(function (candidate) {
@@ -691,6 +698,7 @@
       });
 
       if (!candidate || !candidate.playerId) {
+        setPollHelper('ამ ფეხბურთელზე ხმის მიცემა ჯერ ხელმისაწვდომი არ არის.');
         return;
       }
 
@@ -706,11 +714,13 @@
         : { ok: false, reason: 'missing-helper' };
 
       if (!voteResult.ok && voteResult.reason !== 'duplicate') {
+        setPollHelper('ხმის მიცემა ვერ შესრულდა. სცადე თავიდან.');
         return;
       }
 
       currentUserVotes.add(String(candidate.playerId));
       await loadCandidates();
+      setPollHelper('ხმა წარმატებით დაფიქსირდა.');
       updateCounters();
       renderSearchResults();
       renderTopTen();
@@ -740,6 +750,7 @@
 
       await loadCurrentUser();
       await loadCandidates();
+      setPollHelper('');
       updateCounters();
       renderSearchResults();
       renderTopTen();
