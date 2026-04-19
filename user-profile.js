@@ -732,6 +732,10 @@
         throw error;
       }
 
+      if (window.sitePlayerDomain?.syncMyAccountDomain) {
+        await window.sitePlayerDomain.syncMyAccountDomain(client);
+      }
+
       return { user: data?.user || user, profile: nextProfile };
     } catch (error) {
       console.error(error);
@@ -974,6 +978,9 @@
         throw error;
       }
       setDataEditorStatus('მონაცემები წარმატებით განახლდა. პროფილი ახლავე განახლდება.', 'success');
+      if (window.sitePlayerDomain?.syncMyAccountDomain) {
+        await window.sitePlayerDomain.syncMyAccountDomain(client);
+      }
       window.setTimeout(() => {
         window.location.reload();
       }, 500);
@@ -1294,6 +1301,10 @@
         throw error;
       }
 
+      if (window.sitePlayerDomain?.syncMyAccountDomain) {
+        await window.sitePlayerDomain.syncMyAccountDomain(client);
+      }
+
       teamManageState.user = data?.user || user;
       teamManageState.profile = nextProfile;
       if (input) {
@@ -1334,6 +1345,9 @@
 
     let currentUser = user;
     let currentProfile = user.user_metadata?.profile || {};
+    if (window.sitePlayerDomain?.syncMyAccountDomain) {
+      await window.sitePlayerDomain.syncMyAccountDomain(client);
+    }
     const syncResult = await syncSeasonalProfile(currentUser, role, currentProfile, client);
     currentUser = syncResult.user;
     currentProfile = syncResult.profile;

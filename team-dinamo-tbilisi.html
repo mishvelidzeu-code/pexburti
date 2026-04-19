@@ -726,10 +726,11 @@
     </div>
   </section>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="teams-shared.js"></script>
-  <script src="age-groups-shared.js"></script>
-  <script src="auth-shared.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="teams-shared.js"></script>
+<script src="age-groups-shared.js"></script>
+<script src="supabase-domain-shared.js"></script>
+<script src="auth-shared.js"></script>
   <script>
     const fallbackTeam = {
       mark: 'DT',
@@ -1054,6 +1055,44 @@
         ? window.siteAuth.getUserRole(user)
         : String(user?.user_metadata?.role || '');
       const profile = user.user_metadata?.profile || {};
+
+      if (window.sitePlayerDomain?.syncMyAccountDomain) {
+        await window.sitePlayerDomain.syncMyAccountDomain(client);
+      }
+
+      const managedEntry = window.sitePlayerDomain?.fetchManagedEntry
+        ? await window.sitePlayerDomain.fetchManagedEntry(client, user.id)
+        : null;
+
+      if (managedEntry) {
+        const managedLinked = (
+          String(managedEntry.teamRoute || '').trim() === team.route ||
+          normalizeTeamText(managedEntry.team) === normalizeTeamText(team.name)
+        );
+
+        if (managedLinked) {
+          const ageGroup = getAgeGroupConfig(managedEntry.ageGroup);
+          renderRoster({
+            name: managedEntry.fullName,
+            position: managedEntry.positionLabel || managedEntry.position || 'áƒ›áƒáƒ—áƒáƒ›áƒáƒ¨áƒ”',
+            pos: getPositionCode(managedEntry.positionLabel || managedEntry.position),
+            foot: managedEntry.foot || 'áƒáƒ  áƒáƒ áƒ˜áƒ¡ áƒ›áƒ˜áƒ—áƒ˜áƒ—áƒ”áƒ‘áƒ£áƒšáƒ˜',
+            age: managedEntry.age ?? 'áƒáƒ  áƒáƒ áƒ˜áƒ¡ áƒ›áƒ˜áƒ—áƒ˜áƒ—áƒ”áƒ‘áƒ£áƒšáƒ˜',
+            ageGroup: ageGroup.key,
+            ageLabel: ageGroup.label,
+            img: managedEntry.photo || '',
+            tag: role === 'parent' ? 'áƒ¨áƒ”áƒœáƒ˜ áƒ‘áƒáƒ•áƒ¨áƒ•áƒ˜áƒ¡ áƒžáƒ áƒáƒ¤áƒ˜áƒšáƒ˜' : 'áƒ¨áƒ”áƒœáƒ˜ áƒžáƒ áƒáƒ¤áƒ˜áƒšáƒ˜',
+            actionHref: 'user-profile.html?view=overview&from=team-dinamo-tbilisi.html',
+            actionLabel: 'áƒ©áƒ”áƒ›áƒ˜ áƒžáƒ áƒáƒ¤áƒ˜áƒšáƒ˜'
+          });
+
+          connectedBanner.hidden = false;
+          connectedBannerText.textContent = managedEntry.ageGroupOverride
+            ? `${managedEntry.fullName} áƒáƒ®áƒšáƒ ${ageGroup.label} áƒ™áƒáƒ¢áƒ”áƒ’áƒáƒ áƒ˜áƒáƒ¨áƒ˜ áƒ©áƒáƒœáƒ¡, áƒ áƒáƒ“áƒ’áƒáƒœ áƒáƒ¡áƒáƒ™áƒáƒ‘áƒ áƒ˜áƒ•áƒ˜ áƒ¯áƒ’áƒ£áƒ¤áƒ˜ áƒ®áƒ”áƒšáƒ˜áƒ— áƒáƒ¡ áƒ£áƒ™áƒ•áƒ” áƒ’áƒáƒ“áƒáƒ™áƒ”áƒ—áƒ”áƒ‘áƒ£áƒšáƒ˜áƒ.`
+            : `${managedEntry.fullName} áƒáƒ•áƒ¢áƒáƒ›áƒáƒ¢áƒ£áƒ áƒáƒ“ áƒ“áƒáƒ”áƒ›áƒáƒ¢áƒ ${ageGroup.label} áƒ™áƒáƒ¢áƒ”áƒ’áƒáƒ áƒ˜áƒáƒ¨áƒ˜ áƒ›áƒ˜áƒ›áƒ“áƒ˜áƒœáƒáƒ áƒ” áƒ¡áƒ”áƒ–áƒáƒœáƒ˜áƒ¡ áƒáƒ¡áƒáƒ™áƒáƒ¡ áƒ›áƒ˜áƒ®áƒ”áƒ“áƒ•áƒ˜áƒ—.`;
+          return;
+        }
+      }
 
       const playerLinked = role === 'player' && (
         String(profile.playerTeamRoute || '').trim() === team.route ||

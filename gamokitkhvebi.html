@@ -427,11 +427,10 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="age-groups-shared.js"></script>
+  <script src="supabase-domain-shared.js"></script>
   <script src="registered-players-shared.js"></script>
   <script src="auth-shared.js"></script>
   <script>
-    const VOTES_KEY = 'mfg-poll-votes-v1';
-
     const searchInput = document.getElementById('pollSearchInput');
     const resultsGrid = document.getElementById('pollResultsGrid');
     const resultsState = document.getElementById('pollResultsState');
@@ -442,7 +441,7 @@
 
     let currentUser = null;
     let registeredCandidates = [];
-    let voteRecords = loadVoteRecords();
+    let currentUserVotes = new Set();
 
     function escapeHtml(value) {
       return String(value || '')
@@ -454,9 +453,13 @@
     }
 
     function normalizeText(value) {
-      return window.siteRegisteredPlayers?.normalizeText
-        ? window.siteRegisteredPlayers.normalizeText(value)
-        : String(value || '').trim().toLowerCase().replace(/\s+/g, ' ');
+      return window.sitePlayerDomain?.normalizeText
+        ? window.sitePlayerDomain.normalizeText(value)
+        : (
+          window.siteRegisteredPlayers?.normalizeText
+            ? window.siteRegisteredPlayers.normalizeText(value)
+            : String(value || '').trim().toLowerCase().replace(/\s+/g, ' ')
+        );
     }
 
     function getInitials(name) {
@@ -470,42 +473,12 @@
         .join('') || 'FG';
     }
 
-    function loadVoteRecords() {
-      try {
-        const parsed = JSON.parse(localStorage.getItem(VOTES_KEY) || '[]');
-        return Array.isArray(parsed) ? parsed : [];
-      } catch (error) {
-        return [];
-      }
+    function getVoteCountForCandidate(candidate) {
+      return Number(candidate?.votes || 0) || 0;
     }
 
-    function saveVoteRecords() {
-      try {
-        localStorage.setItem(VOTES_KEY, JSON.stringify(voteRecords));
-      } catch (error) {
-        // Ignore local persistence issues for now.
-      }
-    }
-
-    function getVoteCountForCandidate(candidateKey) {
-      return voteRecords.filter(function (vote) {
-        return vote.candidateKey === candidateKey;
-      }).length;
-    }
-
-    function getUserVoteKey(candidateKey) {
-      return currentUser ? `${currentUser.id}::${candidateKey}` : '';
-    }
-
-    function hasCurrentUserVoted(candidateKey) {
-      const voterKey = getUserVoteKey(candidateKey);
-      if (!voterKey) {
-        return false;
-      }
-
-      return voteRecords.some(function (vote) {
-        return vote.voterKey === voterKey;
-      });
+    function hasCurrentUserVoted(candidate) {
+      return Boolean(candidate?.playerId) && currentUserVotes.has(String(candidate.playerId));
     }
 
     function formatCandidateMeta(candidate) {
@@ -532,11 +505,14 @@
 
     function createCandidateCard(candidate) {
       const meta = formatCandidateMeta(candidate);
-      const voteCount = getVoteCountForCandidate(candidate.key);
-      const voted = hasCurrentUserVoted(candidate.key);
-      const buttonLabel = currentUser
-        ? (voted ? 'ხმა მიცემულია' : 'ხმის მიცემა')
-        : 'შესვლა და ხმა';
+      const voteCount = getVoteCountForCandidate(candidate);
+      const voted = hasCurrentUserVoted(candidate);
+      const votable = Boolean(candidate.playerId);
+      const buttonLabel = !votable
+        ? 'ხმა ჯერ ვერ მოიცემა'
+        : currentUser
+          ? (voted ? 'ხმა მიცემულია' : 'ხმის მიცემა')
+          : 'შესვლა და ხმა';
 
       return `
         <article class="poll-card">
@@ -557,7 +533,7 @@
               type="button"
               class="btn btn-secondary poll-vote-button${voted ? ' is-voted' : ''}"
               data-candidate-key="${escapeHtml(candidate.key)}"
-              ${voted ? 'disabled' : ''}
+              ${(votable && !voted) ? '' : 'disabled'}
             >${buttonLabel}</button>
           </div>
         </article>
@@ -607,7 +583,7 @@
         .map(function (candidate) {
           return {
             ...candidate,
-            votes: getVoteCountForCandidate(candidate.key)
+            votes: getVoteCountForCandidate(candidate)
           };
         })
         .filter(function (candidate) {
@@ -647,7 +623,9 @@
 
     function updateCounters() {
       candidatesCount.textContent = String(registeredCandidates.length);
-      votesCount.textContent = String(voteRecords.length);
+      votesCount.textContent = String(registeredCandidates.reduce(function (sum, candidate) {
+        return sum + getVoteCountForCandidate(candidate);
+      }, 0));
     }
 
     async function loadCurrentUser() {
@@ -662,6 +640,16 @@
 
       if (currentUser && window.siteRegisteredPlayers?.syncFromAuthUser) {
         window.siteRegisteredPlayers.syncFromAuthUser(currentUser);
+      }
+
+      if (currentUser && window.sitePlayerDomain?.syncMyAccountDomain) {
+        await window.sitePlayerDomain.syncMyAccountDomain(client);
+      }
+
+      if (currentUser && window.sitePlayerDomain?.fetchCurrentUserVotes) {
+        currentUserVotes = new Set(await window.sitePlayerDomain.fetchCurrentUserVotes(client, currentUser.id));
+      } else {
+        currentUserVotes = new Set();
       }
     }
 
@@ -678,8 +666,8 @@
         : null;
 
       registeredCandidates = window.siteRegisteredPlayers?.mergeCandidates
-        ? window.siteRegisteredPlayers.mergeCandidates(publicCandidates, localCandidates, currentCandidate ? [currentCandidate] : [])
-        : [...publicCandidates, ...localCandidates, ...(currentCandidate ? [currentCandidate] : [])];
+        ? window.siteRegisteredPlayers.mergeCandidates(localCandidates, currentCandidate ? [currentCandidate] : [], publicCandidates)
+        : [...localCandidates, ...(currentCandidate ? [currentCandidate] : []), ...publicCandidates];
 
       registeredCandidates = registeredCandidates
         .filter(function (candidate) {
@@ -699,20 +687,31 @@
         return;
       }
 
-      if (hasCurrentUserVoted(candidateKey)) {
+      const candidate = registeredCandidates.find(function (item) {
+        return item.key === candidateKey;
+      });
+
+      if (!candidate || !candidate.playerId) {
+        return;
+      }
+
+      if (hasCurrentUserVoted(candidate)) {
         renderSearchResults();
         renderTopTen();
         return;
       }
 
-      voteRecords.unshift({
-        candidateKey: candidateKey,
-        voterId: currentUser.id,
-        voterKey: getUserVoteKey(candidateKey),
-        createdAt: new Date().toISOString()
-      });
+      const client = window.siteAuth?.getClient ? window.siteAuth.getClient() : null;
+      const voteResult = window.sitePlayerDomain?.voteForPlayer
+        ? await window.sitePlayerDomain.voteForPlayer(client, candidate.playerId, currentUser.id)
+        : { ok: false, reason: 'missing-helper' };
 
-      saveVoteRecords();
+      if (!voteResult.ok && voteResult.reason !== 'duplicate') {
+        return;
+      }
+
+      currentUserVotes.add(String(candidate.playerId));
+      await loadCandidates();
       updateCounters();
       renderSearchResults();
       renderTopTen();

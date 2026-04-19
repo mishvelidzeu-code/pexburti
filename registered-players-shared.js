@@ -101,6 +101,7 @@
 
     return {
       key: String(candidate.key || ('candidate:' + normalizeText(fullName))).trim(),
+      playerId: String(candidate.playerId || '').trim(),
       userId: String(candidate.userId || '').trim(),
       roleSource: String(candidate.roleSource || 'player').trim(),
       fullName: fullName,
@@ -114,6 +115,7 @@
       positionLabel: String(candidate.positionLabel || candidate.position || 'არ არის მითითებული').trim(),
       team: String(candidate.team || 'უგუნდოდ').trim() || 'უგუნდოდ',
       photo: String(candidate.photo || '').trim(),
+      votes: Number(candidate.votes || 0) || 0,
       source: String(candidate.source || 'local').trim(),
       registeredAt: String(candidate.registeredAt || new Date().toISOString()).trim()
     };
@@ -133,6 +135,7 @@
       ...base,
       ...incoming,
       fullName: incoming.fullName || base.fullName,
+      playerId: incoming.playerId || base.playerId,
       firstName: incoming.firstName || base.firstName,
       lastName: incoming.lastName || base.lastName,
       age: Number.isFinite(incoming.age) ? incoming.age : base.age,
@@ -144,6 +147,7 @@
         : base.positionLabel,
       team: incoming.team && incoming.team !== 'უგუნდოდ' ? incoming.team : base.team,
       photo: incoming.photo || base.photo,
+      votes: Number.isFinite(Number(incoming.votes)) ? Number(incoming.votes) : base.votes,
       source: incoming.source || base.source,
       registeredAt: incoming.registeredAt || base.registeredAt
     };
@@ -183,6 +187,7 @@
 
       return sanitizeCandidate({
         key: `player:${user.id}`,
+        playerId: user.id,
         userId: user.id,
         roleSource: 'player',
         fullName: fullName,
@@ -207,6 +212,7 @@
       const age = resolveAge(profile.childAge, profile.childBirthDate);
       return sanitizeCandidate({
         key: `parent-child:${user.id}`,
+        playerId: '',
         userId: user.id,
         roleSource: 'parent-child',
         fullName: childName,
@@ -235,16 +241,18 @@
 
   function mapPublicPlayer(player) {
     return sanitizeCandidate({
-      key: `public-player:${player.user_id}`,
-      userId: player.user_id,
-      roleSource: 'player',
-      fullName: player.display_name,
-      age: player.age,
+      key: `public-player:${player.id || player.user_id}`,
+      playerId: player.id || '',
+      userId: player.auth_user_id || player.user_id || player.owner_user_id || '',
+      roleSource: player.owner_role || 'player',
+      fullName: player.full_name || player.display_name,
+      age: player.current_age ?? player.age,
       ageCat: String(player.age_group || 'pro').trim().toLowerCase(),
       foot: player.preferred_foot,
       positionLabel: player.position_label,
-      team: player.current_club_name,
+      team: player.club_name || player.current_club_name,
       photo: player.avatar_path,
+      votes: Number(player.votes_count || 0) || 0,
       source: 'supabase',
       registeredAt: player.updated_at || player.created_at || new Date().toISOString()
     });
@@ -253,6 +261,15 @@
   async function fetchPublicCandidates(client) {
     if (!client?.from) {
       return [];
+    }
+
+    if (window.sitePlayerDomain?.fetchPublicDirectoryEntries) {
+      const registryEntries = await window.sitePlayerDomain.fetchPublicDirectoryEntries(client);
+      if (Array.isArray(registryEntries) && registryEntries.length) {
+        return registryEntries
+          .map(mapPublicPlayer)
+          .filter(Boolean);
+      }
     }
 
     try {

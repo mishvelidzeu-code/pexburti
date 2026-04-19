@@ -442,6 +442,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="players-shared.js"></script>
+  <script src="supabase-domain-shared.js"></script>
   <script src="auth-shared.js"></script>
   <script>
     const players = Array.isArray(window.playersDirectory) ? window.playersDirectory : [];
@@ -600,6 +601,35 @@
 
       const role = window.siteAuth?.getUserRole ? window.siteAuth.getUserRole(user) : 'player';
       if (role !== 'player' && role !== 'parent') {
+        return;
+      }
+
+      if (window.sitePlayerDomain?.syncMyAccountDomain) {
+        await window.sitePlayerDomain.syncMyAccountDomain(client);
+      }
+
+      const managedEntry = window.sitePlayerDomain?.fetchManagedEntry
+        ? await window.sitePlayerDomain.fetchManagedEntry(client, user.id)
+        : null;
+
+      if (managedEntry) {
+        const parts = managedEntry.fullName.split(/\s+/).filter(Boolean);
+        extraPlayer = {
+          id: managedEntry.id || 'self',
+          first: parts[0] || managedEntry.fullName,
+          last: parts.slice(1).join(' '),
+          name: managedEntry.fullName,
+          pos: getPositionCode(managedEntry.positionLabel || managedEntry.position),
+          ageCat: String(managedEntry.ageGroup || 'pro').toLowerCase() || 'pro',
+          age: managedEntry.age ?? '-',
+          foot: managedEntry.foot || 'áƒáƒ  áƒáƒ áƒ˜áƒ¡ áƒ›áƒ˜áƒ—áƒ˜áƒ—áƒ”áƒ‘áƒ£áƒšáƒ˜',
+          img: managedEntry.photo || '',
+          actionHref: 'user-profile.html?view=overview&from=pexburtelebi.html',
+          actionLabel: 'áƒ©áƒ”áƒ›áƒ˜ áƒžáƒ áƒáƒ¤áƒ˜áƒšáƒ˜'
+        };
+
+        renderPlayers();
+        applyFilters();
         return;
       }
 
