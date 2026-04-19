@@ -3,1013 +3,1018 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>DM Football Georgia</title>
+  <title>Football Georgia</title>
   <meta name="description" content="ივარჯიშე ელიტურად. განვითარდი როგორც პროფესიონალი ფეხბურთელი. მიიღე ვარჯიშები, ტაქტიკური ცოდნა, მენტორობა და ბანაკები ერთ პლატფორმაში." />
   <style>
-    :root{
-      --bg:#ffffff;
-      --bg-2:#ffffff;
-      --panel:#ffffff;
-      --panel-2:#ffffff;
-      --panel-3:#eef2f6;
-      --text:#0b1220;
-      --muted:#344054;
-      --muted-2:#1f2937;
-      --line:rgba(16,24,40,0.18);
-      --line-2:rgba(16,24,40,0.28);
-      --red:#b91c1c;
-      --red-2:#991b1b;
-      --gold:#b45309;
-      --green:#1fa971;
-      --shadow:0 18px 45px rgba(15,23,42,.12);
-      --radius:24px;
-      --radius-lg:34px;
-      --container:1180px;
+    :root {
+      --bg: #ffffff;
+      --bg-alt: #f8fafc;
+      --panel: #ffffff;
+      --text: #0f172a;
+      --muted: #475569;
+      --muted-2: #334155;
+      --line: rgba(15, 23, 42, 0.08);
+      --line-2: rgba(15, 23, 42, 0.15);
+      --red: #b91c1c;
+      --red-2: #991b1b;
+      --gold: #d97706;
+      --green: #15803d;
+      --shadow-sm: 0 4px 10px rgba(15, 23, 42, 0.04);
+      --shadow: 0 20px 40px -10px rgba(15, 23, 42, 0.08);
+      --shadow-hover: 0 25px 50px -12px rgba(15, 23, 42, 0.15);
+      --radius: 20px;
+      --radius-lg: 32px;
+      --container: 1260px;
     }
 
-    *{box-sizing:border-box}
-    html{scroll-behavior:smooth}
-    body{
-      margin:0;
-      color:var(--text);
-      font-family:"Segoe UI", "Sylfaen", "Noto Sans Georgian", "DejaVu Sans", sans-serif;
-      font-size:14px;
-      background:#fff;
-      line-height:1.55;
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--text);
+      font-family: "Segoe UI", "Sylfaen", "Noto Sans Georgian", "DejaVu Sans", sans-serif;
+      font-size: 14px;
+      background: var(--bg);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
     }
 
-    a{text-decoration:none;color:inherit}
-    img{display:block;max-width:100%}
-    .container{width:min(var(--container), calc(100% - 32px));margin-inline:auto}
-    .section{padding:88px 0}
-    .section-sm{padding:60px 0}
-    .center{text-align:center}
+    a { text-decoration: none; color: inherit; }
+    img { display: block; max-width: 100%; height: auto; }
+    .container { width: min(var(--container), calc(100% - 36px)); margin-inline: auto; }
+    
+    .section { padding: 86px 0; }
+    .section-sm { padding: 64px 0; }
+    .bg-alt { background-color: var(--bg-alt); }
+    .center { text-align: center; }
 
-    h1,h2,h3,h4,p{margin:0}
-    h1{
-      font-size:clamp(2rem, 4.6vw, 4.35rem);
-      line-height:.96;
-      letter-spacing:-.05em;
-      font-weight:950;
+    h1, h2, h3, h4, p { margin: 0; }
+    h1 {
+      font-size: clamp(2.1rem, 3.7vw, 3.45rem);
+      line-height: 1.05;
+      letter-spacing: -0.04em;
+      font-weight: 900;
     }
-    h2{
-      font-size:clamp(1.5rem, 3vw, 2.7rem);
-      line-height:1;
-      letter-spacing:-.04em;
-      font-weight:900;
+    h2 {
+      font-size: clamp(1.65rem, 2.55vw, 2.2rem);
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+      font-weight: 800;
     }
-    h3{
-      font-size:clamp(1rem, 1.6vw, 1.25rem);
-      font-weight:850;
-      letter-spacing:-.02em;
+    h3 {
+      font-size: clamp(1.02rem, 1.25vw, 1.18rem);
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      line-height: 1.3;
     }
-    .lead{
-      color:var(--muted);
-      font-size:.93rem;
-      max-width:700px;
+    .lead {
+      color: var(--muted);
+      font-size: .98rem;
+      max-width: 700px;
+      margin-top: 14px;
     }
-    .small{font-size:.84rem;color:var(--muted)}
-    .eyebrow{
-      display:inline-flex;
-      align-items:center;
-      gap:10px;
-      color:var(--red-2);
-      text-transform:uppercase;
-      letter-spacing:.16em;
-      font-size:11px;
-      font-weight:800;
-      margin-bottom:14px;
+    .small { font-size: 0.88rem; color: var(--muted); }
+    
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--red-2);
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      font-size: 12px;
+      font-weight: 800;
+      margin-bottom: 14px;
     }
-    .eyebrow::before{
-      content:"";
-      width:9px;height:9px;border-radius:999px;
-      background:var(--red);
-      box-shadow:0 0 0 6px rgba(185,28,28,.16);
-    }
-
-    .btn-row{
-      display:flex;
-      flex-wrap:wrap;
-      gap:14px;
-      margin-top:28px;
-    }
-    .btn{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      min-height:56px;
-      padding:0 22px;
-      border-radius:999px;
-      font-weight:800;
-      font-size:13px;
-      border:1px solid transparent;
-      transition:.25s ease;
-      white-space:nowrap;
-    }
-    .btn:hover{transform:translateY(-2px)}
-    .btn-primary{
-      color:#fff;
-      background:#020617;
-      border-color:#020617;
-      box-shadow:0 12px 30px rgba(2,6,23,.24);
-    }
-    .btn-secondary{
-      color:var(--text);
-      background:#fff;
-      border-color:var(--line);
-    }
-    .btn-secondary:hover{background:#edf2f7}
-
-    .header{
-      position:sticky;
-      top:0;
-      z-index:1000;
-      backdrop-filter:blur(16px);
-      background:rgba(255,255,255,.98);
-      border-bottom:1px solid var(--line);
-    }
-    .nav{
-      min-height:78px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:20px;
-    }
-    .brand{
-      display:flex;
-      align-items:center;
-      gap:12px;
-      font-size:.95rem;
-      font-weight:900;
-      letter-spacing:-.03em;
-    }
-    .logo{
-      width:42px;
-      height:42px;
-      border-radius:14px;
-      display:grid;
-      place-items:center;
-      background:#b91c1c;
-      color:#fff;
-      font-weight:900;
-      font-size:.92rem;
-      line-height:1;
-      letter-spacing:-.04em;
-      text-transform:uppercase;
-      box-shadow:0 10px 24px rgba(185,28,28,.28);
-    }
-    .nav-links{
-      display:flex;
-      align-items:center;
-      gap:22px;
-      color:var(--muted-2);
-      font-size:13px;
-      font-weight:800;
-      letter-spacing:-.01em;
-    }
-    .nav-links a:hover,
-    .nav-links a.active{color:var(--red)}
-    .nav-actions{
-      display:flex;
-      gap:10px;
-      align-items:center;
-    }
-    .nav-actions .btn-secondary{
-      background:var(--red);
-      color:#fff;
-      border-color:var(--red);
-      box-shadow:0 7px 16px rgba(185,28,28,.16);
-    }
-    .nav-actions .btn-secondary:hover{background:var(--red-2)}
-    .nav-actions .btn-primary{
-      background:#0b1220;
-      border-color:#0b1220;
-      box-shadow:0 7px 16px rgba(2,6,23,.14);
+    .eyebrow::before {
+      content: "";
+      width: 8px; height: 8px; border-radius: 999px;
+      background: var(--red);
+      box-shadow: 0 0 0 4px rgba(185,28,28,.15);
     }
 
-    .hero{
-      padding:0 0 8px;
-      overflow:hidden;
-      position:relative;
-      background:#fff;
-      isolation:isolate;
+    .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 28px;
     }
-    .hero::before{
-      content:"";
-      position:absolute;
-      inset:0;
-      background:url('1.webp') center 56%/cover no-repeat;
-      opacity:1;
-      transform:none;
-      z-index:0;
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 50px;
+      padding: 0 24px;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 14px;
+      border: 1px solid transparent;
+      transition: all 0.3s ease;
+      white-space: nowrap;
     }
-    .hero::after{
-      content:"";
-      position:absolute;
-      inset:0;
-      background:linear-gradient(90deg, rgba(255,255,255,.97) 0%, rgba(255,255,255,.88) 26%, rgba(255,255,255,.56) 46%, rgba(255,255,255,.18) 70%, rgba(255,255,255,.06) 100%);
-      z-index:0;
+    .btn:hover { transform: translateY(-3px); }
+    .btn-primary {
+      color: #fff;
+      background: #0f172a;
+      box-shadow: 0 10px 20px rgba(15,23,42,.15);
     }
-    .hero-grid{
-      display:grid;
-      grid-template-columns:1.05fr .95fr;
-      gap:28px;
-      align-items:center;
-      position:relative;
-      z-index:1;
+    .btn-primary:hover {
+      background: #1e293b;
+      box-shadow: 0 12px 24px rgba(15,23,42,.2);
     }
-    .hero p.lead{margin-top:18px}
-    .hero-points{
-      display:flex;
-      flex-wrap:wrap;
-      gap:12px;
-      margin-top:26px;
+    .btn-secondary {
+      color: var(--text);
+      background: #fff;
+      border-color: var(--line-2);
     }
-    .hero-point{
-      padding:12px 14px;
-      border-radius:999px;
-      background:#fff;
-      border:1px solid var(--line);
-      color:var(--text);
-      font-size:13px;
-      font-weight:700;
+    .btn-secondary:hover { 
+      background: var(--bg-alt); 
+      border-color: var(--text);
     }
 
-    .hero-side{
-      position:relative;
-      min-height:504px;
+    .header {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      backdrop-filter: blur(20px);
+      background: rgba(255,255,255,.95);
+      border-bottom: 1px solid var(--line);
     }
-    .phone-wrap{
-      position:absolute;
-      inset:6px 54px 6px 54px;
-      z-index:1;
-      border-radius:42px;
-      padding:14px;
-      background:#fff;
-      border:1px solid var(--line);
-      box-shadow:var(--shadow);
+    .nav {
+      min-height: 74px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
     }
-    .phone{
-      position:relative;
-      height:100%;
-      border-radius:32px;
-      overflow:hidden;
-      background:#fff;
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 1rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      flex: 0 0 auto;
+      white-space: nowrap;
     }
-    .phone::before{
-      content:"";
-      position:absolute;
-      top:12px;
-      left:50%;
-      transform:translateX(-50%);
-      width:120px;
-      height:22px;
-      border-radius:0 0 18px 18px;
-      background:#b8c4d4;
-      z-index:4;
+    .logo {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      background: var(--red);
+      color: #fff;
+      font-weight: 900;
+      font-size: .95rem;
+      letter-spacing: -0.02em;
+      box-shadow: 0 8px 20px rgba(185,28,28,.25);
     }
-    .screen{
-      position:absolute;
-      inset:0;
-      padding:30px 18px 18px;
+    .nav-links {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex: 1 1 auto;
+      min-width: 0;
+      gap: clamp(12px, 1.6vw, 22px);
+      color: var(--muted-2);
+      font-size: 13px;
+      font-weight: 600;
     }
-    .screen-top{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      margin-bottom:16px;
-      color:var(--text);
-      font-size:14px;
-      font-weight:750;
+    .nav-links a { position: relative; transition: color 0.2s; white-space: nowrap; }
+    .nav-links a:hover, .nav-links a.active { color: var(--text); }
+    .nav-links a.active::after {
+      content: '';
+      position: absolute;
+      bottom: -6px; left: 0; width: 100%; height: 2px;
+      background: var(--red);
+      border-radius: 2px;
     }
-    .screen-card{
-      border-radius:24px;
-      padding:16px;
-      border:1px solid var(--line);
-      background:#fff;
-      margin-bottom:14px;
+    .nav-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex: 0 0 auto;
     }
-    .screen-card.primary{
-      background:linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
-      color:#fff;
-      box-shadow:0 18px 36px rgba(185,28,28,.28);
+    .nav-actions .btn {
+      min-height: 46px;
+      padding: 0 16px;
+      font-size: 13px;
     }
-    .tag{
-      display:inline-flex;
-      align-items:center;
-      padding:7px 10px;
-      border-radius:999px;
-      background:#fee2e2;
-      color:#991b1b;
-      border:1px solid rgba(185,28,28,.16);
-      font-size:11px;
-      font-weight:800;
-      margin-bottom:12px;
+    .nav-actions .btn-secondary {
+      background: var(--red);
+      color: #fff;
+      border: none;
+      box-shadow: 0 6px 14px rgba(185,28,28,.2);
     }
-    .screen-card.primary .tag{
-      background:rgba(255,255,255,.22);
-      color:#fff;
-      border:1px solid rgba(255,255,255,.26);
+    .nav-actions .btn-secondary:hover { background: var(--red-2); }
+    .nav-actions .btn-primary {
+      background: #0f172a;
+      box-shadow: 0 6px 14px rgba(15,23,42,.15);
     }
-    .progress{
-      height:10px;
-      border-radius:999px;
-      overflow:hidden;
-      background:#cbd5e1;
-      margin-top:12px;
+    .profile-menu {
+      position: relative;
     }
-    .screen-card.primary .progress{background:rgba(255,255,255,.26)}
-    .progress span{
-      display:block;
-      width:74%;
-      height:100%;
-      border-radius:999px;
-      background:var(--gold);
+    .profile-trigger {
+      gap: 10px;
     }
-    .mini-grid{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:12px;
-      margin-bottom:14px;
+    .profile-trigger::after {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-right: 2px solid currentColor;
+      border-bottom: 2px solid currentColor;
+      transform: rotate(45deg) translateY(-1px);
+      opacity: .8;
     }
-    .mini-card{
-      min-height:104px;
-      border-radius:22px;
-      padding:16px;
-      border:1px solid rgba(185,28,28,.1);
-      background:linear-gradient(180deg,#ffffff 0%,#fff7f7 100%);
-      box-shadow:0 10px 24px rgba(15,23,42,.05);
+    .profile-dropdown {
+      position: absolute;
+      top: calc(100% + 12px);
+      right: 0;
+      width: min(320px, calc(100vw - 32px));
+      padding: 14px;
+      border-radius: 24px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.98);
+      box-shadow: 0 28px 60px rgba(15,23,42,.16);
+      display: grid;
+      gap: 8px;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(10px);
+      transition: opacity .22s ease, transform .22s ease, visibility .22s ease;
+      z-index: 40;
     }
-
-    .floating{
-      position:absolute;
-      z-index:4;
-      border-radius:24px;
-      padding:18px;
-      background:linear-gradient(180deg,rgba(255,255,255,.98) 0%,rgba(255,248,248,.96) 100%);
-      border:1px solid rgba(185,28,28,.12);
-      box-shadow:0 18px 38px rgba(15,23,42,.12);
-      backdrop-filter:blur(12px);
+    .profile-menu:hover .profile-dropdown,
+    .profile-menu:focus-within .profile-dropdown,
+    .profile-menu.open .profile-dropdown {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
     }
-    .floating .pill{
-      background:#b91c1c;
-      color:#fff;
-      border-color:#b91c1c;
-      box-shadow:0 10px 20px rgba(185,28,28,.18);
+    .profile-menu-label {
+      padding: 8px 10px 12px;
+      border-bottom: 1px solid var(--line);
+      display: grid;
+      gap: 4px;
     }
-    .floating h3{
-      font-size:1.08rem;
-      line-height:1.08;
-      letter-spacing:-.03em;
+    .profile-menu-label strong {
+      font-size: .95rem;
+      color: var(--text);
     }
-    .floating .small{
-      color:#4b5563;
-      line-height:1.5;
+    .profile-menu-label span {
+      font-size: .8rem;
+      color: var(--muted);
     }
-    .f1{top:-8px;left:-18px;width:224px}
-    .f2{top:34px;right:-20px;width:202px}
-    .f3{bottom:118px;left:-34px;width:244px}
-    .f4{bottom:152px;right:-28px;width:228px}
-
-    .weekly-preview{
-      position:relative;
-      z-index:3;
-      margin-top:-88px;
-      padding-bottom:24px;
+    .profile-dropdown a {
+      display: grid;
+      gap: 4px;
+      padding: 12px 14px;
+      border-radius: 18px;
+      transition: background .2s ease, transform .2s ease;
     }
-    .weekly-card{
-      border-radius:30px;
-      padding:22px;
-      background:#fff;
-      border:1px solid var(--line);
-      box-shadow:var(--shadow);
+    .profile-dropdown a strong {
+      font-size: .92rem;
+      color: var(--text);
     }
-    .weekly-head{
-      display:flex;
-      align-items:flex-start;
-      justify-content:space-between;
-      gap:18px;
-      margin-bottom:18px;
+    .profile-dropdown a span {
+      font-size: .8rem;
+      color: var(--muted);
+      line-height: 1.45;
     }
-    .weekly-lead{
-      max-width:720px;
-      color:var(--muted);
-      font-size:.88rem;
-      margin-top:10px;
-    }
-    .monthly-grid{
-      display:grid;
-      grid-template-columns:minmax(0,1.08fr) minmax(320px,.82fr);
-      gap:20px;
-      align-items:start;
-    }
-    .month-card{
-      border-radius:30px;
-      background:#fff;
-      border:1px solid var(--line);
-      box-shadow:var(--shadow);
-    }
-    .month-card-inner,
-    .month-card-summary{
-      padding:22px;
-    }
-    .month-label{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      min-height:38px;
-      padding:0 14px;
-      border-radius:999px;
-      background:#b91c1c;
-      color:#fff;
-      font-size:.76rem;
-      font-weight:900;
-      box-shadow:0 10px 20px rgba(185,28,28,.18);
-    }
-    .month-club-card{
-      background:linear-gradient(180deg,#fff 0%,#fff6f6 100%);
-    }
-    .month-club-top{
-      display:flex;
-      align-items:flex-start;
-      justify-content:space-between;
-      gap:18px;
-    }
-    .month-club-copy h3,
-    .month-card-summary h3{
-      font-size:1.42rem;
-      line-height:1.02;
-      letter-spacing:-.04em;
-      margin-top:12px;
-    }
-    .month-club-copy p,
-    .month-card-summary p{
-      color:var(--muted);
-      font-size:.9rem;
-      line-height:1.7;
-      margin-top:12px;
-    }
-    .month-club-badge{
-      width:78px;
-      height:78px;
-      border-radius:24px;
-      display:grid;
-      place-items:center;
-      background:linear-gradient(135deg,#b91c1c,#991b1b);
-      color:#fff;
-      font-size:1.45rem;
-      font-weight:950;
-      letter-spacing:-.05em;
-      box-shadow:0 20px 34px rgba(185,28,28,.24);
-      flex:0 0 auto;
-    }
-    .month-team-meta{
-      display:grid;
-      grid-template-columns:repeat(3,minmax(0,1fr));
-      gap:12px;
-      margin-top:20px;
-    }
-    .month-meta{
-      padding:14px 16px;
-      border-radius:20px;
-      background:#fff;
-      border:1px solid rgba(185,28,28,.1);
-    }
-    .month-meta span{
-      display:block;
-      color:var(--muted);
-      font-size:.74rem;
-      font-weight:800;
-      margin-bottom:8px;
-    }
-    .month-meta strong{
-      display:block;
-      font-size:1rem;
-      font-weight:900;
-      line-height:1.2;
-    }
-    .month-team-note{
-      margin-top:18px;
-      padding:16px 18px;
-      border-radius:22px;
-      background:#fff;
-      border:1px solid rgba(15,23,42,.08);
-      color:#475467;
-      font-size:.88rem;
-      line-height:1.65;
-    }
-    .month-card-actions{
-      display:flex;
-      gap:12px;
-      flex-wrap:wrap;
-      margin-top:20px;
-    }
-    .month-squad-card{
-      overflow:hidden;
-    }
-    .month-squad-card summary{
-      list-style:none;
-      cursor:pointer;
-    }
-    .month-squad-card summary::-webkit-details-marker{
-      display:none;
-    }
-    .month-expand{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      min-height:36px;
-      padding:0 12px;
-      border-radius:999px;
-      background:#111827;
-      color:#fff;
-      font-size:.74rem;
-      font-weight:900;
-      margin-top:16px;
-    }
-    .month-mini-pitch{
-      position:relative;
-      min-height:148px;
-      margin-top:18px;
-      border-radius:24px;
-      overflow:hidden;
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.08) 0%, rgba(255,255,255,0) 100%),
-        repeating-linear-gradient(
-          90deg,
-          rgba(255,255,255,.03) 0,
-          rgba(255,255,255,.03) 36px,
-          rgba(8,120,52,.08) 36px,
-          rgba(8,120,52,.08) 72px
-        ),
-        linear-gradient(180deg,#14913f 0%,#0f7a34 100%);
-      border:1px solid rgba(15,23,42,.12);
-    }
-    .month-mini-pitch::before{
-      content:"";
-      position:absolute;
-      inset:14px;
-      border:2px solid rgba(255,255,255,.28);
-      border-radius:18px;
-    }
-    .month-mini-dot{
-      position:absolute;
-      width:10px;
-      height:10px;
-      border-radius:50%;
-      background:#fff;
-      box-shadow:0 0 0 6px rgba(255,255,255,.12);
-    }
-    .month-mini-dot.gk{left:50%;bottom:14%;transform:translateX(-50%)}
-    .month-mini-dot.rb{left:18%;bottom:32%}
-    .month-mini-dot.rcb{left:38%;bottom:28%}
-    .month-mini-dot.lcb{left:62%;bottom:28%}
-    .month-mini-dot.lb{left:82%;bottom:32%}
-    .month-mini-dot.rcm{left:28%;top:42%}
-    .month-mini-dot.cm{left:50%;top:36%;transform:translateX(-50%)}
-    .month-mini-dot.lcm{left:72%;top:42%}
-    .month-mini-dot.rw{left:22%;top:18%}
-    .month-mini-dot.st{left:50%;top:10%;transform:translateX(-50%)}
-    .month-mini-dot.lw{left:78%;top:18%}
-    .month-squad-expanded{
-      display:none;
-      padding:0 22px 22px;
-    }
-    .month-squad-card[open] .month-squad-expanded{
-      display:grid;
-      gap:16px;
-    }
-    .month-squad-card[open] .month-card-summary{
-      padding-bottom:16px;
-      border-bottom:1px solid var(--line);
-    }
-    .month-squad-note{
-      display:flex;
-      align-items:flex-start;
-      justify-content:space-between;
-      gap:14px;
-      flex-wrap:wrap;
-    }
-    .month-squad-note p{
-      margin:0;
-      color:var(--muted);
-      font-size:.86rem;
-    }
-    .month-squad-expanded .weekly-pitch{
-      min-height:520px;
-    }
-    .weekly-pitch{
-      position:relative;
-      min-height:612px;
-      border-radius:28px;
-      overflow:hidden;
-      background:
-        radial-gradient(circle at center, rgba(255,255,255,.12) 0%, rgba(255,255,255,.03) 34%, transparent 35%),
-        linear-gradient(180deg, rgba(255,255,255,.06) 0%, rgba(255,255,255,0) 100%),
-        repeating-linear-gradient(
-          90deg,
-          rgba(255,255,255,.02) 0,
-          rgba(255,255,255,.02) 58px,
-          rgba(8,120,52,.08) 58px,
-          rgba(8,120,52,.08) 116px
-        ),
-        linear-gradient(180deg,#14913f 0%,#0f7a34 100%);
-      border:1px solid rgba(15,23,42,.12);
-      box-shadow:inset 0 0 0 1px rgba(255,255,255,.12);
-    }
-    .weekly-pitch::before,
-    .weekly-pitch::after{
-      content:"";
-      position:absolute;
-      left:50%;
-      transform:translateX(-50%);
-      pointer-events:none;
-    }
-    .weekly-pitch::before{
-      top:22px;
-      bottom:22px;
-      width:calc(100% - 44px);
-      border:2px solid rgba(255,255,255,.34);
-      border-radius:24px;
-    }
-    .weekly-pitch::after{
-      top:50%;
-      width:calc(100% - 44px);
-      border-top:2px solid rgba(255,255,255,.34);
-    }
-    .pitch-circle{
-      position:absolute;
-      top:50%;
-      left:50%;
-      width:132px;
-      height:132px;
-      transform:translate(-50%,-50%);
-      border-radius:50%;
-      border:2px solid rgba(255,255,255,.34);
-      pointer-events:none;
-    }
-    .pitch-box{
-      position:absolute;
-      left:50%;
-      transform:translateX(-50%);
-      width:34%;
-      height:96px;
-      border:2px solid rgba(255,255,255,.34);
-      pointer-events:none;
-    }
-    .pitch-box.top{top:22px;border-radius:0 0 22px 22px;border-top:none}
-    .pitch-box.bottom{bottom:22px;border-radius:22px 22px 0 0;border-bottom:none}
-    .pitch-player{
-      position:absolute;
-      transform:translate(-50%,-50%);
-      width:88px;
-      text-align:center;
-      color:#fff;
-      z-index:2;
-      transition:transform .22s ease;
-    }
-    .pitch-player img{
-      width:48px;
-      height:48px;
-      border-radius:50%;
-      object-fit:cover;
-      margin:0 auto 8px;
-      border:3px solid rgba(255,255,255,.92);
-      box-shadow:0 10px 24px rgba(2,6,23,.26);
-      background:#fff;
-    }
-    .pitch-badge{
-      display:grid;
-      gap:4px;
-      padding:8px 9px;
-      border-radius:16px;
-      background:rgba(3,18,10,.32);
-      backdrop-filter:blur(8px);
-      border:1px solid rgba(255,255,255,.18);
-    }
-    .pitch-badge strong{
-      display:block;
-      font-size:.72rem;
-      font-weight:900;
-      line-height:1.18;
-    }
-    .pitch-badge span{
-      display:block;
-      font-size:.64rem;
-      color:rgba(255,255,255,.86);
-      line-height:1.2;
-    }
-    .pitch-player:hover{
-      transform:translate(-50%,-50%) scale(1.04);
-    }
-    .pitch-player:hover .pitch-badge{
-      background:rgba(113,18,18,.72);
-      border-color:rgba(255,255,255,.26);
-    }
-    .pitch-player.gk{left:50%;top:84%}
-    .pitch-player.rb{left:17%;top:67%}
-    .pitch-player.rcb{left:39%;top:69%}
-    .pitch-player.lcb{left:61%;top:69%}
-    .pitch-player.lb{left:83%;top:67%}
-    .pitch-player.rcm{left:26%;top:49%}
-    .pitch-player.cm{left:50%;top:43%}
-    .pitch-player.lcm{left:74%;top:49%}
-    .pitch-player.rw{left:20%;top:23%}
-    .pitch-player.st{left:50%;top:17%}
-    .pitch-player.lw{left:80%;top:23%}
-    .weekly-legend{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:14px;
-      margin-top:16px;
-      color:var(--muted);
-      font-size:.82rem;
+    .profile-dropdown a:hover {
+      background: #fff5f5;
+      transform: translateX(2px);
     }
 
-    .stats-bar{
-      display:grid;
-      grid-template-columns:repeat(3,1fr);
-      gap:18px;
-      margin-top:30px;
+    .hero {
+      padding: 42px 0 76px;
+      overflow: hidden;
+      position: relative;
+      background: var(--bg);
+      isolation: isolate;
     }
-    .stat{
-      border-radius:22px;
-      padding:20px;
-      background:#fff;
-      border:1px solid var(--line);
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: url('1.webp') center right/contain no-repeat;
+      opacity: 1;
+      z-index: 0;
     }
-    .stat strong{
-      display:block;
-      font-size:1.15rem;
-      font-weight:900;
-      margin-bottom:6px;
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0.92) 35%, rgba(255,255,255,0.6) 60%, rgba(255,255,255,0.1) 100%);
+      z-index: 0;
     }
-
-    .brand-strip{
-      display:grid;
-      grid-template-columns:repeat(5,1fr);
-      gap:14px;
-      margin-top:34px;
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 30px;
+      align-items: center;
+      position: relative;
+      z-index: 1;
     }
-    .brand-box{
-      min-height:88px;
-      border-radius:20px;
-      display:grid;
-      place-items:center;
-      text-align:center;
-      padding:18px;
-      background:#fff;
-      border:1px solid var(--line);
-      color:var(--text);
-      font-weight:800;
+    .hero-points {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 30px;
     }
-
-    .grid-2,.grid-3,.grid-4{
-      display:grid;
-      gap:20px;
-    }
-    .grid-2{grid-template-columns:repeat(2,1fr)}
-    .grid-3{grid-template-columns:repeat(3,1fr)}
-    .grid-4{grid-template-columns:repeat(4,1fr)}
-
-    .card{
-      border-radius:var(--radius);
-      padding:24px;
-      background:#fff;
-      border:1px solid var(--line);
-      box-shadow:var(--shadow);
-    }
-    .card.soft{
-      background:#fff;
-      box-shadow:none;
-    }
-    .card.glow{
-      background:#fff;
-    }
-    .card.red{
-      background:#fff;
-      border-color:rgba(185,28,28,.34);
+    .hero-point {
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.8);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(15,23,42,0.08);
+      color: var(--text);
+      font-size: 12px;
+      font-weight: 600;
+      box-shadow: var(--shadow-sm);
     }
 
-    .icon-box{
-      width:54px;height:54px;
-      display:grid;place-items:center;
-      border-radius:18px;
-      margin-bottom:16px;
-      font-size:21px;
-      font-weight:900;
-      background:#fcb0b0;
-      border:1px solid rgba(185,28,28,.22);
+    .hero-side {
+      position: relative;
+      min-height: 520px;
+      display: flex;
+      justify-content: center;
+    }
+    .phone-wrap {
+      position: relative;
+      z-index: 1;
+      width: 300px;
+      height: 590px;
+      border-radius: 48px;
+      padding: 12px;
+      background: #e2e8f0;
+      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+      border: 1px solid #cbd5e1;
+    }
+    .phone {
+      position: relative;
+      height: 100%;
+      border-radius: 36px;
+      overflow: hidden;
+      background: #f8fafc;
+      border: 6px solid #0f172a;
+    }
+    .phone::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 50%;
+      transform: translateX(-50%);
+      width: 130px; height: 26px;
+      border-radius: 0 0 16px 16px;
+      background: #0f172a;
+      z-index: 10;
+    }
+    .screen {
+      position: absolute;
+      inset: 0;
+      padding: 34px 18px 18px;
+      overflow-y: auto;
+      background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+    }
+    .screen::-webkit-scrollbar { display: none; }
+    
+    .screen-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 18px;
+      color: var(--text);
+      font-size: 14px;
+      font-weight: 700;
+    }
+    .screen-card {
+      border-radius: 20px;
+      padding: 18px;
+      background: #fff;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 14px;
+      border: 1px solid var(--line);
+    }
+    .screen-card.primary {
+      background: linear-gradient(135deg, #b91c1c 0%, #7f1d1d 100%);
+      color: #fff;
+      border: none;
+      box-shadow: 0 14px 28px rgba(185,28,28,.2);
+    }
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 5px 10px;
+      border-radius: 8px;
+      background: #fee2e2;
+      color: #b91c1c;
+      font-size: 10px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .screen-card.primary .tag {
+      background: rgba(255,255,255,.2);
+      color: #fff;
+    }
+    .progress {
+      height: 8px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.3);
+      margin-top: 14px;
+      overflow: hidden;
+    }
+    .progress span {
+      display: block;
+      width: 74%;
+      height: 100%;
+      border-radius: 999px;
+      background: #fcd34d;
+    }
+    .mini-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .mini-card {
+      border-radius: 16px;
+      padding: 14px;
+      background: #fff;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--line);
+    }
+    .mini-card h3 { font-size: 1rem; }
+
+    .floating {
+      position: absolute;
+      z-index: 4;
+      border-radius: 18px;
+      padding: 16px;
+      background: rgba(255, 255, 255, 0.95);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(12px);
+      transition: transform 0.3s ease;
+    }
+    .floating:hover { transform: translateY(-5px); }
+    .floating .pill {
+      background: var(--red);
+      color: #fff;
+      font-size: 10px;
+      padding: 6px 10px;
+      border-radius: 8px;
+      display: inline-block;
+      font-weight: bold;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .f1 { top: 40px; left: -60px; width: 240px; }
+    .f2 { top: 120px; right: -50px; width: 220px; }
+    .f3 { bottom: 100px; left: -70px; width: 250px; }
+    
+    .stats-bar {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-top: 30px;
+      padding-top: 30px;
+      border-top: 1px solid var(--line);
+    }
+    .stat { padding-right: 10px; }
+    .stat strong {
+      display: block;
+      font-size: 1.5rem;
+      font-weight: 800;
+      margin-bottom: 6px;
+      color: var(--text);
     }
 
-    .story-head{
-      display:flex;
-      justify-content:space-between;
-      align-items:flex-start;
-      gap:16px;
-      margin-bottom:16px;
+    .weekly-preview {
+      position: relative;
+      z-index: 3;
+      margin-top: -60px;
+      padding-bottom: 40px;
     }
-    .pill{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding:8px 12px;
-      border-radius:999px;
-      border:1px solid var(--line);
-      background:#fff;
-      font-size:11px;
-      font-weight:800;
-      color:var(--text);
+    .monthly-grid {
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 30px;
+      align-items: start;
     }
-    .quote{
-      font-size:.96rem;
-      font-weight:650;
-      color:var(--text);
+    .month-card {
+      border-radius: var(--radius-lg);
+      background: #fff;
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      overflow: hidden;
     }
-    ul.clean{
-      margin:16px 0 0;
-      padding-left:18px;
-      color:var(--muted);
+    .month-card-inner {
+      padding: 40px;
     }
-    ul.clean li{margin:9px 0}
+    .month-card-summary {
+      padding: 40px 40px 24px;
+      border-bottom: 1px solid var(--line);
+      margin-bottom: 24px;
+    }
+    .month-label {
+      display: inline-flex;
+      align-items: center;
+      padding: 8px 16px;
+      border-radius: 999px;
+      background: rgba(185,28,28,0.1);
+      color: var(--red);
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 16px;
+    }
+    .month-club-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 24px;
+    }
+    .month-club-badge {
+      width: 80px; height: 80px;
+      border-radius: 20px;
+      display: grid; place-items: center;
+      background: linear-gradient(135deg, #b91c1c, #7f1d1d);
+      color: #fff;
+      font-size: 1.6rem;
+      font-weight: 900;
+      box-shadow: 0 15px 30px rgba(185,28,28,.2);
+      flex-shrink: 0;
+    }
+    .month-team-meta {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-top: 32px;
+    }
+    .month-meta {
+      padding: 20px;
+      border-radius: 16px;
+      background: var(--bg-alt);
+      border: 1px solid var(--line);
+      text-align: center;
+    }
+    .month-meta span {
+      display: block;
+      color: var(--muted);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .month-meta strong {
+      font-size: 1.2rem;
+      font-weight: 800;
+    }
+    .month-team-note {
+      margin-top: 24px;
+      padding: 20px 24px;
+      border-radius: 16px;
+      background: rgba(15,23,42,0.03);
+      color: var(--muted-2);
+      border-left: 4px solid var(--red);
+    }
+    .month-card-actions {
+      display: flex;
+      gap: 16px;
+      margin-top: 32px;
+    }
+    .month-player-card .month-card-inner {
+      padding: 24px;
+    }
+    .month-player-link {
+      display: block;
+      text-decoration: none;
+      color: inherit;
+    }
+    .month-player-media {
+      position: relative;
+      border-radius: 24px;
+      overflow: hidden;
+      background: linear-gradient(180deg, #fecaca 0%, #fee2e2 100%);
+      min-height: 260px;
+      margin-bottom: 22px;
+    }
+    .month-player-media img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+    }
+    .month-player-rating {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      min-width: 82px;
+      padding: 12px 14px;
+      border-radius: 18px;
+      background: rgba(15,23,42,0.92);
+      color: #fff;
+      text-align: center;
+      box-shadow: 0 14px 28px rgba(15,23,42,0.24);
+    }
+    .month-player-rating span {
+      display: block;
+      font-size: 0.62rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      opacity: 0.78;
+      margin-bottom: 4px;
+    }
+    .month-player-rating strong {
+      display: block;
+      font-size: 1.35rem;
+      line-height: 1;
+      font-weight: 900;
+    }
+    .month-player-copy h3 {
+      font-size: 1.72rem;
+      margin-bottom: 10px;
+    }
+    .month-player-subline {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      color: var(--muted);
+      font-weight: 700;
+      margin-bottom: 18px;
+    }
+    .month-player-subline .pill {
+      padding: 8px 14px;
+      font-size: 0.76rem;
+    }
+    .month-player-stats {
+      display: grid;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+    .month-player-stat {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      padding: 14px 16px;
+      border-radius: 16px;
+      background: var(--bg-alt);
+      border: 1px solid var(--line);
+    }
+    .month-player-stat span {
+      color: var(--muted);
+      font-size: 0.82rem;
+    }
+    .month-player-stat strong {
+      color: var(--text);
+      font-size: 0.96rem;
+      font-weight: 800;
+      text-align: right;
+    }
+    .month-player-note {
+      padding: 16px 18px;
+      border-radius: 16px;
+      background: rgba(185,28,28,0.06);
+      border-left: 4px solid var(--red);
+      color: var(--muted-2);
+      line-height: 1.65;
+    }
+    .month-player-actions {
+      margin-top: 22px;
+      flex-wrap: wrap;
+    }
 
-    .split-showcase{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:22px;
-      margin-top:24px;
+    .month-squad-expanded { padding: 0 40px 40px; }
+    
+    .weekly-pitch {
+      position: relative;
+      height: 600px;
+      border-radius: 20px;
+      background: linear-gradient(180deg, #166534 0%, #14532d 100%);
+      border: 2px solid rgba(0,0,0,0.1);
+      box-shadow: inset 0 0 40px rgba(0,0,0,0.2);
+      overflow: hidden;
+      margin-top: 24px;
+    }
+    .weekly-pitch::before {
+      content: ""; position: absolute; left: 50%; top: 20px; bottom: 20px;
+      width: calc(100% - 40px); transform: translateX(-50%);
+      border: 2px solid rgba(255,255,255,0.3); border-radius: 16px;
+    }
+    .weekly-pitch::after {
+      content: ""; position: absolute; left: 20px; right: 20px; top: 50%;
+      border-top: 2px solid rgba(255,255,255,0.3);
+    }
+    .pitch-circle {
+      position: absolute; top: 50%; left: 50%; width: 120px; height: 120px;
+      transform: translate(-50%,-50%); border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.3);
+    }
+    .pitch-box {
+      position: absolute; left: 50%; transform: translateX(-50%);
+      width: 40%; height: 90px; border: 2px solid rgba(255,255,255,0.3);
+    }
+    .pitch-box.top { top: 20px; border-radius: 0 0 16px 16px; border-top: none; }
+    .pitch-box.bottom { bottom: 20px; border-radius: 16px 16px 0 0; border-bottom: none; }
+
+    .pitch-player {
+      position: absolute;
+      transform: translate(-50%,-50%);
+      text-align: center;
+      z-index: 2;
+      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .pitch-player img {
+      width: 50px; height: 50px; border-radius: 50%; object-fit: cover;
+      margin: 0 auto 8px; border: 3px solid #fff;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+    }
+    .pitch-badge {
+      background: rgba(15,23,42,0.85); backdrop-filter: blur(4px);
+      padding: 6px 10px; border-radius: 12px;
+      color: #fff; border: 1px solid rgba(255,255,255,0.1);
+      white-space: nowrap;
+    }
+    .pitch-badge strong { display: block; font-size: 0.7rem; font-weight: 700; }
+    .pitch-badge span { display: block; font-size: 0.6rem; color: #cbd5e1; margin-top: 2px;}
+    .pitch-player:hover { transform: translate(-50%,-50%) scale(1.1); z-index: 10; }
+
+    .pitch-player.gk { left: 50%; top: 88%; }
+    .pitch-player.rb { left: 18%; top: 70%; }
+    .pitch-player.rcb { left: 38%; top: 74%; }
+    .pitch-player.lcb { left: 62%; top: 74%; }
+    .pitch-player.lb { left: 82%; top: 70%; }
+    .pitch-player.rcm { left: 28%; top: 52%; }
+    .pitch-player.cm { left: 50%; top: 44%; }
+    .pitch-player.lcm { left: 72%; top: 52%; }
+    .pitch-player.rw { left: 22%; top: 24%; }
+    .pitch-player.st { left: 50%; top: 16%; }
+    .pitch-player.lw { left: 78%; top: 24%; }
+
+    /* =========================================
+       ახალი და გაუმჯობესებული დიზაინი აქედან ქვემოთ
+       ========================================= */
+
+    .brand-strip {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 16px;
+      margin-top: 48px;
+    }
+    .brand-box {
+      border-radius: 16px;
+      padding: 24px 16px;
+      background: #fff;
+      border: 1px solid var(--line);
+      text-align: center;
+      font-weight: 700;
+      font-size: 0.95rem;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.3s ease;
+      cursor: default;
+    }
+    .brand-box:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-hover);
+      border-color: rgba(185,28,28,0.2);
+    }
+    .grid-2, .grid-3, .grid-4 { display: grid; gap: 24px; }
+    .grid-2 { grid-template-columns: repeat(2, 1fr); }
+    .grid-3 { grid-template-columns: repeat(3, 1fr); }
+    .grid-4 { grid-template-columns: repeat(4, 1fr); }
+
+    .card {
+      border-radius: var(--radius);
+      padding: 36px 32px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow-sm);
+      transition: all 0.3s ease;
+      height: 100%;
+      position: relative;
+      overflow: hidden;
+    }
+    .card:hover { 
+      transform: translateY(-6px); 
+      box-shadow: var(--shadow-hover); 
+    }
+    .card.soft { 
+      background: var(--bg-alt); 
+      border-color: transparent; 
+      box-shadow: none; 
+    }
+    .card.soft:hover {
+      background: #fff;
+      box-shadow: var(--shadow-hover);
+      border-color: var(--line);
+    }
+    .card.red { 
+      background: #fff; 
+      border: 1px solid rgba(185,28,28,0.3); 
+      box-shadow: 0 10px 30px rgba(185,28,28,0.08);
     }
 
-    .steps{
-      display:grid;
-      grid-template-columns:repeat(4,1fr);
-      gap:18px;
-      margin-top:34px;
-    }
-    .step{
-      border-radius:28px;
-      padding:24px;
-      background:#fff;
-      border:1px solid var(--line);
-    }
-    .step-number{
-      width:50px;
-      height:50px;
-      display:grid;
-      place-items:center;
-      border-radius:16px;
-      margin-bottom:16px;
-      font-weight:900;
-      background:var(--red);
-      color:#fff;
+    .icon-box {
+      width: 60px; height: 60px;
+      display: grid; place-items: center;
+      border-radius: 16px;
+      margin-bottom: 24px;
+      font-size: 22px; font-weight: 900;
+      background: linear-gradient(135deg, rgba(185,28,28,0.1) 0%, rgba(185,28,28,0.05) 100%);
+      color: var(--red);
+      border: 1px solid rgba(185,28,28,0.1);
     }
 
-    .camp-wrap{
-      border-radius:36px;
-      overflow:hidden;
-      border:1px solid var(--line);
-      background:#fff;
-      box-shadow:var(--shadow);
+    .story-head {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      margin-bottom: 20px;
+      position: relative;
+      z-index: 2;
     }
-    .camp-grid{
-      display:grid;
-      grid-template-columns:1fr 1fr;
+    .pill {
+      display: inline-flex; align-items: center; padding: 6px 14px;
+      border-radius: 8px; background: var(--bg-alt);
+      font-size: 12px; font-weight: 700; color: var(--text);
+      border: 1px solid var(--line);
     }
-    .camp-copy{
-      padding:46px;
+    /* ციტატების ბრჭყალების ვიზუალი */
+    .quote-card {
+      position: relative;
     }
-    .camp-visual{
-      padding:34px;
-      display:grid;
-      align-content:center;
-      gap:16px;
-      background:#fff;
+    .quote-card::before {
+      content: '“';
+      position: absolute;
+      top: 10px;
+      right: 20px;
+      font-size: 6rem;
+      line-height: 1;
+      font-family: Georgia, serif;
+      color: rgba(15, 23, 42, 0.04);
+      z-index: 0;
     }
-    .camp-shot{
-      border-radius:24px;
-      padding:22px;
-      min-height:150px;
-      background:#fff;
-      border:1px solid var(--line);
+    .quote-card.red::before {
+      color: rgba(185,28,28,0.06);
+    }
+    .quote { 
+      font-size: 1.05rem; 
+      font-style: italic; 
+      color: var(--muted-2);
+      position: relative;
+      z-index: 2;
+      line-height: 1.7;
+    }
+    
+    ul.clean { margin: 24px 0 0; padding-left: 20px; color: var(--muted); }
+    ul.clean li { margin: 12px 0; padding-left: 8px; }
+    ul.clean li::marker { color: var(--red); }
+
+    .split-showcase {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 40px;
     }
 
-    .cta-box{
-      border-radius:32px;
-      padding:42px;
-      border:1px solid rgba(185,28,28,.24);
-      background:#fff;
-      box-shadow:var(--shadow);
+    .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; margin-top: 48px; }
+    .step {
+      border-radius: var(--radius); padding: 36px 28px;
+      background: #fff; border: 1px solid var(--line);
+      box-shadow: var(--shadow-sm); 
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .step:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-hover);
+    }
+    .step-number {
+      width: 54px; height: 54px; display: grid; place-items: center;
+      border-radius: 16px; margin-bottom: 24px; font-weight: 900; font-size: 20px;
+      background: linear-gradient(135deg, #b91c1c 0%, #7f1d1d 100%); 
+      color: #fff;
+      box-shadow: 0 10px 20px rgba(185,28,28,.2);
     }
 
-    .faq{
-      display:grid;
-      gap:14px;
-      margin-top:32px;
+    .camp-wrap {
+      border-radius: 40px; overflow: hidden;
+      background: #fff; border: 1px solid var(--line);
+      box-shadow: var(--shadow);
     }
-    .faq-item{
-      border-radius:22px;
-      padding:20px 22px;
-      background:#fff;
-      border:1px solid var(--line);
+    .camp-grid { display: grid; grid-template-columns: 1.1fr 0.9fr; }
+    .camp-copy { padding: 60px; display: flex; flex-direction: column; justify-content: center; }
+    .camp-visual {
+      padding: 40px; display: grid; gap: 20px;
+      background: var(--bg-alt); align-content: center;
+    }
+    .camp-shot {
+      border-radius: 20px; padding: 30px; min-height: 180px;
+      background: #fff; border: 1px solid var(--line);
+      box-shadow: var(--shadow-sm);
+      position: relative; overflow: hidden;
+      display: flex; flex-direction: column; justify-content: flex-end;
+      transition: transform 0.3s ease;
+    }
+    .camp-shot:hover { transform: scale(1.02); }
+    .camp-shot:nth-child(1) { background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.2) 100%), url('https://images.unsplash.com/photo-1518605368461-1e1e38ce8042?auto=format&fit=crop&q=80&w=800') center/cover; color: #fff; border: none; }
+    .camp-shot:nth-child(2) { background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.2) 100%), url('https://images.unsplash.com/photo-1431324155629-1a6104635a2b?auto=format&fit=crop&q=80&w=800') center/cover; color: #fff; border: none; }
+    .camp-shot:nth-child(3) { background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.2) 100%), url('https://images.unsplash.com/photo-1517466787929-bc90951d0974?auto=format&fit=crop&q=80&w=800') center/cover; color: #fff; border: none; }
+    .camp-shot .pill { align-self: flex-start; background: rgba(255,255,255,0.15); color: #fff; border: 1px solid rgba(255,255,255,0.3); backdrop-filter: blur(8px); margin-bottom: 12px;}
+    .camp-shot .small { color: rgba(255,255,255,0.85); margin-top: 8px;}
+
+    .cta-box {
+      border-radius: 40px; padding: 80px 40px;
+      background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+    .cta-box::after {
+      content: '';
+      position: absolute;
+      top: 0; right: 0; width: 300px; height: 300px;
+      background: radial-gradient(circle, rgba(185,28,28,0.05) 0%, rgba(255,255,255,0) 70%);
+      border-radius: 50%;
+      z-index: 0;
+    }
+    .cta-box > * { position: relative; z-index: 1; }
+
+    .faq { display: grid; gap: 16px; margin-top: 48px; max-width: 800px; margin-inline: auto; }
+    .faq-item {
+      border-radius: 20px; padding: 28px;
+      background: #fff; border: 1px solid var(--line);
+      text-align: left; transition: all 0.3s ease;
+    }
+    .faq-item:hover { 
+      box-shadow: var(--shadow-sm); 
+      border-color: rgba(15,23,42,0.15);
+      transform: translateX(4px);
+    }
+    .faq-item h3 { font-size: 1.15rem; color: var(--text); }
+
+    .footer {
+      padding: 80px 0 40px;
+      border-top: 1px solid var(--line);
+      background: #0f172a;
+      color: #f8fafc;
+    }
+    .footer-grid {
+      display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr; gap: 40px;
+    }
+    .footer h4 { margin-bottom: 20px; font-size: 1.05rem; font-weight: 700; color: #fff; }
+    .footer a {
+      display: block; padding: 8px 0; color: #94a3b8;
+      transition: color 0.2s; font-size: 0.95rem;
+    }
+    .footer a:hover { color: #fff; }
+    .footer p.small { color: #94a3b8; }
+    .footer-brand { display:inline-flex; align-items:center; gap:12px; margin-bottom:24px; color: #fff; font-weight: 800; font-size: 1.1rem;}
+    .footer-bottom {
+      margin-top: 60px; padding-top: 30px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap;
+      color: #64748b; font-size: 0.9rem;
     }
 
-    .footer{
-      padding:70px 0 30px;
-      border-top:1px solid var(--line);
-      background:#fff;
-    }
-    .footer-grid{
-      display:grid;
-      grid-template-columns:1.3fr 1fr 1fr 1fr;
-      gap:24px;
-    }
-    .footer h4{
-      margin-bottom:14px;
-      font-size:1rem;
-      font-weight:850;
-    }
-    .footer a{
-      display:block;
-      padding:7px 0;
-      color:var(--muted);
-    }
-    .footer a:hover{color:var(--text)}
-    .footer-bottom{
-      margin-top:28px;
-      padding-top:22px;
-      border-top:1px solid var(--line);
-      display:flex;
-      justify-content:space-between;
-      gap:16px;
-      flex-wrap:wrap;
-      color:var(--muted);
-      font-size:13px;
-    }
-
-    @media (max-width:1100px){
-      .hero-grid,
-      .grid-4,
-      .grid-3,
-      .grid-2,
-      .camp-grid,
-      .footer-grid,
-      .steps,
-      .split-showcase{
-        grid-template-columns:1fr 1fr;
+    @media (max-width: 1100px) {
+      .nav {
+        min-height: auto;
+        flex-wrap: wrap;
+        padding: 12px 0;
       }
-      .brand-strip{grid-template-columns:repeat(3,1fr)}
-      .stats-bar{grid-template-columns:1fr}
-      .hero-side{min-height:470px}
-      .phone-wrap{inset:14px 30px 10px}
-      .monthly-grid{grid-template-columns:1fr}
-      .month-team-meta{grid-template-columns:repeat(3,minmax(0,1fr))}
-      .weekly-preview{margin-top:-72px}
-      .weekly-pitch{min-height:560px}
-      .pitch-player{width:88px}
-      .pitch-badge strong{font-size:.73rem}
+      .nav-links {
+        order: 3;
+        width: 100%;
+      }
+      .hero-grid, .grid-4, .grid-3, .grid-2, .camp-grid, .steps, .split-showcase {
+        grid-template-columns: 1fr 1fr;
+      }
+      .brand-strip { grid-template-columns: repeat(3, 1fr); }
+      .monthly-grid { grid-template-columns: 1fr; }
+      .hero-side { display: none; }
+      .hero-grid { grid-template-columns: 1fr; text-align: center; }
+      .hero-points { justify-content: center; }
+      .btn-row { justify-content: center; }
     }
 
-    @media (max-width:760px){
-      .nav-links{display:none}
-      .nav-actions .btn-secondary{display:none}
-      .hero-grid,
-      .grid-4,
-      .grid-3,
-      .grid-2,
-      .camp-grid,
-      .footer-grid,
-      .steps,
-      .brand-strip,
-      .split-showcase{
-        grid-template-columns:1fr;
+    @media (max-width: 760px) {
+      .nav-links, .nav-actions .btn-secondary { display: none; }
+      .hero-grid, .grid-4, .grid-3, .grid-2, .camp-grid, .footer-grid, .steps, .brand-strip, .split-showcase {
+        grid-template-columns: 1fr;
       }
-      .hero{padding:0 0 22px}
-      .hero::before{
-        background:url('1.webp') center center/cover no-repeat;
-        opacity:1;
-        transform:none;
-      }
-      .hero::after{
-        background:linear-gradient(180deg, rgba(255,255,255,.92) 0%, rgba(255,255,255,.72) 44%, rgba(255,255,255,.36) 100%);
-      }
-      .section{padding:70px 0}
-      .hero-side{min-height:390px}
-      .phone-wrap{inset:18px 10px}
-      .floating{display:none}
-      .weekly-head{flex-direction:column}
-      .month-club-top,
-      .month-squad-note{flex-direction:column}
-      .month-team-meta{grid-template-columns:1fr}
-      .weekly-preview{margin-top:-28px}
-      .weekly-pitch{min-height:560px}
-      .pitch-player{width:74px}
-      .pitch-player img{width:42px;height:42px}
-      .pitch-badge{padding:6px 7px}
-      .pitch-badge strong{font-size:.64rem}
-      .pitch-badge span{font-size:.6rem}
-      .weekly-legend{flex-direction:column;align-items:flex-start}
-      .camp-copy,.camp-visual,.cta-box{padding:28px}
+      .section { padding: 64px 0; }
+      .month-club-top { flex-direction: column; }
+      .month-team-meta { grid-template-columns: 1fr; }
+      .month-player-copy h3 { font-size: 1.45rem; }
+      .month-player-stat { flex-direction: column; align-items: flex-start; }
+      .month-player-stat strong { text-align: left; }
+      .month-player-actions { flex-direction: column; }
+      .weekly-pitch { height: 500px; }
+      .pitch-player img { width: 40px; height: 40px; }
+      .pitch-badge { padding: 4px 8px; }
+      .pitch-badge strong { font-size: 0.6rem; }
+      .camp-copy, .camp-visual, .cta-box { padding: 30px; }
+      h1 { font-size: 2.2rem; }
     }
   </style>
 </head>
@@ -1019,15 +1024,16 @@
     <div class="container nav">
       <a href="index.html" class="brand">
         <span class="logo">DM</span>
-        <span>DM Football Georgia</span>
+      <span>Football Georgia</span>
       </a>
 
       <nav class="nav-links">
         <a href="index.html" class="active">მთავარი</a>
         <a href="gundebi.html">გუნდები</a>
         <a href="pexburtelebi.html">ფეხბურთელები</a>
-        <a href="#coaching">ქოუჩინგი</a>
-        <a href="#camps">ბანაკები</a>
+        <a href="coaching.html">ქოუჩინგი</a>
+        <a href="banakebi.html">ბანაკები</a>
+        <a href="cxrilebi.html">ცხრილები</a>
       </nav>
 
       <div class="nav-actions" id="homeAuthNav">
@@ -1098,8 +1104,8 @@
 
               <div class="screen-card primary">
                 <div class="tag">პერსონალური ტრენინგი</div>
-                <h3 style="margin-bottom:6px;">შენი მომდევნო ნაბიჯი: ითამაშე უფრო ჭკვიანურად</h3>
-                <p style="opacity:.94;">ტექნიკა + ტაქტიკა + სისწრაფე + თავდაჯერებულობა</p>
+                <h3 style="margin-bottom:8px;">შენი მომდევნო ნაბიჯი: ითამაშე უფრო ჭკვიანურად</h3>
+                <p style="opacity:.94; font-size: 0.9rem;">ტექნიკა + ტაქტიკა + სისწრაფე + თავდაჯერებულობა</p>
                 <div class="progress"><span></span></div>
               </div>
 
@@ -1128,7 +1134,7 @@
 
               <div class="screen-card">
                 <div class="tag">ვიდეო მასტერკლასები</div>
-                <h3 style="margin-bottom:6px;">ისწავლე პროფესიონალებისგან</h3>
+                <h3 style="margin-bottom:8px;">ისწავლე პროფესიონალებისგან</h3>
                 <p class="small">ფლანგის თამაში, სკანინგი, ნომერი 10, ელიტური მენტალიტეტი.</p>
               </div>
             </div>
@@ -1140,12 +1146,6 @@
           <h3 style="margin-top:10px;">იდეალური ვინგერი</h3>
           <p class="small" style="margin-top:8px;">1v1, ფინალური ფაზა, დროის კონტროლი.</p>
         </div>
-
-        <div class="floating f4">
-          <div class="pill">გამოჩენა</div>
-          <h3 style="margin-top:10px;">აჩვენე შენი თავი</h3>
-          <p class="small" style="margin-top:8px;">შეფასება, ბანაკები, კარიერული ხედვა.</p>
-        </div>
       </div>
     </div>
   </section>
@@ -1153,68 +1153,16 @@
   <section class="weekly-preview">
     <div class="container">
       <div class="monthly-grid">
-        <article class="month-card month-club-card">
-          <div class="month-card-inner">
-            <div class="month-club-top">
-              <div class="month-club-copy">
-                <div class="month-label">საუკეთესო თვის გუნდი</div>
-                <h3>დინამო თბილისი</h3>
-                <p>აპრილის საუკეთესო გუნდად ავირჩიეთ დინამო თბილისი: სტაბილური შედეგი, მაღალი ინტენსივობა და გამორჩეული ასაკობრივი სტრუქტურა.</p>
-              </div>
-              <div class="month-club-badge">DM</div>
-            </div>
-
-            <div class="month-team-meta">
-              <div class="month-meta">
-                <span>ფორმა</span>
-                <strong>9 მოგება</strong>
-              </div>
-              <div class="month-meta">
-                <span>ბურთები</span>
-                <strong>24:7</strong>
-              </div>
-              <div class="month-meta">
-                <span>გამორჩეული</span>
-                <strong>U17 + U14</strong>
-              </div>
-            </div>
-
-            <div class="month-team-note">
-              გუნდმა ამ თვეში განსაკუთრებით მოიგო მაღალი პრესინგით, კარგი გარდაქმნით შეტევაში და რამდენიმე ასაკობრივი ჯგუფის ერთდროული პროგრესით.
-            </div>
-
-            <div class="month-card-actions">
-              <a href="team-dinamo-tbilisi.html" class="btn btn-primary">გუნდის გვერდი</a>
-              <a href="gundebi.html" class="btn btn-secondary">სხვა გუნდები</a>
-            </div>
+        <div class="month-card month-squad-card bg-alt">
+          <div class="month-card-summary">
+            <div class="month-label" style="background: var(--text); color: #fff;">თვის გუნდი</div>
+            <h3 style="font-size: 1.8rem; margin: 12px 0;">სიმბოლური 11-ეული</h3>
+            <p style="color: var(--muted); line-height: 1.6;">თვის საუკეთესო მოთამაშეების სრული 4-3-3 შემადგენლობა.</p>
           </div>
-        </article>
-
-        <details class="month-card month-squad-card">
-          <summary class="month-card-summary">
-            <div class="month-label">თვის გუნდი</div>
-            <h3>სიმბოლური 11-ეული</h3>
-            <p>მარჯვენა ბარათი ახლა პატარაა. დააკლიკე და გახსენი თვის სრული 4-3-3 შემადგენლობა მოთამაშეების ფოტოებით.</p>
-            <span class="month-expand">დაკლიკე გასადიდებლად</span>
-
-            <div class="month-mini-pitch">
-              <span class="month-mini-dot gk"></span>
-              <span class="month-mini-dot rb"></span>
-              <span class="month-mini-dot rcb"></span>
-              <span class="month-mini-dot lcb"></span>
-              <span class="month-mini-dot lb"></span>
-              <span class="month-mini-dot rcm"></span>
-              <span class="month-mini-dot cm"></span>
-              <span class="month-mini-dot lcm"></span>
-              <span class="month-mini-dot rw"></span>
-              <span class="month-mini-dot st"></span>
-              <span class="month-mini-dot lw"></span>
-            </div>
-          </summary>
 
           <div class="month-squad-expanded">
-            <div class="month-squad-note">
-              <p>თვის სიმბოლური 11-ეული დალაგებულია 4-3-3-ზე. თითოეულ მოთამაშეზე კლიკით იხსნება მისი საკუთარი გვერდი.</p>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+              <p class="small">მოთამაშეზე კლიკით იხსნება მისი პროფილი.</p>
               <div class="pill">ფორმაცია 4-3-3</div>
             </div>
 
@@ -1224,7 +1172,7 @@
               <div class="pitch-box bottom"></div>
 
               <a class="pitch-player gk" href="player-profile.html?player=6&from=index.html" aria-label="გიორგი მამარდაშვილი">
-                <img src="https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?auto=format&fit=crop&w=300&h=400&q=80" alt="გიორგი მამარდაშვილი">
+                <img src="https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?auto=format&fit=crop&w=150&h=150&q=80" alt="გიორგი მამარდაშვილი">
                 <div class="pitch-badge">
                   <strong>გიორგი მამარდაშვილი</strong>
                   <span>GK • U17</span>
@@ -1232,7 +1180,7 @@
               </a>
 
               <a class="pitch-player rb" href="player-profile.html?player=7&from=index.html" aria-label="ოთარ კაკაბაძე">
-                <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&h=400&q=80" alt="ოთარ კაკაბაძე">
+                <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&h=150&q=80" alt="ოთარ კაკაბაძე">
                 <div class="pitch-badge">
                   <strong>ოთარ კაკაბაძე</strong>
                   <span>RB • U12</span>
@@ -1240,7 +1188,7 @@
               </a>
 
               <a class="pitch-player rcb" href="player-profile.html?player=8&from=index.html" aria-label="გურამ კაშია">
-                <img src="https://images.unsplash.com/photo-1528892952291-009c663ce843?auto=format&fit=crop&w=300&h=400&q=80" alt="გურამ კაშია">
+                <img src="https://images.unsplash.com/photo-1528892952291-009c663ce843?auto=format&fit=crop&w=150&h=150&q=80" alt="გურამ კაშია">
                 <div class="pitch-badge">
                   <strong>გურამ კაშია</strong>
                   <span>CB • U11</span>
@@ -1248,7 +1196,7 @@
               </a>
 
               <a class="pitch-player lcb" href="player-profile.html?player=15&from=index.html" aria-label="ლაშა დვალი">
-                <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=300&h=400&q=80" alt="ლაშა დვალი">
+                <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=150&h=150&q=80" alt="ლაშა დვალი">
                 <div class="pitch-badge">
                   <strong>ლაშა დვალი</strong>
                   <span>CB • U17</span>
@@ -1256,7 +1204,7 @@
               </a>
 
               <a class="pitch-player lb" href="player-profile.html?player=28&from=index.html" aria-label="ირაკლი აზაროვი">
-                <img src="https://images.unsplash.com/photo-1510566337590-2fc1f21d0faa?auto=format&fit=crop&w=300&h=400&q=80" alt="ირაკლი აზაროვი">
+                <img src="https://images.unsplash.com/photo-1510566337590-2fc1f21d0faa?auto=format&fit=crop&w=150&h=150&q=80" alt="ირაკლი აზაროვი">
                 <div class="pitch-badge">
                   <strong>ირაკლი აზაროვი</strong>
                   <span>LB • U14</span>
@@ -1264,7 +1212,7 @@
               </a>
 
               <a class="pitch-player rcm" href="player-profile.html?player=26&from=index.html" aria-label="ჯაბა კანკავა">
-                <img src="https://images.unsplash.com/photo-1543326727-cf6c39e8f84c?auto=format&fit=crop&w=300&h=400&q=80" alt="ჯაბა კანკავა">
+                <img src="https://images.unsplash.com/photo-1543326727-cf6c39e8f84c?auto=format&fit=crop&w=150&h=150&q=80" alt="ჯაბა კანკავა">
                 <div class="pitch-badge">
                   <strong>ჯაბა კანკავა</strong>
                   <span>CM • U15</span>
@@ -1272,7 +1220,7 @@
               </a>
 
               <a class="pitch-player cm" href="player-profile.html?player=17&from=index.html" aria-label="ანზორ მექვაბიშვილი">
-                <img src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=300&h=400&q=80" alt="ანზორ მექვაბიშვილი">
+                <img src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=150&h=150&q=80" alt="ანზორ მექვაბიშვილი">
                 <div class="pitch-badge">
                   <strong>ანზორ მექვაბიშვილი</strong>
                   <span>CM • U12</span>
@@ -1280,7 +1228,7 @@
               </a>
 
               <a class="pitch-player lcm" href="player-profile.html?player=10&from=index.html" aria-label="გიორგი ჩაკვეტაძე">
-                <img src="https://images.unsplash.com/photo-1480455624313-e29b44bbfde1?auto=format&fit=crop&w=300&h=400&q=80" alt="გიორგი ჩაკვეტაძე">
+                <img src="https://images.unsplash.com/photo-1480455624313-e29b44bbfde1?auto=format&fit=crop&w=150&h=150&q=80" alt="გიორგი ჩაკვეტაძე">
                 <div class="pitch-badge">
                   <strong>გიორგი ჩაკვეტაძე</strong>
                   <span>AM • U9</span>
@@ -1288,7 +1236,7 @@
               </a>
 
               <a class="pitch-player rw" href="player-profile.html?player=2&from=index.html" aria-label="ხვიჩა კვარაცხელია">
-                <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=300&h=400&q=80" alt="ხვიჩა კვარაცხელია">
+                <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=150&h=150&q=80" alt="ხვიჩა კვარაცხელია">
                 <div class="pitch-badge">
                   <strong>ხვიჩა კვარაცხელია</strong>
                   <span>RW • U16</span>
@@ -1296,7 +1244,7 @@
               </a>
 
               <a class="pitch-player st" href="player-profile.html?player=1&from=index.html" aria-label="გიორგი მიქაუტაძე">
-                <img src="https://images.unsplash.com/photo-1543326727-cf6c39e8f84c?auto=format&fit=crop&w=300&h=400&q=80" alt="გიორგი მიქაუტაძე">
+                <img src="https://images.unsplash.com/photo-1543326727-cf6c39e8f84c?auto=format&fit=crop&w=150&h=150&q=80" alt="გიორგი მიქაუტაძე">
                 <div class="pitch-badge">
                   <strong>გიორგი მიქაუტაძე</strong>
                   <span>ST • U17</span>
@@ -1304,7 +1252,7 @@
               </a>
 
               <a class="pitch-player lw" href="player-profile.html?player=5&from=index.html" aria-label="ზურიკო დავითაშვილი">
-                <img src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=300&h=400&q=80" alt="ზურიკო დავითაშვილი">
+                <img src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=150&h=150&q=80" alt="ზურიკო დავითაშვილი">
                 <div class="pitch-badge">
                   <strong>ზურიკო დავითაშვილი</strong>
                   <span>LW • U13</span>
@@ -1312,16 +1260,64 @@
               </a>
             </div>
           </div>
-        </details>
+        </div>
+
+        <article class="month-card month-player-card">
+          <div class="month-card-inner">
+            <div class="month-label">საუკეთესო თვის ფეხბურთელი</div>
+
+            <a class="month-player-link" href="player-profile.html?player=2&from=index.html" aria-label="ხვიჩა კვარაცხელიას პროფილი">
+              <div class="month-player-media">
+                <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=600&h=760&q=80" alt="ხვიჩა კვარაცხელია">
+                <div class="month-player-rating">
+                  <span>შეფასება</span>
+                  <strong>9.8</strong>
+                </div>
+              </div>
+            </a>
+
+            <div class="month-player-copy">
+              <h3>ხვიჩა კვარაცხელია</h3>
+              <div class="month-player-subline">
+                <span>შემტევი ნახევარმცველი</span>
+                <div class="pill">U16</div>
+              </div>
+
+              <div class="month-player-stats">
+                <div class="month-player-stat">
+                  <span>გუნდი</span>
+                  <strong>იბერია 1999</strong>
+                </div>
+                <div class="month-player-stat">
+                  <span>მუშა ფეხი</span>
+                  <strong>ორივე</strong>
+                </div>
+                <div class="month-player-stat">
+                  <span>ფორმა</span>
+                  <strong>7 გოლი • 5 ასისტი</strong>
+                </div>
+              </div>
+
+              <div class="month-player-note">
+                აპრილში გამოირჩა 1v1 ეპიზოდებში, ბოლო მესამედში ეფექტური გადაწყვეტილებებით და მაღალი ინტენსივობით ორივე ფლანგიდან.
+              </div>
+
+              <div class="month-card-actions month-player-actions">
+                <a href="player-profile.html?player=2&from=index.html" class="btn btn-primary">ფეხბურთელის გვერდი</a>
+                <a href="pexburtelebi.html" class="btn btn-secondary">ყველა ფეხბურთელი</a>
+              </div>
+            </div>
+          </div>
+        </article>
       </div>
     </div>
   </section>
 
-  <section class="section-sm">
+  <section class="section-sm bg-alt">
     <div class="container center">
       <div class="eyebrow">რატომ ეს სისტემა</div>
       <h2>ფეხბურთელში <br>სწრაფ პროგრესს ქმნის</h2>
-      <p class="lead" style="margin:16px auto 0;">
+      <p class="lead" style="margin:24px auto 0;">
         ერთ პლატფორმაში გაერთიანებულია ვარჯიშები, ტაქტიკური განვითარება,
         პროფესიონალური აზროვნება, მენტორობა და კარიერული შესაძლებლობები.
       </p>
@@ -1340,38 +1336,38 @@
     <div class="container">
       <div class="eyebrow">ძირითადი ფუნქციები</div>
       <h2>გააუმჯობესე შენი თამაში <br>ყველა მიმართულებით</h2>
-      <p class="lead" style="margin-top:16px;">
+      <p class="lead" style="margin-top:24px;">
         მხოლოდ მეტი ვარჯიში საკმარისი არ არის. საჭიროა სწორი სისტემა, სწორი თანმიმდევრობა
         და სწორი ფეხბურთის აზროვნება. ამიტომ ეს პლატფორმა გაძლევს სრულ ეკოსისტემას.
       </p>
 
-      <div class="grid-4" style="margin-top:34px;">
-        <div class="card glow">
+      <div class="grid-4" style="margin-top:56px;">
+        <div class="card">
           <div class="icon-box">01</div>
-          <h3>Football Trainer</h3>
-          <p class="small" style="margin-top:10px;">150+ პრაქტიკული ვარჯიში ბურთის კონტროლის, პასის, დრიბლინგის და დარტყმისთვის.</p>
+          <h3 style="font-size: 1.25rem;">Football Trainer</h3>
+          <p class="small" style="margin-top:16px; line-height: 1.7;">150+ პრაქტიკული ვარჯიში ბურთის კონტროლის, პასის, დრიბლინგის და დარტყმისთვის.</p>
         </div>
-        <div class="card glow">
+        <div class="card">
           <div class="icon-box">02</div>
-          <h3>Game Brain</h3>
-          <p class="small" style="margin-top:10px;">ისწავლე სივრცის დანახვა, სკანინგი, სწორი პოზიციონირება და მატჩის სწრაფად კითხვა.</p>
+          <h3 style="font-size: 1.25rem;">Game Brain</h3>
+          <p class="small" style="margin-top:16px; line-height: 1.7;">ისწავლე სივრცის დანახვა, სკანინგი, სწორი პოზიციონირება და მატჩის სწრაფად კითხვა.</p>
         </div>
-        <div class="card glow">
+        <div class="card">
           <div class="icon-box">03</div>
-          <h3>Elite Mindset</h3>
-          <p class="small" style="margin-top:10px;">აიმაღლე თავდაჯერებულობა, გამძლეობა, ფოკუსი და დისციპლინა.</p>
+          <h3 style="font-size: 1.25rem;">Elite Mindset</h3>
+          <p class="small" style="margin-top:16px; line-height: 1.7;">აიმაღლე თავდაჯერებულობა, გამძლეობა, ფოკუსი და დისციპლინა მძიმე მომენტებში.</p>
         </div>
-        <div class="card glow">
+        <div class="card">
           <div class="icon-box">04</div>
-          <h3>Player Tracking</h3>
-          <p class="small" style="margin-top:10px;">აკონტროლე შენი პროგრესი, დატვირთვა და ყოველდღიური შესრულება პროფესიონალური მიდგომით.</p>
+          <h3 style="font-size: 1.25rem;">Player Tracking</h3>
+          <p class="small" style="margin-top:16px; line-height: 1.7;">აკონტროლე შენი პროგრესი, დატვირთვა და ყოველდღიური შესრულება პროფესიონალური მიდგომით.</p>
         </div>
       </div>
 
       <div class="split-showcase">
         <div class="card red">
           <div class="eyebrow">ვიდეო მასტერკლასები</div>
-          <h3>ისწავლე მაღალი დონის ფეხბურთელები და ქოუჩებისგან</h3>
+          <h3 style="font-size: 1.6rem; margin-top: 12px; line-height: 1.3;">ისწავლე მაღალი დონის ფეხბურთელები და ქოუჩებისგან</h3>
           <ul class="clean">
             <li>ფლანგის მოთამაშის სრული არსენალი</li>
             <li>მსოფლიო დონის mindset და გამარჯვების ჩვევები</li>
@@ -1381,10 +1377,10 @@
 
         <div class="card soft">
           <div class="eyebrow">პერსონალური გეგმა</div>
-          <h3>ყოველდღე ზუსტად იცოდე, რა უნდა გააკეთო</h3>
+          <h3 style="font-size: 1.6rem; margin-top: 12px; line-height: 1.3;">ყოველდღე ზუსტად იცოდე, რა უნდა გააკეთო</h3>
           <ul class="clean">
             <li>დღიური პროგრამა შენს მიზნებზე მორგებით</li>
-            <li>სუსტი მხარეების იდენტიფიცირება</li>
+            <li>სუსტი მხარეების იდენტიფიცირება რეალური შეფასებით</li>
             <li>სწორი პრიორიტეტები სწრაფი პროგრესისთვის</li>
           </ul>
         </div>
@@ -1392,41 +1388,38 @@
     </div>
   </section>
 
-  <section id="stories" class="section">
+  <section id="stories" class="section bg-alt">
     <div class="container">
       <div class="eyebrow">წარმატების ისტორიები</div>
       <h2>რეალური მოთამაშეები. <br>რეალური პროგრესი.</h2>
 
-      <div class="grid-3" style="margin-top:34px;">
-        <div class="card red">
+      <div class="grid-3" style="margin-top:56px;">
+        <div class="card quote-card red">
           <div class="story-head">
             <div>
-              <div class="pill">აკადემია → ძირითადი გუნდი</div>
-              <h3 style="margin-top:14px;">ნიკა ბერიძე</h3>
+              <div class="pill" style="background: var(--red); color: #fff; border-color: var(--red);">აკადემია → ძირითადი გუნდი</div>
+              <h3 style="margin-top:20px; font-size: 1.2rem;">ნიკა ბერიძე</h3>
             </div>
-            <div class="pill">ვინგერი</div>
           </div>
           <p class="quote">„როდესაც ვარჯიშს ტაქტიკური ცოდნა და ყოველდღიური გეგმა დაემატა, თამაში ბევრად უფრო სწრაფად და თავისუფლად დავინახე.“</p>
         </div>
 
-        <div class="card">
+        <div class="card quote-card">
           <div class="story-head">
             <div>
               <div class="pill">უფრო ძლიერი mindset</div>
-              <h3 style="margin-top:14px;">ლუკა მ.</h3>
+              <h3 style="margin-top:20px; font-size: 1.2rem;">ლუკა მ.</h3>
             </div>
-            <div class="pill">ნახევარმცველი</div>
           </div>
           <p class="quote">„ყველაზე დიდი ცვლილება იყო თავდაჯერებულობა. ახლა ვიცი რა უნდა ვაკეთო სავარჯიშოდ და თამაშშიც უფრო მშვიდი ვარ.“</p>
         </div>
 
-        <div class="card">
+        <div class="card quote-card">
           <div class="story-head">
             <div>
               <div class="pill">შეფასება და ბანაკი</div>
-              <h3 style="margin-top:14px;">ანდრია კ.</h3>
+              <h3 style="margin-top:20px; font-size: 1.2rem;">ანდრია კ.</h3>
             </div>
-            <div class="pill">დამცველი</div>
           </div>
           <p class="quote">„პირველად მივიღე ძალიან კონკრეტული უკუკავშირი, რას ვაკეთებ კარგად და რა უნდა გავაუმჯობესო შემდეგი დონისთვის.“</p>
         </div>
@@ -1439,12 +1432,12 @@
       <div class="grid-2">
         <div class="card">
           <div class="eyebrow">მსოფლიო დონის ქოუჩინგი</div>
-          <h2>წვდომა ელიტურ ცოდნაზე</h2>
-          <p class="lead" style="margin-top:16px;">
+          <h2 style="font-size: 2.2rem; margin-top: 8px;">წვდომა ელიტურ ცოდნაზე</h2>
+          <p class="lead" style="margin-top:20px;">
             მიიღე ცოდნა ყოფილი პროფესიონალებისა და მაღალი დონის ექსპერტებისგან,
             რათა უკეთ იფიქრო, უკეთ ივარჯიშო და უკეთ ითამაშო.
           </p>
-          <ul class="clean">
+          <ul class="clean" style="margin-bottom: 40px;">
             <li>პროფესიონალური გამოცდილებიდან გამოტანილი პრაქტიკული რჩევები</li>
             <li>პოზიციისა და თამაშის ფაზების მიხედვით კონკრეტული მითითებები</li>
             <li>ფეხბურთელი აზროვნება ყოველდღიურ ცხოვრებაშიც</li>
@@ -1456,88 +1449,66 @@
 
         <div class="card soft">
           <div class="eyebrow">შენი კარიერა, შენს ხელში</div>
-          <h2>შექმენი განვითარების <br>პერსონალური გზა</h2>
-          <ul class="clean">
+          <h2 style="font-size: 2.2rem; margin-top: 8px;">შექმენი განვითარების <br>პერსონალური გზა</h2>
+          <ul class="clean" style="margin-top: 24px; margin-bottom: 40px;">
             <li>მენტორი, რომელიც დაგეხმარება შენი მიზნების გასწორებაში</li>
             <li>ეტაპობრივი გზა: საიდან ხარ და სად გინდა მისვლა</li>
             <li>რეალისტური, მაგრამ ამბიციური ზრდის რუკა</li>
           </ul>
           <div class="btn-row">
-            <a href="login.html?redirect=index.html%23register#register" class="btn btn-secondary">დაიწყე შენი გზა</a>
+            <a href="login.html?redirect=index.html%23register#register" class="btn btn-secondary" style="background: #fff;">დაიწყე შენი გზა</a>
           </div>
         </div>
       </div>
 
-      <div class="grid-3" style="margin-top:22px;">
-        <div class="card soft">
-          <div class="pill">Masterclass</div>
-          <h3 style="margin-top:14px;">ფლანგის თამაშის საიდუმლოებები</h3>
-          <p class="small" style="margin-top:10px;">როგორ შექმნა სივრცე, მოიგო 1v1 და მიიღო კარგი გადაწყვეტილება ბოლო მესამედში.</p>
+      <div class="grid-3" style="margin-top:32px;">
+        <div class="card soft" style="padding: 28px;">
+          <div class="pill" style="background: #0f172a; color: #fff; border-color: #0f172a;">Masterclass</div>
+          <h3 style="margin-top:20px; font-size: 1.15rem;">ფლანგის თამაშის საიდუმლოებები</h3>
+          <p class="small" style="margin-top:12px; line-height: 1.6;">როგორ შექმნა სივრცე, მოიგო 1v1 და მიიღო კარგი გადაწყვეტილება ბოლო მესამედში.</p>
         </div>
-        <div class="card soft">
-          <div class="pill">Mindset</div>
-          <h3 style="margin-top:14px;">ელიტური აზროვნება</h3>
-          <p class="small" style="margin-top:10px;">მაღალი სტანდარტი, სიმშვიდე წნეხში და მუდმივი დისციპლინა.</p>
+        <div class="card soft" style="padding: 28px;">
+          <div class="pill" style="background: #0f172a; color: #fff; border-color: #0f172a;">Mindset</div>
+          <h3 style="margin-top:20px; font-size: 1.15rem;">ელიტური აზროვნება</h3>
+          <p class="small" style="margin-top:12px; line-height: 1.6;">მაღალი სტანდარტი, სიმშვიდე წნეხში და მუდმივი დისციპლინა.</p>
         </div>
-        <div class="card soft">
-          <div class="pill">Playmaker</div>
-          <h3 style="margin-top:14px;">იდეალური №10</h3>
-          <p class="small" style="margin-top:10px;">სივრცის პოვნა, ხაზებს შორის მიღება და თამაშის აჩქარება.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="section">
-    <div class="container center">
-      <div class="eyebrow">რას ამბობენ მოთამაშეები</div>
-      <h2>სისტემა, რომელიც შედეგს <br>ყოველდღიურ დონეზე აჩენს</h2>
-
-      <div class="grid-3" style="margin-top:34px; text-align:left;">
-        <div class="card">
-          <div class="pill">სტრუქტურა</div>
-          <p class="quote" style="margin-top:16px;">„ადრე უბრალოდ ბევრს ვვარჯიშობდი. ახლა კი ვვარჯიშობ სწორად — და ეს სხვაობა ყველაზე დიდია.“</p>
-        </div>
-        <div class="card">
-          <div class="pill">თავდაჯერებულობა</div>
-          <p class="quote" style="margin-top:16px;">„რამდენიმე დღეშივე შევამჩნიე, რომ თამაშში უფრო თამამი და უფრო სწრაფი გადაწყვეტილებების მქონე გავხდი.“</p>
-        </div>
-        <div class="card">
-          <div class="pill">დისციპლინა</div>
-          <p class="quote" style="margin-top:16px;">„როცა ყოველდღიური სისტემა გაქვს, პროგრესი შემთხვევით აღარ ხდება — ის უკვე პროცესად იქცევა.“</p>
+        <div class="card soft" style="padding: 28px;">
+          <div class="pill" style="background: #0f172a; color: #fff; border-color: #0f172a;">Playmaker</div>
+          <h3 style="margin-top:20px; font-size: 1.15rem;">იდეალური №10</h3>
+          <p class="small" style="margin-top:12px; line-height: 1.6;">სივრცის პოვნა, ხაზებს შორის მიღება და თამაშის აჩქარება.</p>
         </div>
       </div>
     </div>
   </section>
 
-  <section id="steps" class="section">
+  <section id="steps" class="section bg-alt">
     <div class="container center">
       <div class="eyebrow">როგორ მუშაობს</div>
       <h2>4 ნაბიჯი შენი ფეხბურთის <br>ახალ დონეზე ასაყვანად</h2>
-      <p class="lead" style="margin:16px auto 0;">
+      <p class="lead" style="margin:24px auto 0;">
         უნარები, Game IQ, პერსონალური გეგმა და exposure — ეს არის პროგრესის ოთხი მთავარი საფეხური.
       </p>
 
       <div class="steps">
         <div class="step">
           <div class="step-number">1</div>
-          <h3>გააუმჯობესე ტექნიკა</h3>
-          <p class="small" style="margin-top:10px;">ბურთის კონტროლი, პასი, დრიბლინგი, დარტყმა და ფიზიკური მზადყოფნა.</p>
+          <h3 style="font-size: 1.2rem;">გააუმჯობესე ტექნიკა</h3>
+          <p class="small" style="margin-top:16px; line-height: 1.6;">ბურთის კონტროლი, პასი, დრიბლინგი, დარტყმა და ფიზიკური მზადყოფნა.</p>
         </div>
         <div class="step">
           <div class="step-number">2</div>
-          <h3>განავითარე Game IQ</h3>
-          <p class="small" style="margin-top:10px;">ისწავლე სივრცე, სკანინგი, დრო და თამაშის უფრო სწრაფად კითხვა.</p>
+          <h3 style="font-size: 1.2rem;">განავითარე Game IQ</h3>
+          <p class="small" style="margin-top:16px; line-height: 1.6;">ისწავლე სივრცე, სკანინგი, დრო და თამაშის უფრო სწრაფად კითხვა.</p>
         </div>
         <div class="step">
           <div class="step-number">3</div>
-          <h3>ააწყე შენი გზა</h3>
-          <p class="small" style="margin-top:10px;">მენტორებთან ერთად ჩამოაყალიბე გეგმა, რომელიც შენთვის მუშაობს.</p>
+          <h3 style="font-size: 1.2rem;">ააწყე შენი გზა</h3>
+          <p class="small" style="margin-top:16px; line-height: 1.6;">მენტორებთან ერთად ჩამოაყალიბე გეგმა, რომელიც შენთვის მუშაობს.</p>
         </div>
         <div class="step">
           <div class="step-number">4</div>
-          <h3>აჩვენე შენი დონე</h3>
-          <p class="small" style="margin-top:10px;">ბანაკები, შეფასება, ქოუჩები და ახალი შესაძლებლობები.</p>
+          <h3 style="font-size: 1.2rem;">აჩვენე შენი დონე</h3>
+          <p class="small" style="margin-top:16px; line-height: 1.6;">ბანაკები, შეფასება, ქოუჩები და ახალი შესაძლებლობები.</p>
         </div>
       </div>
     </div>
@@ -1549,13 +1520,13 @@
         <div class="camp-grid">
           <div class="camp-copy">
             <div class="eyebrow">ფეხბურთის ბანაკები</div>
-            <h2>საბოლოო საფეხბურთო გამოცდილება</h2>
-            <p class="lead" style="margin-top:16px;">
+            <h2 style="font-size: 2.4rem;">საბოლოო საფეხბურთო გამოცდილება</h2>
+            <p class="lead" style="margin-top:24px;">
               იცხოვრე, ივარჯიშე და ითამაშე როგორც პროფესიონალი ფეხბურთელი —
               საერთაშორისო გარემოში, მაღალი დონის მწვრთნელებთან და რეალური შეფასებით.
             </p>
 
-            <ul class="clean">
+            <ul class="clean" style="margin-bottom: 48px;">
               <li>ელიტური მწვრთნელები და მაღალი ხარისხის სავარჯიშო გარემო</li>
               <li>სკაუტებისა და პროფესიონალური ქსელის წარმომადგენლების შეფასება</li>
               <li>პერსონალური feedback და განვითარების ანგარიში</li>
@@ -1563,7 +1534,7 @@
             </ul>
 
             <div class="btn-row">
-          <a href="login.html?redirect=index.html%23register#register" class="btn btn-primary">შეუერთდი ბანაკს</a>
+              <a href="login.html?redirect=index.html%23register#register" class="btn btn-primary">შეუერთდი ბანაკს</a>
               <a href="#contact" class="btn btn-secondary">დაგვიკავშირდი</a>
             </div>
           </div>
@@ -1571,18 +1542,18 @@
           <div class="camp-visual">
             <div class="camp-shot">
               <div class="pill">Elite Coaches</div>
-              <h3 style="margin-top:14px;">ივარჯიშე საუკეთესოებთან</h3>
-              <p class="small" style="margin-top:10px;">ტექნიკა, ტაქტიკა, კონკურენცია და პროფესიონალური სტანდარტი ერთ სივრცეში.</p>
+              <h3 style="margin-top:auto; font-size: 1.3rem;">ივარჯიშე საუკეთესოებთან</h3>
+              <p class="small">ტექნიკა, ტაქტიკა, კონკურენცია და პროფესიონალური სტანდარტი ერთ სივრცეში.</p>
             </div>
             <div class="camp-shot">
               <div class="pill">Scout Feedback</div>
-              <h3 style="margin-top:14px;">მიიღე რეალური შეფასება</h3>
-              <p class="small" style="margin-top:10px;">გაიგე ზუსტად რა გაკლია შემდეგი დონისთვის და რა არის შენი ძლიერი მხარე.</p>
+              <h3 style="margin-top:auto; font-size: 1.3rem;">მიიღე რეალური შეფასება</h3>
+              <p class="small">გაიგე ზუსტად რა გაკლია შემდეგი დონისთვის და რა არის შენი ძლიერი მხარე.</p>
             </div>
             <div class="camp-shot">
               <div class="pill">Career Push</div>
-              <h3 style="margin-top:14px;">მოუმატე კარიერას სიჩქარე</h3>
-              <p class="small" style="margin-top:10px;">სწორი გარემო, სწორი ადამიანები და ძლიერი წარმოდგენა შენი ფეხბურთის შესახებ.</p>
+              <h3 style="margin-top:auto; font-size: 1.3rem;">მოუმატე კარიერას სიჩქარე</h3>
+              <p class="small">სწორი გარემო, სწორი ადამიანები და ძლიერი წარმოდგენა შენი ფეხბურთის შესახებ.</p>
             </div>
           </div>
         </div>
@@ -1590,21 +1561,21 @@
     </div>
   </section>
 
-  <section id="contact" class="section">
+  <section id="contact" class="section bg-alt">
     <div class="container">
       <div class="cta-box center">
         <div class="eyebrow">დაგვიკავშირდი</div>
-        <h2>გაქვს კითხვა? <br>ესაუბრე ჩვენს გუნდს</h2>
-        <p class="lead" style="margin:16px auto 0;">
+        <h2 style="font-size: 2.6rem;">გაქვს კითხვა? <br>ესაუბრე ჩვენს გუნდს</h2>
+        <p class="lead" style="margin:24px auto 0;">
           თუ გინდა გაარკვიო რომელი პროგრამა ან ბანაკია შენთვის საუკეთესო,
           დაგეგმე ზარი ან მოგვწერე პირდაპირ.
         </p>
 
-        <div class="btn-row" style="justify-content:center;">
-          <a href="#" class="btn btn-primary">WhatsApp</a>
-          <a href="#" class="btn btn-secondary">Instagram</a>
-          <a href="#" class="btn btn-secondary">ვიდეო ზარი</a>
-          <a href="#" class="btn btn-secondary">ელფოსტა</a>
+        <div class="btn-row" style="justify-content:center; margin-top: 48px;">
+          <a href="#" class="btn btn-primary" style="padding: 0 32px;">WhatsApp</a>
+          <a href="#" class="btn btn-secondary" style="background: #fff;">Instagram</a>
+          <a href="#" class="btn btn-secondary" style="background: #fff;">ვიდეო ზარი</a>
+          <a href="#" class="btn btn-secondary" style="background: #fff;">ელფოსტა</a>
         </div>
       </div>
     </div>
@@ -1618,32 +1589,32 @@
       <div class="faq">
         <div class="faq-item">
           <h3>ვისთვის არის ეს პლატფორმა?</h3>
-          <p class="small" style="margin-top:10px;">ყველა მოთამაშისთვის, ვისაც სურს ინდივიდუალური პროგრესი — აკადემიიდან ზრდასრულ დონემდე.</p>
+          <p class="small" style="margin-top:16px; line-height: 1.6;">ყველა მოთამაშისთვის, ვისაც სურს ინდივიდუალური პროგრესი — აკადემიიდან ზრდასრულ დონემდე.</p>
         </div>
         <div class="faq-item">
           <h3>მჭირდება კლუბში თამაში?</h3>
-          <p class="small" style="margin-top:10px;">არა. პლატფორმა მუშაობს როგორც კლუბის მოთამაშეებისთვის, ასევე დამოუკიდებლად მოსამზადებელი ფეხბურთელებისთვის.</p>
+          <p class="small" style="margin-top:16px; line-height: 1.6;">არა. პლატფორმა მუშაობს როგორც კლუბის მოთამაშეებისთვის, ასევე დამოუკიდებლად მოსამზადებელი ფეხბურთელებისთვის.</p>
         </div>
         <div class="faq-item">
           <h3>რა ტიპის კონტენტს მივიღებ?</h3>
-          <p class="small" style="margin-top:10px;">ვარჯიშები, ტაქტიკური ვიდეოები, mindset მასალები, ქოუჩინგი და ფეხბურთის ბანაკების შესაძლებლობები.</p>
+          <p class="small" style="margin-top:16px; line-height: 1.6;">ვარჯიშები, ტაქტიკური ვიდეოები, mindset მასალები, ქოუჩინგი და ფეხბურთის ბანაკების შესაძლებლობები.</p>
         </div>
       </div>
     </div>
   </section>
 
-  <section id="cta" class="section">
+  <section id="cta" class="section bg-alt">
     <div class="container center">
       <div class="eyebrow">დაიწყე დღესვე</div>
-      <h2>ივარჯიშე როგორც პროფესიონალი. <br>ითამაშე უკეთესად. გაიზარდე სწრაფად.</h2>
-      <p class="lead" style="margin:16px auto 0;">
+      <h2 style="font-size: 2.8rem;">ივარჯიშე როგორც პროფესიონალი. <br>ითამაშე უკეთესად. გაიზარდე სწრაფად.</h2>
+      <p class="lead" style="margin:24px auto 0;">
         თუ გინდა შენი ფეხბურთი შემთხვევითობაზე აღარ იყოს დამოკიდებული და რეალურად ააშენო პროგრესი,
         ეს არის შენი შემდეგი სწორი ნაბიჯი.
       </p>
 
-      <div class="btn-row" style="justify-content:center;">
-            <a href="login.html?redirect=index.html%23register#register" class="btn btn-primary">დაიწყე უფასოდ</a>
-        <a href="#" class="btn btn-secondary">ნახე გეგმები</a>
+      <div class="btn-row" style="justify-content:center; margin-top: 48px;">
+        <a href="login.html?redirect=index.html%23register#register" class="btn btn-primary" style="padding: 0 40px; min-height: 60px; font-size: 16px;">დაიწყე უფასოდ</a>
+        <a href="#" class="btn btn-secondary" style="padding: 0 40px; min-height: 60px; font-size: 16px; background: #fff;">ნახე გეგმები</a>
       </div>
     </div>
   </section>
@@ -1652,11 +1623,11 @@
     <div class="container">
       <div class="footer-grid">
         <div>
-          <a href="index.html" class="brand" style="display:inline-flex;margin-bottom:14px;">
-            <span class="logo">DM</span>
-            <span>DM Football Georgia</span>
+          <a href="index.html" class="footer-brand">
+            <span class="logo" style="width: 36px; height: 36px; font-size: 0.85rem; border-radius: 10px;">DM</span>
+      <span>Football Georgia</span>
           </a>
-          <p class="small">
+          <p class="small" style="line-height: 1.8;">
             პლატფორმა ფეხბურთელებისთვის, რომლებიც სერიოზულად უყურებენ საკუთარ განვითარებას
             და სურთ იმუშაონ უფრო ჭკვიანურად, უფრო დისციპლინირებულად და უფრო ეფექტურად.
           </p>
@@ -1666,30 +1637,30 @@
           <h4>განვითარება</h4>
           <a href="#features">როგორ გავხდე უკეთესი ფეხბურთელი</a>
           <a href="#stories">როგორ ავიმაღლო თავდაჯერებულობა</a>
-          <a href="#coaching">როგორ გავაუმჯობესო ტექნიკა</a>
-          <a href="#steps">როგორ წავიკითხო თამაში</a>
+          <a href="coaching.html">ქოუჩინგი და პერსონალური გეგმა</a>
+          <a href="banakebi.html">ბანაკები და შეფასება</a>
         </div>
 
         <div>
           <h4>პროგრამები</h4>
           <a href="pexburtelebi.html">ფეხბურთელები</a>
           <a href="gundebi.html">გუნდები</a>
+          <a href="cxrilebi.html">ცხრილები</a>
           <a href="user-profile.html?from=index.html">ჩემი პროფილი</a>
-          <a href="admin-deshboard.html">ადმინ პანელი</a>
         </div>
 
         <div>
           <h4>ინფორმაცია</h4>
-          <a href="#stories">ჩვენ შესახებ</a>
-          <a href="#contact">კონტაქტი</a>
+          <a href="coaching.html">ქოუჩინგი</a>
+          <a href="banakebi.html">ბანაკები</a>
           <a href="login.html?redirect=index.html%23login#login">შესვლა</a>
           <a href="login.html?redirect=index.html%23register#register">რეგისტრაცია</a>
         </div>
       </div>
 
       <div class="footer-bottom">
-        <span>© 2026 DM Football Georgia. ყველა უფლება დაცულია.</span>
-        <span>Premium Georgian landing page adaptation.</span>
+          <span>© 2026 Football Georgia. ყველა უფლება დაცულია.</span>
+        <span>ციფრული საფეხბურთო პლატფორმა საქართველოსთვის.</span>
       </div>
     </div>
   </footer>
@@ -1703,7 +1674,6 @@
         loginClass: 'btn btn-secondary',
         registerClass: 'btn btn-primary',
         profileClass: 'btn btn-primary',
-        logoutClass: 'btn btn-secondary',
         afterLogout: 'index.html'
       });
     }

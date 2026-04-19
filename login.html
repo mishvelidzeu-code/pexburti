@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ავტორიზაცია | DM Football Georgia</title>
-  <meta name="description" content="შესვლა და რეგისტრაცია DM Football Georgia-სთვის.">
+  <title>ავტორიზაცია | Football Georgia</title>
+  <meta name="description" content="შესვლა და რეგისტრაცია Football Georgia-სთვის.">
   <style>
     :root {
       --bg:#ffffff;
@@ -41,7 +41,7 @@
     a{text-decoration:none;color:inherit}
     button,input,select{font:inherit}
     [hidden]{display:none !important}
-    .container{width:min(var(--container), calc(100% - 32px));margin-inline:auto}
+    .container{width:min(var(--container), calc(100% - 36px));margin-inline:auto}
 
     .header{
       position:sticky;
@@ -52,19 +52,21 @@
       border-bottom:1px solid var(--line);
     }
     .nav{
-      min-height:78px;
+      min-height:74px;
       display:flex;
       align-items:center;
       justify-content:space-between;
-      gap:18px;
+      gap:16px;
     }
     .brand{
       display:flex;
       align-items:center;
       gap:12px;
-      font-size:.95rem;
-      font-weight:900;
-      letter-spacing:-.03em;
+      font-size:1rem;
+      font-weight:800;
+      letter-spacing:-.02em;
+      flex:0 0 auto;
+      white-space:nowrap;
     }
     .logo{
       width:42px;
@@ -84,26 +86,63 @@
     .nav-links{
       display:flex;
       align-items:center;
-      gap:22px;
+      justify-content:center;
+      flex:1 1 auto;
+      min-width:0;
+      gap:clamp(12px,1.6vw,22px);
       color:var(--muted-2);
       font-size:13px;
-      font-weight:800;
-      letter-spacing:-.01em;
+      font-weight:600;
+    }
+    .nav-links a{
+      position:relative;
+      white-space:nowrap;
+      transition:color .2s ease;
     }
     .nav-links a:hover,
-    .nav-links a.active{color:var(--red)}
+    .nav-links a.active{color:var(--text)}
+    .nav-links a.active::after{
+      content:'';
+      position:absolute;
+      left:0;
+      bottom:-6px;
+      width:100%;
+      height:2px;
+      border-radius:2px;
+      background:var(--red);
+    }
     .nav-actions{
       display:flex;
       align-items:center;
       gap:10px;
+      flex:0 0 auto;
     }
+    .nav-actions .btn{
+      min-height:46px;
+      padding:0 16px;
+      font-size:13px;
+    }
+    .nav-actions .btn-white{
+      background:var(--red);
+      color:#fff;
+      border:none;
+      box-shadow:0 6px 14px rgba(185,28,28,.2);
+    }
+    .nav-actions .btn-white:hover{background:var(--red-2)}
+    .nav-actions .btn-red{
+      background:#0f172a;
+      color:#fff;
+      border-color:#0f172a;
+      box-shadow:0 6px 14px rgba(15,23,42,.15);
+    }
+    .nav-actions .btn-red:hover{background:#1e293b}
 
     .btn{
       display:inline-flex;
       align-items:center;
       justify-content:center;
-      min-height:52px;
-      padding:0 20px;
+      min-height:48px;
+      padding:0 18px;
       border-radius:999px;
       border:1px solid transparent;
       font-size:13px;
@@ -137,12 +176,12 @@
       display:flex;
       align-items:center;
       justify-content:center;
-      padding:34px 20px 54px;
+      padding:28px 18px 44px;
     }
     .auth-scene{
       position:relative;
-      width:min(1180px,100%);
-      min-height:760px;
+      width:min(1120px,100%);
+      min-height:700px;
       display:flex;
       align-items:center;
       justify-content:center;
@@ -151,19 +190,19 @@
       position:relative;
       z-index:2;
       width:100%;
-      max-width:500px;
+      max-width:470px;
       background:#fff;
       border:1px solid var(--line);
-      border-radius:28px;
-      padding:36px 32px;
+      border-radius:24px;
+      padding:30px 26px;
       box-shadow:var(--shadow);
     }
     .auth-float{
       position:absolute;
       z-index:1;
-      width:220px;
-      padding:16px;
-      border-radius:24px;
+      width:200px;
+      padding:14px;
+      border-radius:20px;
       background:#fff;
       border:1px solid var(--line);
       box-shadow:0 18px 38px rgba(15,23,42,.11);
@@ -196,8 +235,8 @@
       font-weight:900;
     }
     .auth-float.featured{
-      width:292px;
-      padding:20px;
+      width:268px;
+      padding:18px;
       background:linear-gradient(180deg,#cb2020 0%,#a71313 100%);
       border-color:rgba(185,28,28,.22);
       color:#fff;
@@ -212,17 +251,17 @@
     .auth-float.featured p{
       color:#fff;
     }
-    .float-player{top:74px;left:24px}
-    .float-parent{top:122px;right:32px}
-    .float-agent{bottom:112px;left:52px}
-    .float-exposure{bottom:84px;right:40px}
+    .float-player{top:66px;left:24px}
+    .float-parent{top:108px;right:28px}
+    .float-agent{bottom:98px;left:48px}
+    .float-exposure{bottom:72px;right:36px}
     .auth-header{
       text-align:center;
-      margin-bottom:28px;
+      margin-bottom:22px;
     }
     .auth-header h1{
       margin:0 0 8px;
-      font-size:1.6rem;
+      font-size:1.48rem;
       font-weight:900;
       letter-spacing:-.03em;
     }
@@ -232,7 +271,7 @@
       font-size:.88rem;
     }
 
-    .form-group{margin-bottom:18px}
+    .form-group{margin-bottom:16px}
     .form-row{
       display:grid;
       grid-template-columns:1fr 1fr;
@@ -247,7 +286,7 @@
     }
     .form-input{
       width:100%;
-      padding:14px 16px;
+      padding:12px 14px;
       border-radius:16px;
       border:1px solid var(--line);
       background:var(--panel-2);
@@ -471,6 +510,17 @@
       color:#1d4ed8;
     }
 
+    @media (max-width:1100px){
+      .nav{
+        min-height:auto;
+        flex-wrap:wrap;
+        padding:12px 0;
+      }
+      .nav-links{
+        order:3;
+        width:100%;
+      }
+    }
     @media (max-width:560px){
       .auth-box{
         padding:28px 20px;
@@ -533,14 +583,15 @@
     <div class="container nav">
       <a href="index.html" class="brand">
         <span class="logo">DM</span>
-        <span>DM Football Georgia</span>
+      <span>Football Georgia</span>
       </a>
       <nav class="nav-links">
         <a href="index.html">მთავარი</a>
         <a href="gundebi.html">გუნდები</a>
         <a href="pexburtelebi.html">ფეხბურთელები</a>
-        <a href="index.html#coaching">ქოუჩინგი</a>
-        <a href="index.html#camps">ბანაკები</a>
+        <a href="coaching.html">ქოუჩინგი</a>
+        <a href="banakebi.html">ბანაკები</a>
+        <a href="cxrilebi.html">ცხრილები</a>
       </nav>
       <div class="nav-actions" id="loginAuthNav">
         <a href="#login" class="btn btn-white">შესვლა</a>

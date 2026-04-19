@@ -169,6 +169,113 @@
     return 'პროფილი';
   }
 
+  function escapeHtml(value) {
+    return String(value || '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  function ensureProfileMenuStyles() {
+    if (document.getElementById('siteAuthProfileMenuStyles')) {
+      return;
+    }
+
+    const style = document.createElement('style');
+    style.id = 'siteAuthProfileMenuStyles';
+    style.textContent = [
+      '.site-auth-profile-menu{position:relative}',
+      '.site-auth-profile-trigger{gap:10px}',
+      '.site-auth-profile-trigger::after{content:"";width:8px;height:8px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg) translateY(-1px);opacity:.82}',
+      '.site-auth-profile-panel{position:absolute;top:calc(100% + 10px);right:0;width:min(236px,calc(100vw - 32px));padding:10px;border-radius:20px;border:1px solid rgba(15,23,42,.12);background:rgba(255,255,255,.985);box-shadow:0 24px 48px rgba(15,23,42,.14);display:grid;gap:6px;opacity:0;visibility:hidden;transform:translateY(10px);transition:opacity .22s ease,transform .22s ease,visibility .22s ease;z-index:120}',
+      '.site-auth-profile-menu:hover .site-auth-profile-panel,.site-auth-profile-menu:focus-within .site-auth-profile-panel,.site-auth-profile-menu.open .site-auth-profile-panel{opacity:1;visibility:visible;transform:translateY(0)}',
+      '.site-auth-profile-label{padding:6px 8px 10px;border-bottom:1px solid rgba(15,23,42,.08)}',
+      '.site-auth-profile-label strong{font-size:.9rem;color:#111827;display:block}',
+      '.site-auth-profile-link{display:block;padding:10px 12px;border-radius:16px;transition:background .2s ease,transform .2s ease;font-size:.88rem;font-weight:800;color:#111827}',
+      '.site-auth-profile-link:hover{background:#fff5f5;transform:translateX(2px)}',
+      '.site-auth-profile-logout{margin-top:4px;display:inline-flex;align-items:center;justify-content:center;min-height:42px;padding:0 16px;border-radius:999px;border:none;background:#b91c1c;color:#fff;font-weight:800;font-size:.82rem;box-shadow:0 10px 22px rgba(185,28,28,.18)}',
+      '.site-auth-profile-logout:hover{background:#991b1b}'
+    ].join('');
+
+    document.head.appendChild(style);
+  }
+
+  function getProfileMenuFromPath(currentPath) {
+    const normalized = stripAuthHash(currentPath);
+    const parts = String(normalized || '').split('?');
+    const base = parts[0] || '';
+    const search = parts[1] || '';
+
+    if ((base === DEFAULT_PROFILE_ROUTE || base === DEFAULT_ADMIN_ROUTE) && search) {
+      const params = new URLSearchParams(search);
+      return sanitizeInternalPath(params.get('from'), 'index.html');
+    }
+
+    return normalized || 'index.html';
+  }
+
+  function buildProfileMenuItems(user, currentPath) {
+    const role = getUserRole(user);
+    const fromPath = getProfileMenuFromPath(currentPath);
+
+    if (role === 'admin') {
+      return [
+        {
+          href: buildProfileHref(DEFAULT_ADMIN_ROUTE, fromPath),
+          title: 'ადმინ პანელი',
+          copy: 'სრული ადმინისტრირება, კონტროლი და მიმოხილვა.'
+        },
+        {
+          href: buildProfileHref(`${DEFAULT_PROFILE_ROUTE}?view=data`, fromPath),
+          title: 'მონაცემები',
+          copy: 'საკუთარი მონაცემების და ანგარიშის პარამეტრების ნახვა.'
+        }
+      ];
+    }
+
+    const items = [
+      {
+        key: 'overview',
+        title: 'პროფილის მთავარი',
+        copy: 'საერთო სურათი, სწრაფი ბლოკები და აქტიური სტატუსი.'
+      },
+      {
+        key: 'data',
+        title: 'მონაცემები',
+        copy: 'რეგისტრაციის მონაცემები, ფოტო და რედაქტირება.'
+      },
+      {
+        key: 'status',
+        title: 'სტატუსი',
+        copy: 'ასაკობრივი, მიმდინარე პროგრესი და აქტიური მდგომარეობა.'
+      }
+    ];
+
+    if (role === 'player' || role === 'parent') {
+      items.push({
+        key: 'team',
+        title: role === 'parent' ? 'ბავშვის გუნდი' : 'გუნდი და ასაკობრივი',
+        copy: 'გუნდის შეცვლა, ასაკობრივის მართვა და მიბმის განახლება.'
+      });
+    }
+
+    items.push({
+      key: 'portfolio',
+      title: 'პორტფოლიო',
+      copy: 'ვიდეო CV, ბმები და შემდეგი ნაბიჯები.'
+    });
+
+    return items.map(function (item) {
+      return {
+        href: buildProfileHref(`${DEFAULT_PROFILE_ROUTE}?view=${item.key}`, fromPath),
+        title: item.title,
+        copy: item.copy
+      };
+    });
+  }
+
   async function signOut(options) {
     const settings = options || {};
     const client = getClient();
@@ -196,7 +303,6 @@
     const loginClass = settings.loginClass || 'btn btn-white';
     const registerClass = settings.registerClass || 'btn btn-red';
     const profileClass = settings.profileClass || loginClass;
-    const logoutClass = settings.logoutClass || registerClass;
 
     const client = getClient();
     if (!client) {
@@ -223,13 +329,61 @@
       currentPath
     );
     const displayName = getUserDisplayName(user);
+    if (typeof settings.renderLoggedIn === 'function') {
+      const handled = await settings.renderLoggedIn({
+        currentPath: currentPath,
+        displayName: displayName,
+        getUserRole: getUserRole,
+        profileHref: profileHref,
+        profileRoute: getProfileRouteForUser(user),
+        signOut: signOut,
+        target: target,
+        user: user
+      });
 
+      if (handled !== false) {
+        return;
+      }
+    }
+    ensureProfileMenuStyles();
+    const menuItems = buildProfileMenuItems(user, currentPath);
     target.innerHTML = [
-      '<a href="', profileHref, '" class="', profileClass, '" title="', displayName, '">პროფილი</a>',
-      '<button type="button" class="', logoutClass, '" data-auth-logout>გასვლა</button>'
+      '<div class="site-auth-profile-menu">',
+        '<button type="button" class="', profileClass, ' site-auth-profile-trigger" aria-haspopup="true" aria-expanded="false" title="', escapeHtml(displayName), '">პროფილი</button>',
+        '<div class="site-auth-profile-panel">',
+          '<div class="site-auth-profile-label">',
+            '<strong>', escapeHtml(displayName), '</strong>',
+          '</div>',
+          menuItems.map(function (item) {
+            return [
+              '<a href="', item.href, '" class="site-auth-profile-link">',
+                escapeHtml(item.title),
+              '</a>'
+            ].join('');
+          }).join(''),
+          '<button type="button" class="site-auth-profile-logout" data-auth-logout>გასვლა</button>',
+        '</div>',
+      '</div>'
     ].join('');
 
+    const menu = target.querySelector('.site-auth-profile-menu');
+    const trigger = target.querySelector('.site-auth-profile-trigger');
     const logoutButton = target.querySelector('[data-auth-logout]');
+
+    if (trigger && menu) {
+      trigger.addEventListener('click', function () {
+        const isOpen = menu.classList.toggle('open');
+        trigger.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+      });
+
+      document.addEventListener('click', function (event) {
+        if (!menu.contains(event.target)) {
+          menu.classList.remove('open');
+          trigger.setAttribute('aria-expanded', 'false');
+        }
+      });
+    }
+
     if (logoutButton) {
       logoutButton.addEventListener('click', function () {
         signOut({ redirect: settings.afterLogout || 'index.html' });

@@ -18,6 +18,13 @@
     back: 'index.html',
     config: null
   };
+  const dataEditorState = {
+    role: '',
+    user: null,
+    profile: {},
+    back: 'index.html',
+    client: null
+  };
 
   const from = () => window.siteAuth?.sanitizeInternalPath(
     new URLSearchParams(location.search).get('from'),
@@ -88,6 +95,24 @@
       .join('')
   ) || 'MF';
 
+  function renderAvatar(user, role, profile) {
+    const avatar = document.getElementById('avatar');
+    if (!avatar) {
+      return;
+    }
+
+    const image = getProfileImageSource(role, profile);
+    if (image) {
+      const name = window.siteAuth?.getUserDisplayName
+        ? window.siteAuth.getUserDisplayName(user)
+        : (user?.email || 'პროფილი');
+      avatar.innerHTML = `<img src="${esc(image)}" alt="${esc(name)}">`;
+      return;
+    }
+
+    avatar.textContent = initials(user);
+  }
+
   const renderItems = (list) => list.map((item) => (
     `<div class="info"><div class="label">${esc(item.l)}</div>${
       item.h
@@ -128,6 +153,38 @@
 
   function dateText(value) {
     return parseBirthDate(value)?.formatted || String(value || '').trim();
+  }
+
+  function inputDateValue(value) {
+    const parsed = parseBirthDate(value);
+    if (!parsed?.year || !parsed?.month || !parsed?.day) {
+      return '';
+    }
+    const month = String(parsed.month).padStart(2, '0');
+    const day = String(parsed.day).padStart(2, '0');
+    return `${parsed.year}-${month}-${day}`;
+  }
+
+  function dateValueFromInput(value) {
+    const raw = String(value || '').trim();
+    if (!raw) {
+      return '';
+    }
+    const [year, month, day] = raw.split('-');
+    if (!year || !month || !day) {
+      return '';
+    }
+    return `${day}.${month}.${year}`;
+  }
+
+  function getProfileImageSource(role, profile) {
+    if (role === 'parent') {
+      return String(profile?.childPhoto || profile?.profilePhoto || '').trim();
+    }
+    if (role === 'player') {
+      return String(profile?.playerPhoto || profile?.profilePhoto || '').trim();
+    }
+    return String(profile?.profilePhoto || '').trim();
   }
 
   function teamStatusText(status) {
@@ -475,7 +532,7 @@
       const state = resolveAgeState(profile, config);
       const currentAge = state.actualAge ?? profile.playerAge ?? '-';
       return {
-        eye: 'ციფრული საფეხბურთო პასპორტი',
+        eye: 'ციფრული საფეხბურთო პროფილი',
         lead: 'ეს არის შენი მოთამაშის პროფილი. აქ დაგიგროვდება გუნდი, ვიდეო CV, სტატისტიკა და სეზონური ასაკობრივი ისტორია.',
         side: 'აქედან შეგიძლია მართო გუნდი, ასაკობრივი ჯგუფი და დაბრუნდე ზუსტად იმავე გვერდზე, საიდანაც გახსენი პროფილი.',
         quick: [
@@ -504,7 +561,7 @@
           a: [
             profile.playerTeamRoute
               ? { h: profile.playerTeamRoute, l: 'ჩემი გუნდის გვერდი', c: 'btn-red' }
-              : { h: back, l: 'წინა გვერდზე დაბრუნება', c: 'btn-red' },
+              : { h: buildProfileViewHref('overview', back), l: 'პროფილის მთავარი', c: 'btn-red' },
             { h: 'pexburtelebi.html', l: 'ფეხბურთელების ბაზა', c: 'btn-white' },
             { h: 'gundebi.html', l: 'გუნდების გვერდი', c: 'btn-white' }
           ],
@@ -561,7 +618,7 @@
           a: [
             profile.childTeamRoute
               ? { h: profile.childTeamRoute, l: 'ბავშვის გუნდის გვერდი', c: 'btn-red' }
-              : { h: back, l: 'წინა გვერდზე დაბრუნება', c: 'btn-red' },
+              : { h: buildProfileViewHref('overview', back), l: 'პროფილის მთავარი', c: 'btn-red' },
             { h: 'gundebi.html', l: 'გუნდების ნახვა', c: 'btn-white' },
             { h: 'pexburtelebi.html', l: 'ტალანტების ბაზა', c: 'btn-white' }
           ],
@@ -607,7 +664,7 @@
         t: 'აგენტის სამუშაო სივრცე',
         c: 'შემდეგ ეტაპზე შეგვიძლია ამ პროფილზე მოთამაშეების ცალკე დამატება, შეთავაზებები და კლუბებთან ბმებიც მივაბათ.',
         a: [
-          { h: back, l: 'წინა გვერდზე დაბრუნება', c: 'btn-red' },
+          { h: buildProfileViewHref('overview', back), l: 'პროფილის მთავარი', c: 'btn-red' },
           { h: 'pexburtelebi.html', l: 'ფეხბურთელების ბაზა', c: 'btn-white' },
           { h: 'gundebi.html', l: 'გუნდების ბაზა', c: 'btn-white' }
         ],
@@ -728,6 +785,406 @@
     const state = renderAgeGroupSelect(profile, config);
     document.getElementById('teamManageNotes').innerHTML = renderNotes(buildManageNotes(profile, config, state));
     setTeamEditorStatus('');
+  }
+
+  function setDataEditorStatus(message, state) {
+    const status = document.getElementById('dataEditorStatus');
+    if (!status) {
+      return;
+    }
+    if (!message) {
+      status.hidden = true;
+      status.textContent = '';
+      status.dataset.state = 'info';
+      return;
+    }
+    status.hidden = false;
+    status.dataset.state = state || 'info';
+    status.textContent = message;
+  }
+
+  function toggleDataEditor(show) {
+    const panel = document.getElementById('dataEditPanel');
+    if (!panel) {
+      return;
+    }
+    panel.hidden = !show;
+    if (!show) {
+      setDataEditorStatus('');
+      const photoInput = document.getElementById('photoInput');
+      if (photoInput) {
+        photoInput.value = '';
+      }
+    }
+  }
+
+  function getDataEditorFields(role, user, profile) {
+    const common = [
+      { key: 'first_name', label: 'სახელი', type: 'text', value: user.user_metadata?.first_name || '' },
+      { key: 'last_name', label: 'გვარი', type: 'text', value: user.user_metadata?.last_name || '' },
+      { key: 'phone_number', label: 'ტელეფონი', type: 'tel', value: user.user_metadata?.phone_number || '' },
+      { key: 'personal_number', label: 'პირადი ნომერი', type: 'text', value: user.user_metadata?.personal_number || '' }
+    ];
+
+    if (role === 'player') {
+      return common.concat([
+        { key: 'playerBirthDate', label: 'დაბადების თარიღი', type: 'date', value: inputDateValue(profile.playerBirthDate) },
+        { key: 'playerPosition', label: 'პოზიცია', type: 'text', value: profile.playerPosition || '' },
+        { key: 'playerFoot', label: 'უპირატესი ფეხი', type: 'text', value: profile.playerFoot || '' }
+      ]);
+    }
+
+    if (role === 'parent') {
+      return common.concat([
+        { key: 'childName', label: 'ბავშვის სახელი და გვარი', type: 'text', value: profile.childName || '' },
+        { key: 'childBirthDate', label: 'ბავშვის დაბადების თარიღი', type: 'date', value: inputDateValue(profile.childBirthDate) },
+        { key: 'childPosition', label: 'ბავშვის პოზიცია', type: 'text', value: profile.childPosition || '' },
+        { key: 'childFoot', label: 'ბავშვის ფეხი', type: 'text', value: profile.childFoot || '' },
+        { key: 'parentRelation', label: 'კავშირი ბავშვთან', type: 'text', value: profile.parentRelation || '' }
+      ]);
+    }
+
+    return common.concat([
+      { key: 'agencyName', label: 'სააგენტო', type: 'text', value: profile.agencyName || '' },
+      { key: 'playersManaged', label: 'რამდენ მოთამაშეს წარმოადგენს', type: 'number', value: profile.playersManaged || '' },
+      { key: 'agencyRegion', label: 'რეგიონი', type: 'text', value: profile.agencyRegion || '' },
+      { key: 'agentFocus', label: 'მიმართულება', type: 'text', value: profile.agentFocus || '' }
+    ]);
+  }
+
+  function renderDataEditor(role, user, profile) {
+    const fieldsBox = document.getElementById('dataEditFields');
+    if (!fieldsBox) {
+      return;
+    }
+
+    dataEditorState.role = role;
+    dataEditorState.user = user;
+    dataEditorState.profile = { ...(profile || {}) };
+
+    const fields = getDataEditorFields(role, user, profile);
+    fieldsBox.innerHTML = fields.map((field) => (
+      `<div class="form-group">
+        <label class="form-label" for="data-${esc(field.key)}">${esc(field.label)}</label>
+        <input id="data-${esc(field.key)}" data-field="${esc(field.key)}" class="form-input" type="${esc(field.type)}" value="${esc(field.value)}">
+      </div>`
+    )).join('');
+
+    const photoFieldLabel = document.getElementById('photoFieldLabel');
+    if (photoFieldLabel) {
+      photoFieldLabel.textContent = role === 'parent' ? 'ბავშვის ფოტო' : 'პირადი ფოტო';
+    }
+    setDataEditorStatus('');
+  }
+
+  function readDataField(key) {
+    const element = document.querySelector(`[data-field="${key}"]`);
+    return String(element?.value || '').trim();
+  }
+
+  function compressImageFile(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const image = new Image();
+        image.onload = () => {
+          const canvas = document.createElement('canvas');
+          const maxSize = 480;
+          const ratio = Math.min(maxSize / image.width, maxSize / image.height, 1);
+          canvas.width = Math.max(1, Math.round(image.width * ratio));
+          canvas.height = Math.max(1, Math.round(image.height * ratio));
+          const context = canvas.getContext('2d');
+          context.drawImage(image, 0, 0, canvas.width, canvas.height);
+          resolve(canvas.toDataURL('image/jpeg', 0.84));
+        };
+        image.onerror = () => reject(new Error('ფოტოს დამუშავება ვერ შესრულდა.'));
+        image.src = reader.result;
+      };
+      reader.onerror = () => reject(new Error('ფაილის წაკითხვა ვერ შესრულდა.'));
+      reader.readAsDataURL(file);
+    });
+  }
+
+  async function saveDataEditor() {
+    const role = dataEditorState.role;
+    const user = dataEditorState.user;
+    const client = dataEditorState.client;
+    const nextProfile = { ...(dataEditorState.profile || {}) };
+    if (!role || !user || !client) {
+      return;
+    }
+
+    const firstName = readDataField('first_name');
+    const lastName = readDataField('last_name');
+    const phoneNumber = readDataField('phone_number');
+    const personalNumber = readDataField('personal_number');
+
+    if (!firstName || !lastName || !phoneNumber || !personalNumber) {
+      setDataEditorStatus('სახელი, გვარი, ტელეფონი და პირადი ნომერი სავალდებულოა.', 'error');
+      return;
+    }
+
+    if (role === 'player') {
+      nextProfile.playerBirthDate = dateValueFromInput(readDataField('playerBirthDate'));
+      nextProfile.playerPosition = readDataField('playerPosition');
+      nextProfile.playerFoot = readDataField('playerFoot');
+    } else if (role === 'parent') {
+      nextProfile.childName = readDataField('childName');
+      nextProfile.childBirthDate = dateValueFromInput(readDataField('childBirthDate'));
+      nextProfile.childPosition = readDataField('childPosition');
+      nextProfile.childFoot = readDataField('childFoot');
+      nextProfile.parentRelation = readDataField('parentRelation');
+    } else {
+      nextProfile.agencyName = readDataField('agencyName');
+      nextProfile.playersManaged = readDataField('playersManaged');
+      nextProfile.agencyRegion = readDataField('agencyRegion');
+      nextProfile.agentFocus = readDataField('agentFocus');
+    }
+
+    const photoInput = document.getElementById('photoInput');
+    if (photoInput?.files?.[0]) {
+      try {
+        const photoData = await compressImageFile(photoInput.files[0]);
+        nextProfile.profilePhoto = photoData;
+        if (role === 'player') {
+          nextProfile.playerPhoto = photoData;
+        } else if (role === 'parent') {
+          nextProfile.childPhoto = photoData;
+        }
+      } catch (error) {
+        setDataEditorStatus(error?.message || 'ფოტოს ატვირთვა ვერ შესრულდა.', 'error');
+        return;
+      }
+    }
+
+    setDataEditorStatus('მონაცემები ინახება...', 'info');
+
+    try {
+      const payload = {
+        ...user.user_metadata,
+        first_name: firstName,
+        last_name: lastName,
+        full_name: [firstName, lastName].filter(Boolean).join(' ').trim(),
+        phone_number: phoneNumber,
+        personal_number: personalNumber,
+        profile: nextProfile
+      };
+      const { error } = await client.auth.updateUser({ data: payload });
+      if (error) {
+        throw error;
+      }
+      setDataEditorStatus('მონაცემები წარმატებით განახლდა. პროფილი ახლავე განახლდება.', 'success');
+      window.setTimeout(() => {
+        window.location.reload();
+      }, 500);
+    } catch (error) {
+      setDataEditorStatus(error?.message || 'მონაცემების შენახვა ვერ შესრულდა.', 'error');
+    }
+  }
+
+  function initializeDataEditor(role, user, profile) {
+    dataEditorState.role = role;
+    dataEditorState.user = user;
+    dataEditorState.profile = { ...(profile || {}) };
+    renderDataEditor(role, user, profile);
+
+    const editButton = document.getElementById('editDataBtn');
+    const cancelButton = document.getElementById('cancelDataBtn');
+    const saveButton = document.getElementById('saveDataBtn');
+
+    if (editButton && editButton.dataset.ready !== 'true') {
+      editButton.dataset.ready = 'true';
+      editButton.addEventListener('click', () => {
+        renderDataEditor(dataEditorState.role, dataEditorState.user, dataEditorState.profile);
+        toggleDataEditor(true);
+      });
+    }
+
+    if (cancelButton && cancelButton.dataset.ready !== 'true') {
+      cancelButton.dataset.ready = 'true';
+      cancelButton.addEventListener('click', () => {
+        toggleDataEditor(false);
+      });
+    }
+
+    if (saveButton && saveButton.dataset.ready !== 'true') {
+      saveButton.dataset.ready = 'true';
+      saveButton.addEventListener('click', () => {
+        saveDataEditor();
+      });
+    }
+  }
+
+  function getProfileViewKey(role) {
+    const raw = String(new URLSearchParams(location.search).get('view') || 'overview')
+      .trim()
+      .toLowerCase();
+    const allowed = ['overview', 'data', 'status', 'portfolio'];
+    if (role === 'player' || role === 'parent') {
+      allowed.push('team');
+    }
+    return allowed.includes(raw) ? raw : 'overview';
+  }
+
+  function buildProfileViewHref(viewKey, back) {
+    const key = String(viewKey || 'overview').trim().toLowerCase() || 'overview';
+    const route = `user-profile.html?view=${encodeURIComponent(key)}`;
+    if (window.siteAuth?.buildProfileHref) {
+      return window.siteAuth.buildProfileHref(route, back);
+    }
+    return `${route}&from=${encodeURIComponent(back || 'index.html')}`;
+  }
+
+  function getProfileViewItems(role, back) {
+    const items = [
+      { key: 'overview', label: 'მთავარი', title: 'პროფილის მთავარი' },
+      { key: 'data', label: 'მონაცემები', title: 'მონაცემები' },
+      { key: 'status', label: 'სტატუსი', title: 'სტატუსი' }
+    ];
+
+    if (role === 'player' || role === 'parent') {
+      items.push({
+        key: 'team',
+        label: role === 'parent' ? 'ბავშვის გუნდი' : 'გუნდი',
+        title: role === 'parent' ? 'ბავშვის გუნდი და ასაკობრივი' : 'გუნდი და ასაკობრივი'
+      });
+    }
+
+    items.push({ key: 'portfolio', label: 'პორტფოლიო', title: 'პორტფოლიო' });
+
+    return items.map((item) => ({
+      ...item,
+      href: buildProfileViewHref(item.key, back)
+    }));
+  }
+
+  function renderProfileNavigation(role, back, currentView) {
+    const nav = document.getElementById('profileNav');
+    if (!nav) {
+      return;
+    }
+
+    nav.innerHTML = getProfileViewItems(role, back).map((item) => (
+      `<a href="${esc(item.href)}" class="${item.key === currentView ? 'active' : ''}">${esc(item.label)}</a>`
+    )).join('');
+  }
+
+  function buildOverviewCards(role, profile, roleView, back) {
+    const config = getManagedConfig(role);
+    const ageState = config ? resolveAgeState(profile, config) : null;
+    const ageText = ageState ? ageCategoryValue(ageState) : 'აქტიური';
+    const commonCards = [
+      {
+        key: 'data',
+        kicker: 'მონაცემები',
+        title: 'სრული სარეგისტრაციო მონაცემები',
+        copy: role === 'player'
+          ? 'მოთამაშის ასაკი, პოზიცია, მუშა ფეხი და მიმდინარე გუნდი ერთ გვერდზეა დალაგებული.'
+          : role === 'parent'
+            ? 'მშობლის და ბავშვის ყველა ძირითადი მონაცემი ერთადაა თავმოყრილი.'
+            : 'აგენტის სააგენტო, რეგიონი და საკონტაქტო მონაცემები ცალკე გვერდზეა გამოტანილი.',
+        meta: role === 'player'
+          ? `${safe(profile.playerPosition)} • ${safe(profile.playerFoot)}`
+          : role === 'parent'
+            ? `${safe(profile.childName)} • ${safe(profile.parentRelation)}`
+            : `${safe(profile.agencyName)} • ${safe(profile.agencyRegion)}`,
+        href: buildProfileViewHref('data', back)
+      },
+      {
+        key: 'status',
+        kicker: 'სტატუსი',
+        title: 'აქტიური მდგომარეობა',
+        copy: 'აქ ჩანს სეზონური ასაკობრივი, მიმდინარე სტატუსი და შენი შემდეგი სამუშაო მიმართულება.',
+        meta: ageText,
+        href: buildProfileViewHref('status', back)
+      }
+    ];
+
+    if (role === 'player' || role === 'parent') {
+      commonCards.push({
+        key: 'team',
+        kicker: 'გუნდი',
+        title: role === 'parent' ? 'ბავშვის გუნდი და კატეგორია' : 'გუნდი და ასაკობრივი',
+        copy: 'გუნდის შეცვლა, უგუნდოდ გადაყვანა და ასაკობრივის ხელით მართვა ცალკე გვერდზეა.',
+        meta: role === 'parent'
+          ? safe(profile.childTeam, TEAM_FREE_AGENT)
+          : safe(profile.playerTeam, TEAM_FREE_AGENT),
+        href: buildProfileViewHref('team', back)
+      });
+    }
+
+    commonCards.push({
+      key: 'portfolio',
+      kicker: 'პორტფოლიო',
+      title: roleView.port.t,
+      copy: roleView.port.c,
+      meta: 'ვიდეო CV • ბმები • შემდეგი ნაბიჯები',
+      href: buildProfileViewHref('portfolio', back)
+    });
+
+    return commonCards;
+  }
+
+  function renderProfileHub(role, profile, roleView, back) {
+    const hub = document.getElementById('profileHub');
+    if (!hub) {
+      return;
+    }
+
+    hub.innerHTML = buildOverviewCards(role, profile, roleView, back).map((item) => (
+      `<a href="${esc(item.href)}" class="overview-card">
+        <div class="overview-card-top">
+          <div>
+            <span class="overview-card-kicker">${esc(item.kicker)}</span>
+            <strong>${esc(item.title)}</strong>
+          </div>
+          <span class="overview-card-arrow">გახსენი</span>
+        </div>
+        <div class="overview-card-copy">${esc(item.copy)}</div>
+        <div class="overview-card-meta">
+          <span>${esc(item.meta)}</span>
+          <span>&rarr;</span>
+        </div>
+      </a>`
+    )).join('');
+  }
+
+  function applyProfileView(role, currentView) {
+    const hub = document.getElementById('profileHub');
+    const sections = document.querySelector('.sections');
+    const sideCopy = document.getElementById('sideCopy');
+    const articleMap = {
+      data: 'dataSection',
+      status: 'stats',
+      team: 'teamManage',
+      portfolio: 'portfolio'
+    };
+
+    Object.keys(articleMap).forEach((key) => {
+      const article = document.getElementById(articleMap[key]);
+      if (!article) {
+        return;
+      }
+      article.hidden = currentView === 'overview' || key !== currentView;
+    });
+
+    if (hub) {
+      hub.hidden = currentView !== 'overview';
+    }
+    if (sections) {
+      sections.hidden = currentView === 'overview';
+    }
+
+    if (currentView === 'overview') {
+      if (sideCopy) {
+        sideCopy.textContent = 'აირჩიე რომელი ბლოკი გინდა ცალკე გვერდზე გახსნა. თითო სექცია დამოუკიდებლადაა დალაგებული და სწრაფად იხსნება.';
+      }
+      return;
+    }
+
+    if (sideCopy) {
+      sideCopy.textContent = 'ეს არის პროფილის ცალკე სექცია. მარცხნივ შეგიძლია სხვა ბლოკზეც გადახვიდე ან დაბრუნდე პროფილის მთავარ გვერდზე.';
+    }
   }
 
   function initializeTeamEditor() {
@@ -863,15 +1320,6 @@
 
   async function init() {
     const back = from();
-    const label = backLabel(back);
-    ['backTop', 'backContent'].forEach((id) => {
-      const element = document.getElementById(id);
-      if (element) {
-        element.href = back;
-        element.textContent = label;
-      }
-    });
-
     const auth = window.siteAuth || {};
     const { client, user } = await auth.requireAuth({ redirect: here() });
     if (!user) {
@@ -895,36 +1343,55 @@
     teamManageState.role = role;
     teamManageState.client = client;
     teamManageState.back = back;
+    dataEditorState.role = role;
+    dataEditorState.user = currentUser;
+    dataEditorState.profile = currentProfile;
+    dataEditorState.back = back;
+    dataEditorState.client = client;
 
-    const view = buildRoleView(role, currentProfile, currentUser, back);
-    document.getElementById('eyebrow').textContent = view.eye;
+    const roleView = buildRoleView(role, currentProfile, currentUser, back);
+    const currentView = getProfileViewKey(role);
+    document.getElementById('eyebrow').textContent = roleView.eye;
     document.getElementById('roleBadge').textContent = roleLabel(role);
     document.getElementById('memberSince').textContent = `გაწევრიანდა ${new Date(currentUser.created_at).toLocaleDateString('ka-GE')}`;
-    document.getElementById('avatar').textContent = initials(currentUser);
-    document.getElementById('name').textContent = view.name;
-    document.getElementById('lead').textContent = view.lead;
-    document.getElementById('sideCopy').textContent = view.side;
-    document.getElementById('quick').innerHTML = renderQuick(view.quick);
-    document.getElementById('passportGrid').innerHTML = renderItems(view.pass);
-    document.getElementById('statsGrid').innerHTML = renderStats(view.stat);
-    document.getElementById('portfolioTitle').textContent = view.port.t;
-    document.getElementById('portfolioCopy').textContent = view.port.c;
-    document.getElementById('portfolioActions').innerHTML = renderActions(view.port.a);
-    document.getElementById('notes').innerHTML = renderNotes(view.port.n);
-    document.getElementById('mini').innerHTML = renderMini(view.mini);
+    renderAvatar(currentUser, role, currentProfile);
+    document.getElementById('name').textContent = roleView.name;
+    document.getElementById('lead').textContent = roleView.lead;
+    document.getElementById('sideCopy').textContent = roleView.side;
+    document.getElementById('quick').innerHTML = renderQuick(roleView.quick);
+    document.getElementById('dataGrid').innerHTML = renderItems(roleView.pass);
+    document.getElementById('statsGrid').innerHTML = renderStats(roleView.stat);
+    document.getElementById('portfolioTitle').textContent = roleView.port.t;
+    document.getElementById('portfolioCopy').textContent = roleView.port.c;
+    document.getElementById('portfolioActions').innerHTML = renderActions(roleView.port.a);
+    document.getElementById('notes').innerHTML = renderNotes(roleView.port.n);
+    document.getElementById('mini').innerHTML = renderMini(roleView.mini);
 
+    if (window.siteAuth?.renderAuthNav) {
+      window.siteAuth.renderAuthNav('#profileHeaderAuth', {
+        currentPath: here(),
+        loginClass: 'btn btn-white',
+        registerClass: 'btn btn-red',
+        profileClass: 'btn btn-red',
+        afterLogout: back || 'index.html'
+      });
+    }
+
+    initializeDataEditor(role, currentUser, currentProfile);
     initializeTeamEditor();
     renderTeamManagement(role, currentProfile);
+    renderProfileNavigation(role, back, currentView);
+    renderProfileHub(role, currentProfile, roleView, back);
+    applyProfileView(role, currentView);
 
-    document.getElementById('logoutBtn').addEventListener('click', () => {
-      if (window.siteAuth?.signOut) {
-        window.siteAuth.signOut({ redirect: back || 'index.html' });
-        return;
-      }
-      location.href = back || 'index.html';
-    });
-
-    document.title = `${view.name} | DM Football Georgia`;
+    const titleMap = {
+      overview: roleView.name,
+      data: 'მონაცემები',
+      status: 'სტატუსი',
+      team: role === 'parent' ? 'ბავშვის გუნდი' : 'გუნდი და ასაკობრივი',
+      portfolio: 'პორტფოლიო'
+    };
+    document.title = `${titleMap[currentView] || roleView.name} | Football Georgia`;
     showApp();
   }
 

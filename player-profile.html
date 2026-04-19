@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>მოთამაშის პროფილი | DM Football Georgia</title>
+  <title>მოთამაშის პროფილი | Football Georgia</title>
   <style>
     :root{
       --bg:#f4f7fb;
@@ -27,7 +27,7 @@
     }
     a{text-decoration:none;color:inherit}
     [hidden]{display:none !important}
-    .container{width:min(1160px,calc(100% - 32px));margin:0 auto}
+    .container{width:min(1220px,calc(100% - 36px));margin:0 auto}
     .header{
       position:sticky;
       top:0;
@@ -37,7 +37,7 @@
       border-bottom:1px solid var(--line);
     }
     .nav{
-      min-height:82px;
+      min-height:74px;
       display:flex;
       align-items:center;
       justify-content:space-between;
@@ -87,8 +87,8 @@
       display:inline-flex;
       align-items:center;
       justify-content:center;
-      min-height:50px;
-      padding:0 20px;
+      min-height:46px;
+      padding:0 18px;
       border-radius:999px;
       border:1px solid transparent;
       font-size:13px;
@@ -110,7 +110,7 @@
       border-color:var(--line);
     }
     .btn-white:hover{background:#eef2f6}
-    .page{padding:34px 0 70px}
+    .page{padding:28px 0 56px}
     .eyebrow{
       display:inline-flex;
       align-items:center;
@@ -130,8 +130,8 @@
     .profile-hero{
       display:grid;
       grid-template-columns:minmax(260px,340px) minmax(0,1fr);
-      gap:24px;
-      padding:26px;
+      gap:20px;
+      padding:22px;
       border-radius:var(--radius);
       background:#fff;
       border:1px solid var(--line);
@@ -141,7 +141,7 @@
       position:relative;
       border-radius:28px;
       overflow:hidden;
-      min-height:430px;
+      min-height:390px;
       background:linear-gradient(180deg,#e2e8f0 0%,#cbd5e1 100%);
     }
     .photo-wrap img{
@@ -172,14 +172,14 @@
     }
     h1{
       margin:0;
-      font-size:2.2rem;
+      font-size:2rem;
       line-height:1;
       letter-spacing:-.05em;
     }
     .lead{
       margin:0;
       color:var(--muted);
-      font-size:.96rem;
+      font-size:.92rem;
       line-height:1.75;
       max-width:760px;
     }
@@ -214,7 +214,7 @@
     .info-card,
     .note-card{
       border-radius:22px;
-      padding:18px;
+      padding:16px;
       background:var(--soft);
       border:1px solid rgba(15,23,42,.08);
     }
@@ -240,7 +240,7 @@
     }
     .panel{
       border-radius:28px;
-      padding:24px;
+      padding:20px;
       background:#fff;
       border:1px solid var(--line);
       box-shadow:var(--shadow);
@@ -323,14 +323,15 @@
     <div class="container nav">
       <a href="index.html" class="brand">
         <span class="logo">DM</span>
-        <span>DM Football Georgia</span>
+      <span>Football Georgia</span>
       </a>
       <nav class="nav-links">
         <a href="index.html">მთავარი</a>
         <a href="gundebi.html">გუნდები</a>
         <a href="pexburtelebi.html" class="active">ფეხბურთელები</a>
-        <a href="index.html#coaching">ქოუჩინგი</a>
-        <a href="index.html#camps">ბანაკები</a>
+        <a href="coaching.html">ქოუჩინგი</a>
+        <a href="banakebi.html">ბანაკები</a>
+        <a href="cxrilebi.html">ცხრილები</a>
       </nav>
       <div class="nav-actions" id="playerAuthNav">
         <a href="login.html?redirect=player-profile.html%23login#login" class="btn btn-white">შესვლა</a>
@@ -357,7 +358,7 @@
             <div class="info-grid" id="playerInfo"></div>
 
             <div class="action-row">
-              <a id="backLink" href="index.html" class="btn btn-white">უკან დაბრუნება</a>
+              <a id="backLink" href="user-profile.html?view=overview&from=player-profile.html" class="btn btn-white">პროფილი</a>
               <a href="pexburtelebi.html" class="btn btn-red">სხვა ფეხბურთელები</a>
             </div>
           </div>
@@ -413,9 +414,9 @@
     }
 
     if (player) {
-      document.title = `${player.name} | DM Football Georgia`;
+      document.title = `${player.name} | Football Georgia`;
       document.getElementById('playerView').hidden = false;
-      document.getElementById('backLink').href = backPath;
+      document.getElementById('backLink').href = 'user-profile.html?view=overview&from=player-profile.html';
       document.getElementById('playerImage').src = player.img;
       document.getElementById('playerImage').alt = player.name;
       document.getElementById('playerName').textContent = player.name;

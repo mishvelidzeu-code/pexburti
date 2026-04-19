@@ -3,24 +3,31 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ჩემი პროფილი | DM Football Georgia</title>
+  <title>ჩემი პროფილი | Football Georgia</title>
   <style>
-    :root{--bg:#f5f7fb;--panel:#fff;--soft:#f8fafc;--line:rgba(15,23,42,.12);--text:#111827;--muted:#667085;--red:#b91c1c;--red2:#991b1b;--black:#0f172a;--shadow:0 18px 42px rgba(15,23,42,.08);--r:26px;--rs:18px}
+    :root{--bg:#f5f7fb;--panel:#fff;--soft:#f8fafc;--line:rgba(15,23,42,.12);--text:#111827;--muted:#667085;--red:#b91c1c;--red2:#991b1b;--black:#0f172a;--shadow:0 18px 42px rgba(15,23,42,.08);--r:24px;--rs:16px}
     *{box-sizing:border-box} body{margin:0;font-family:"Segoe UI","Sylfaen","Noto Sans Georgian","DejaVu Sans",sans-serif;background:linear-gradient(180deg,#fff 0%,var(--bg) 20%,var(--bg) 100%);color:var(--text);overflow-x:hidden} a{text-decoration:none;color:inherit} button{font:inherit;cursor:pointer} [hidden]{display:none !important} #loading[hidden],#app[hidden]{display:none !important}
-    .container{width:min(1160px,calc(100% - 32px));margin:0 auto}.header{position:sticky;top:0;z-index:30;background:rgba(255,255,255,.94);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
-    .nav{min-height:88px;display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap}.brand{display:flex;align-items:center;gap:12px;font-weight:900;font-size:1.28rem;white-space:nowrap}.logo{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;background:#b91c1c;color:#fff;box-shadow:0 10px 22px rgba(185,28,28,.22);font-size:.92rem;line-height:1;letter-spacing:-.04em;text-transform:uppercase}
-    .links{display:flex;gap:24px;flex-wrap:wrap}.links a{font-weight:800;color:#475467}.links a:hover{color:var(--black)}.actions{display:flex;gap:12px;flex-wrap:wrap}.btn{display:inline-flex;align-items:center;justify-content:center;min-height:50px;padding:0 20px;border-radius:999px;border:1px solid transparent;font-weight:800;font-size:.95rem;transition:.2s}
-    .btn-white{background:#fff;border-color:var(--line);box-shadow:0 8px 24px rgba(15,23,42,.06)}.btn-white:hover{color:var(--red);border-color:rgba(185,28,28,.22)}.btn-red{background:linear-gradient(135deg,var(--red),#ef4444);color:#fff;box-shadow:0 14px 30px rgba(185,28,28,.24)}.btn-red:hover{background:linear-gradient(135deg,var(--red2),var(--red))}
-    .loading{min-height:100vh;display:grid;place-items:center;padding:24px}.loading .box,.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}.loading .box{width:min(440px,100%);padding:30px;text-align:center}.loading h1{margin:0 0 10px;font-size:1.7rem}.loading p{margin:0;color:var(--muted)}
-    .page{padding:32px 0 60px}.top{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:22px}.eyebrow{display:inline-flex;align-items:center;padding:11px 16px;border-radius:999px;background:#fff;border:1px solid var(--line);font-weight:800;color:var(--red)}
-    .hero{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(280px,.8fr);gap:22px}.card{padding:28px}.identity{display:flex;gap:18px;align-items:flex-start}.avatar{width:88px;height:88px;border-radius:24px;display:grid;place-items:center;background:linear-gradient(135deg,var(--black),#1f2937);color:#fff;font-size:1.9rem;font-weight:900;flex:0 0 auto}
-    h1{margin:0 0 10px;font-size:2.05rem;line-height:1.03;letter-spacing:-.04em}.lead,.copy,.mini span,.note span{color:var(--muted);line-height:1.6}.badges{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}.badge{padding:9px 14px;border-radius:999px;font-size:.84rem;font-weight:900}.badge.red{background:#fee2e2;color:var(--red)}.badge.gray{background:var(--soft);border:1px solid var(--line);color:var(--black)}
+    .container{width:min(1240px,calc(100% - 36px));margin:0 auto}.header{position:sticky;top:0;z-index:30;background:rgba(255,255,255,.95);backdrop-filter:blur(20px);border-bottom:1px solid var(--line)}
+    .nav{min-height:74px;display:flex;align-items:center;justify-content:space-between;gap:14px}.brand{display:flex;align-items:center;gap:12px;font-weight:800;font-size:1rem;letter-spacing:-.02em;white-space:nowrap;flex:0 0 auto}.logo{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;background:var(--red);color:#fff;box-shadow:0 8px 20px rgba(185,28,28,.25);font-size:.95rem;line-height:1;letter-spacing:-.02em;text-transform:uppercase}
+    .links{display:flex;align-items:center;justify-content:center;gap:clamp(12px,1.6vw,22px);flex:1 1 auto;min-width:0}.links a{position:relative;white-space:nowrap;font-weight:600;color:#667085;transition:color .2s;font-size:13px}.links a:hover,.links a.active{color:var(--black)}.links a.active::after{content:'';position:absolute;left:0;bottom:-6px;width:100%;height:2px;border-radius:2px;background:var(--red)}.actions{display:flex;gap:10px;flex-wrap:wrap}.header .actions{align-items:center;gap:10px;flex:0 0 auto;flex-wrap:nowrap}.btn{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0 18px;border-radius:999px;border:1px solid transparent;font-weight:800;font-size:13px;transition:.2s;white-space:nowrap}
+    .btn-white{background:#fff;border-color:var(--line);box-shadow:0 8px 24px rgba(15,23,42,.06)}.btn-white:hover{color:var(--red);border-color:rgba(185,28,28,.22)}.btn-red{background:var(--red);color:#fff;box-shadow:0 10px 20px rgba(185,28,28,.22)}.btn-red:hover{background:var(--red2)}
+    .loading{position:fixed;inset:0;min-height:100vh;display:grid;place-items:center;padding:24px;background:linear-gradient(180deg,#fff 0%,var(--bg) 100%);z-index:120}.loading .box,.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}.loading .box{width:min(400px,100%);padding:26px;text-align:center}.loading h1{margin:0 0 10px;font-size:1.55rem}.loading p{margin:0;color:var(--muted)}
+    .page{padding:28px 0 52px}.top{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:18px}.eyebrow{display:inline-flex;align-items:center;padding:10px 14px;border-radius:999px;background:#fff;border:1px solid var(--line);font-weight:800;color:var(--red)}
+    .hero{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(280px,.8fr);gap:18px}.card{padding:24px}.identity{display:flex;gap:16px;align-items:flex-start}.avatar{width:80px;height:80px;border-radius:22px;display:grid;place-items:center;overflow:hidden;background:linear-gradient(135deg,var(--black),#1f2937);color:#fff;font-size:1.7rem;font-weight:900;flex:0 0 auto}.avatar img{width:100%;height:100%;object-fit:cover}
+    h1{margin:0 0 10px;font-size:1.9rem;line-height:1.03;letter-spacing:-.04em}.lead,.copy,.mini span,.note span{color:var(--muted);line-height:1.6}.badges{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}.badge{padding:8px 12px;border-radius:999px;font-size:.8rem;font-weight:900}.badge.red{background:#fee2e2;color:var(--red)}.badge.gray{background:var(--soft);border:1px solid var(--line);color:var(--black)}
     .grid2,.stats{display:grid;gap:14px}.grid2{grid-template-columns:repeat(2,minmax(0,1fr));margin-top:20px}.tile,.info,.stat,.mini,.note{background:var(--soft);border:1px solid rgba(15,23,42,.08);border-radius:20px}.tile,.info,.stat{padding:16px 18px}.label{font-size:.82rem;font-weight:700;color:var(--muted);margin-bottom:8px}.value{font-size:1rem;font-weight:900;line-height:1.3}
-    .side h2,.section h2{margin:0 0 8px;font-size:1.28rem;letter-spacing:-.03em}.jump{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0}.jump a{padding:10px 14px;border-radius:999px;background:#fff;border:1px solid var(--line);font-weight:800;font-size:.84rem}.mini-list,.notes{display:grid;gap:12px}.mini,.note{padding:14px 16px}.mini strong,.note strong{display:block;margin-bottom:6px;font-size:.9rem}
-    .sections{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px;margin-top:22px}.portfolio{grid-column:1/-1}.info-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.info a{font-weight:900}.info a:hover{color:var(--red)}.stats{grid-template-columns:repeat(3,minmax(0,1fr))}.stat strong{display:block;font-size:1.6rem;line-height:1;margin-bottom:8px}
+    .side h2,.section h2{margin:0 0 8px;font-size:1.28rem;letter-spacing:-.03em}.jump{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 18px}.jump a{padding:10px 14px;border-radius:999px;background:#fff;border:1px solid var(--line);font-weight:800;font-size:.84rem;transition:.2s}.jump a:hover,.jump a.active{background:#fff1f2;border-color:rgba(185,28,28,.18);color:var(--red)}.mini-list,.notes{display:grid;gap:12px}.mini,.note{padding:14px 16px}.mini strong,.note strong{display:block;margin-bottom:6px;font-size:.9rem}
+    .overview-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin-top:18px}.overview-card{display:grid;gap:12px;padding:20px;border-radius:var(--r);background:linear-gradient(180deg,#fff 0%,var(--soft) 100%);border:1px solid var(--line);box-shadow:var(--shadow);transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease}.overview-card:hover{transform:translateY(-4px);box-shadow:0 24px 54px rgba(15,23,42,.12);border-color:rgba(185,28,28,.18)}.overview-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:14px}.overview-card-top strong{font-size:.98rem;line-height:1.3}.overview-card-kicker{display:inline-flex;align-items:center;padding:7px 11px;border-radius:999px;background:#fee2e2;color:var(--red);font-size:.74rem;font-weight:900}.overview-card-copy{color:var(--muted);line-height:1.6;font-size:.9rem}.overview-card-meta{display:flex;align-items:center;justify-content:space-between;gap:14px;font-weight:800;color:var(--black);font-size:.88rem}.overview-card-arrow{color:var(--red)}
+    .sections{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin-top:18px}.portfolio{grid-column:1/-1}.info-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.info a{font-weight:900}.info a:hover{color:var(--red)}.stats{grid-template-columns:repeat(3,minmax(0,1fr))}.stat strong{display:block;font-size:1.45rem;line-height:1;margin-bottom:8px}
+    .section-top{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:12px}
+    .section-copy{margin:0 0 18px}
+    .edit-panel{margin-top:18px;padding:20px;border-radius:22px;background:linear-gradient(180deg,#fff 0%,var(--soft) 100%);border:1px solid rgba(15,23,42,.08)}
+    .edit-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+    .file-box{display:grid;gap:10px;padding:14px;border-radius:18px;border:1px dashed rgba(185,28,28,.24);background:#fff}
+    .file-box input{padding:12px;border:1px solid var(--line);border-radius:14px;background:#fff}
     .port{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(260px,.9fr);gap:18px}.feature{padding:20px;border-radius:22px;background:linear-gradient(180deg,#fff 0%,var(--soft) 100%);border:1px solid rgba(15,23,42,.08)}.feature h3{margin:0 0 8px;font-size:1.06rem}.feature .actions{margin-top:18px}
     .team-manage{grid-column:1/-1}.team-panel{display:grid;grid-template-columns:minmax(0,1fr) minmax(260px,.9fr);gap:18px}.team-form{padding:20px;border-radius:22px;background:linear-gradient(180deg,#fff 0%,var(--soft) 100%);border:1px solid rgba(15,23,42,.08)}.team-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.form-group{display:grid;gap:10px}.form-label{font-size:.86rem;font-weight:800;color:var(--black)}.form-input{width:100%;min-height:50px;padding:0 16px;border-radius:16px;border:1px solid var(--line);background:#fff;color:var(--text);font-size:.95rem;outline:none}.form-input:focus{border-color:rgba(185,28,28,.35);box-shadow:0 0 0 4px rgba(185,28,28,.08)}.team-picker{position:relative}.team-suggestions{position:absolute;top:calc(100% + 8px);left:0;right:0;display:grid;gap:8px;padding:10px;background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:0 18px 42px rgba(15,23,42,.12);z-index:20}.team-option{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;border:none;border-radius:14px;background:var(--soft);text-align:left}.team-option:hover{background:#fff1f2}.team-option-main{display:grid;gap:4px}.team-option-main strong{font-size:.9rem}.team-option-main span{font-size:.82rem;color:var(--muted)}.team-option-tag{display:inline-flex;align-items:center;justify-content:center;min-width:54px;padding:6px 10px;border-radius:999px;background:#fee2e2;color:var(--red2);font-size:.72rem;font-weight:900}.form-hint{font-size:.84rem;color:var(--muted)}.form-status{margin-top:14px;padding:12px 14px;border-radius:16px;border:1px solid var(--line);background:#fff;color:var(--black);font-size:.86rem;font-weight:700}.form-status[data-state="success"]{border-color:rgba(22,163,74,.22);background:#f0fdf4;color:#166534}.form-status[data-state="error"]{border-color:rgba(185,28,28,.22);background:#fef2f2;color:#991b1b}.form-status[data-state="info"]{border-color:rgba(37,99,235,.18);background:#eff6ff;color:#1d4ed8}.team-actions{margin-top:16px}
-    @media (max-width:980px){.hero,.sections,.port,.stats,.team-panel,.team-form-grid{grid-template-columns:1fr}} @media (max-width:760px){.grid2,.info-grid{grid-template-columns:1fr}.identity{flex-direction:column}h1{font-size:1.8rem}.card{padding:22px}}
+    @media (max-width:1100px){.nav{min-height:auto;flex-wrap:wrap;padding:12px 0}.links{order:3;width:100%;flex-wrap:wrap}.header .actions{margin-left:auto}} @media (max-width:980px){.hero,.overview-grid,.sections,.port,.stats,.team-panel,.team-form-grid,.edit-grid{grid-template-columns:1fr}} @media (max-width:760px){.links{display:none}.grid2,.info-grid{grid-template-columns:1fr}.identity{flex-direction:column}h1{font-size:1.8rem}.card,.overview-card{padding:22px}.header .actions{width:auto;justify-content:flex-end}}
   </style>
 </head>
 <body>
@@ -28,14 +35,14 @@
   <div id="app" hidden>
     <header class="header">
       <div class="container nav">
-        <a href="index.html" class="brand"><span class="logo">DM</span><span>DM Football Georgia</span></a>
-        <nav class="links"><a href="index.html">მთავარი</a><a href="gundebi.html">გუნდები</a><a href="pexburtelebi.html">ფეხბურთელები</a><a href="index.html#coaching">ქოუჩინგი</a><a href="index.html#camps">ბანაკები</a></nav>
-        <div class="actions"><a id="backTop" href="index.html" class="btn btn-white">უკან დაბრუნება</a><button id="logoutBtn" type="button" class="btn btn-red">გასვლა</button></div>
+        <a href="index.html" class="brand"><span class="logo">DM</span><span>Football Georgia</span></a>
+        <nav class="links"><a href="index.html">მთავარი</a><a href="gundebi.html">გუნდები</a><a href="pexburtelebi.html">ფეხბურთელები</a><a href="coaching.html">ქოუჩინგი</a><a href="banakebi.html">ბანაკები</a><a href="cxrilebi.html">ცხრილები</a></nav>
+        <div class="actions" id="profileHeaderAuth"></div>
       </div>
     </header>
     <main class="page">
       <div class="container">
-        <div class="top"><div class="eyebrow" id="eyebrow">ციფრული პროფილი</div><a id="backContent" href="index.html" class="btn btn-white">წინა გვერდზე დაბრუნება</a></div>
+        <div class="top"><div class="eyebrow" id="eyebrow">ციფრული პროფილი</div></div>
         <section class="hero">
           <article class="card">
             <div class="identity">
@@ -49,14 +56,36 @@
             <div class="grid2" id="quick"></div>
           </article>
           <aside class="card side">
-            <h2>სწრაფი ნავიგაცია</h2>
-            <p class="copy" id="sideCopy">ამ გვერდიდან შეგიძლია ნახო ძირითადი მონაცემები და დაბრუნდე იმავე გვერდზე, საიდანაც გახსენი პროფილი.</p>
-            <div class="jump"><a href="#passport">პასპორტი</a><a href="#stats">სტატუსი</a><a href="#portfolio">პორტფოლიო</a></div>
+            <p class="copy" id="sideCopy">ამ გვერდიდან შეგიძლია გადახვიდე პროფილის სექციებს შორის და მართო შენი აქტიური ინფორმაცია.</p>
+            <div class="jump" id="profileNav"></div>
             <div class="mini-list" id="mini"></div>
           </aside>
         </section>
+        <section class="overview-grid" id="profileHub"></section>
         <section class="sections">
-          <article class="card section" id="passport"><h2>პასპორტი</h2><p class="copy">რეგისტრაციაში შევსებული მონაცემები სწორედ აქ აისახება.</p><div class="info-grid" id="passportGrid"></div></article>
+          <article class="card section" id="dataSection">
+            <div class="section-top">
+              <div>
+                <h2>მონაცემები</h2>
+                <p class="copy section-copy">აქ ჩანს რეგისტრაციისას შევსებული ინფორმაცია და აქედანვე შეგიძლია მისი რედაქტირებაც.</p>
+              </div>
+              <button id="editDataBtn" type="button" class="btn btn-white">რედაქტირება მონაცემების</button>
+            </div>
+            <div class="info-grid" id="dataGrid"></div>
+            <div class="edit-panel" id="dataEditPanel" hidden>
+              <div class="edit-grid" id="dataEditFields"></div>
+              <div class="file-box">
+                <label class="form-label" id="photoFieldLabel" for="photoInput">პირადი ფოტო</label>
+                <input id="photoInput" type="file" accept="image/*">
+                <div class="form-hint" id="photoHint">კვადრატული ფოტო საუკეთესოდ გამოჩნდება ფეხბურთელებისა და გუნდების ბარათებში.</div>
+              </div>
+              <div class="actions team-actions">
+                <button id="saveDataBtn" type="button" class="btn btn-red">შენახვა</button>
+                <button id="cancelDataBtn" type="button" class="btn btn-white">გაუქმება</button>
+              </div>
+              <div id="dataEditorStatus" class="form-status" data-state="info" hidden></div>
+            </div>
+          </article>
           <article class="card section" id="stats"><h2>სტატუსი</h2><p class="copy">ეს სექცია მზად არის მომავალი სტატისტიკის, პროგრესისა და რეიტინგებისთვის.</p><div class="stats" id="statsGrid"></div></article>
           <article class="card section team-manage" id="teamManage" hidden><h2 id="teamManageTitle">გუნდის მართვა</h2><p class="copy" id="teamManageCopy">აქედან შეცვლი გუნდს, გადაალაგებ ასაკობრივ კატეგორიას ან გააუქმებ მიმდინარე მიბმას.</p><div class="team-panel"><div class="team-form"><div class="team-form-grid"><div class="form-group"><label class="form-label" id="teamEditorLabel" for="teamEditorInput">აირჩიე გუნდი</label><div class="team-picker"><input id="teamEditorInput" class="form-input" type="text" autocomplete="off" spellcheck="false" placeholder="მაგ: დინამო თბილისი ან უგუნდოდ"><div id="teamEditorSuggestions" class="team-suggestions" hidden></div></div><div id="teamEditorHint" class="form-hint" data-default-helper="ჩაწერისას გამოჩნდება მსგავსი გუნდები. შეგიძლია აირჩიო დარეგისტრირებული გუნდი, მიუთითო უგუნდოდ ან ჩაწერო ახალი გუნდი.">ჩაწერისას გამოჩნდება მსგავსი გუნდები. შეგიძლია აირჩიო დარეგისტრირებული გუნდი, მიუთითო უგუნდოდ ან ჩაწერო ახალი გუნდი.</div></div><div class="form-group"><label class="form-label" for="ageGroupSelect">ასაკობრივი კატეგორია</label><select id="ageGroupSelect" class="form-input"></select><div id="ageGroupHint" class="form-hint" data-default-helper="ავტომატური რეჟიმი კატეგორიას მიმდინარე წლის 1 იანვრის ასაკით ითვლის. საჭიროების შემთხვევაში შეგიძლია ხელითაც შეცვალო.">ავტომატური რეჟიმი კატეგორიას მიმდინარე წლის 1 იანვრის ასაკით ითვლის. საჭიროების შემთხვევაში შეგიძლია ხელითაც შეცვალო.</div></div></div><div class="actions team-actions"><button id="saveTeamBtn" type="button" class="btn btn-red">შენახვა</button><button id="removeTeamBtn" type="button" class="btn btn-white">უგუნდოდ გადაყვანა</button></div><div id="teamEditorStatus" class="form-status" data-state="info" hidden></div></div><div class="notes" id="teamManageNotes"></div></div></article>
           <article class="card section portfolio" id="portfolio"><h2>პორტფოლიო და შემდეგი ნაბიჯები</h2><p class="copy">აქ დაგიგროვდება ვიდეო CV, გუნდის ბმები და მომავალი ფუნქციები.</p><div class="port"><div class="feature"><h3 id="portfolioTitle">პროფილის ცენტრი</h3><p class="copy" id="portfolioCopy">პროფილი უკვე შექმნილია და მზად არის დამატებითი ფუნქციებისთვის.</p><div class="actions" id="portfolioActions"></div></div><div class="notes" id="notes"></div></div></article>
