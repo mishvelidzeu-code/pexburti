@@ -925,11 +925,12 @@
     });
 
     document.title = `${view.name} | DM Football Georgia`;
-    document.getElementById('loading').hidden = true;
-    document.getElementById('app').hidden = false;
+    showApp();
   }
 
   init().catch((error) => {
+    showLoadingError(error?.message);
+    return;
     document.querySelector('#loading .box').innerHTML = `<h1>პროფილის ჩატვირთვა ვერ შესრულდა</h1><p>${esc(error?.message || 'სცადე ხელახლა შესვლა ან გვერდის განახლება.')}</p>`;
   });
 })();

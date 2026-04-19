@@ -146,9 +146,17 @@
     .logo{
       width:42px;
       height:42px;
-      display:block;
-      object-fit:contain;
-      flex:0 0 auto;
+      border-radius:14px;
+      display:grid;
+      place-items:center;
+      background:#b91c1c;
+      color:#fff;
+      font-weight:900;
+      font-size:.92rem;
+      line-height:1;
+      letter-spacing:-.04em;
+      text-transform:uppercase;
+      box-shadow:0 10px 24px rgba(185,28,28,.28);
     }
     .nav-links{
       display:flex;
@@ -234,6 +242,7 @@
     .phone-wrap{
       position:absolute;
       inset:6px 54px 6px 54px;
+      z-index:1;
       border-radius:42px;
       padding:14px;
       background:#fff;
@@ -290,8 +299,9 @@
       align-items:center;
       padding:7px 10px;
       border-radius:999px;
-      background:#fcb3b3;
-      color:#7f1d1d;
+      background:#fee2e2;
+      color:#991b1b;
+      border:1px solid rgba(185,28,28,.16);
       font-size:11px;
       font-weight:800;
       margin-bottom:12px;
@@ -326,22 +336,40 @@
       min-height:104px;
       border-radius:22px;
       padding:16px;
-      border:1px solid var(--line);
-      background:#fff;
+      border:1px solid rgba(185,28,28,.1);
+      background:linear-gradient(180deg,#ffffff 0%,#fff7f7 100%);
+      box-shadow:0 10px 24px rgba(15,23,42,.05);
     }
 
     .floating{
       position:absolute;
-      border-radius:22px;
-      padding:16px;
-      background:#fff;
-      border:1px solid var(--line);
-      box-shadow:var(--shadow);
+      z-index:4;
+      border-radius:24px;
+      padding:18px;
+      background:linear-gradient(180deg,rgba(255,255,255,.98) 0%,rgba(255,248,248,.96) 100%);
+      border:1px solid rgba(185,28,28,.12);
+      box-shadow:0 18px 38px rgba(15,23,42,.12);
+      backdrop-filter:blur(12px);
     }
-    .f1{top:8px;left:0;width:220px}
-    .f2{top:88px;right:0;width:196px}
-    .f3{bottom:16px;left:10px;width:228px}
-    .f4{bottom:42px;right:4px;width:214px}
+    .floating .pill{
+      background:#b91c1c;
+      color:#fff;
+      border-color:#b91c1c;
+      box-shadow:0 10px 20px rgba(185,28,28,.18);
+    }
+    .floating h3{
+      font-size:1.08rem;
+      line-height:1.08;
+      letter-spacing:-.03em;
+    }
+    .floating .small{
+      color:#4b5563;
+      line-height:1.5;
+    }
+    .f1{top:-8px;left:-18px;width:224px}
+    .f2{top:34px;right:-20px;width:202px}
+    .f3{bottom:118px;left:-34px;width:244px}
+    .f4{bottom:152px;right:-28px;width:228px}
 
     .weekly-preview{
       position:relative;
@@ -368,6 +396,207 @@
       color:var(--muted);
       font-size:.88rem;
       margin-top:10px;
+    }
+    .monthly-grid{
+      display:grid;
+      grid-template-columns:minmax(0,1.08fr) minmax(320px,.82fr);
+      gap:20px;
+      align-items:start;
+    }
+    .month-card{
+      border-radius:30px;
+      background:#fff;
+      border:1px solid var(--line);
+      box-shadow:var(--shadow);
+    }
+    .month-card-inner,
+    .month-card-summary{
+      padding:22px;
+    }
+    .month-label{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-height:38px;
+      padding:0 14px;
+      border-radius:999px;
+      background:#b91c1c;
+      color:#fff;
+      font-size:.76rem;
+      font-weight:900;
+      box-shadow:0 10px 20px rgba(185,28,28,.18);
+    }
+    .month-club-card{
+      background:linear-gradient(180deg,#fff 0%,#fff6f6 100%);
+    }
+    .month-club-top{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:18px;
+    }
+    .month-club-copy h3,
+    .month-card-summary h3{
+      font-size:1.42rem;
+      line-height:1.02;
+      letter-spacing:-.04em;
+      margin-top:12px;
+    }
+    .month-club-copy p,
+    .month-card-summary p{
+      color:var(--muted);
+      font-size:.9rem;
+      line-height:1.7;
+      margin-top:12px;
+    }
+    .month-club-badge{
+      width:78px;
+      height:78px;
+      border-radius:24px;
+      display:grid;
+      place-items:center;
+      background:linear-gradient(135deg,#b91c1c,#991b1b);
+      color:#fff;
+      font-size:1.45rem;
+      font-weight:950;
+      letter-spacing:-.05em;
+      box-shadow:0 20px 34px rgba(185,28,28,.24);
+      flex:0 0 auto;
+    }
+    .month-team-meta{
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:12px;
+      margin-top:20px;
+    }
+    .month-meta{
+      padding:14px 16px;
+      border-radius:20px;
+      background:#fff;
+      border:1px solid rgba(185,28,28,.1);
+    }
+    .month-meta span{
+      display:block;
+      color:var(--muted);
+      font-size:.74rem;
+      font-weight:800;
+      margin-bottom:8px;
+    }
+    .month-meta strong{
+      display:block;
+      font-size:1rem;
+      font-weight:900;
+      line-height:1.2;
+    }
+    .month-team-note{
+      margin-top:18px;
+      padding:16px 18px;
+      border-radius:22px;
+      background:#fff;
+      border:1px solid rgba(15,23,42,.08);
+      color:#475467;
+      font-size:.88rem;
+      line-height:1.65;
+    }
+    .month-card-actions{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-top:20px;
+    }
+    .month-squad-card{
+      overflow:hidden;
+    }
+    .month-squad-card summary{
+      list-style:none;
+      cursor:pointer;
+    }
+    .month-squad-card summary::-webkit-details-marker{
+      display:none;
+    }
+    .month-expand{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-height:36px;
+      padding:0 12px;
+      border-radius:999px;
+      background:#111827;
+      color:#fff;
+      font-size:.74rem;
+      font-weight:900;
+      margin-top:16px;
+    }
+    .month-mini-pitch{
+      position:relative;
+      min-height:148px;
+      margin-top:18px;
+      border-radius:24px;
+      overflow:hidden;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.08) 0%, rgba(255,255,255,0) 100%),
+        repeating-linear-gradient(
+          90deg,
+          rgba(255,255,255,.03) 0,
+          rgba(255,255,255,.03) 36px,
+          rgba(8,120,52,.08) 36px,
+          rgba(8,120,52,.08) 72px
+        ),
+        linear-gradient(180deg,#14913f 0%,#0f7a34 100%);
+      border:1px solid rgba(15,23,42,.12);
+    }
+    .month-mini-pitch::before{
+      content:"";
+      position:absolute;
+      inset:14px;
+      border:2px solid rgba(255,255,255,.28);
+      border-radius:18px;
+    }
+    .month-mini-dot{
+      position:absolute;
+      width:10px;
+      height:10px;
+      border-radius:50%;
+      background:#fff;
+      box-shadow:0 0 0 6px rgba(255,255,255,.12);
+    }
+    .month-mini-dot.gk{left:50%;bottom:14%;transform:translateX(-50%)}
+    .month-mini-dot.rb{left:18%;bottom:32%}
+    .month-mini-dot.rcb{left:38%;bottom:28%}
+    .month-mini-dot.lcb{left:62%;bottom:28%}
+    .month-mini-dot.lb{left:82%;bottom:32%}
+    .month-mini-dot.rcm{left:28%;top:42%}
+    .month-mini-dot.cm{left:50%;top:36%;transform:translateX(-50%)}
+    .month-mini-dot.lcm{left:72%;top:42%}
+    .month-mini-dot.rw{left:22%;top:18%}
+    .month-mini-dot.st{left:50%;top:10%;transform:translateX(-50%)}
+    .month-mini-dot.lw{left:78%;top:18%}
+    .month-squad-expanded{
+      display:none;
+      padding:0 22px 22px;
+    }
+    .month-squad-card[open] .month-squad-expanded{
+      display:grid;
+      gap:16px;
+    }
+    .month-squad-card[open] .month-card-summary{
+      padding-bottom:16px;
+      border-bottom:1px solid var(--line);
+    }
+    .month-squad-note{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:14px;
+      flex-wrap:wrap;
+    }
+    .month-squad-note p{
+      margin:0;
+      color:var(--muted);
+      font-size:.86rem;
+    }
+    .month-squad-expanded .weekly-pitch{
+      min-height:520px;
     }
     .weekly-pitch{
       position:relative;
@@ -733,6 +962,8 @@
       .stats-bar{grid-template-columns:1fr}
       .hero-side{min-height:470px}
       .phone-wrap{inset:14px 30px 10px}
+      .monthly-grid{grid-template-columns:1fr}
+      .month-team-meta{grid-template-columns:repeat(3,minmax(0,1fr))}
       .weekly-preview{margin-top:-72px}
       .weekly-pitch{min-height:560px}
       .pitch-player{width:88px}
@@ -767,6 +998,9 @@
       .phone-wrap{inset:18px 10px}
       .floating{display:none}
       .weekly-head{flex-direction:column}
+      .month-club-top,
+      .month-squad-note{flex-direction:column}
+      .month-team-meta{grid-template-columns:1fr}
       .weekly-preview{margin-top:-28px}
       .weekly-pitch{min-height:560px}
       .pitch-player{width:74px}
@@ -784,7 +1018,7 @@
   <header class="header">
     <div class="container nav">
       <a href="index.html" class="brand">
-        <img src="logo.webp" alt="DM Football Georgia" class="logo">
+        <span class="logo">DM</span>
         <span>DM Football Georgia</span>
       </a>
 
@@ -831,8 +1065,8 @@
             <span class="small">მოთამაშე იყენებს ფეხბურთის განვითარების სისტემას</span>
           </div>
           <div class="stat">
-            <strong>4.8/5</strong>
-            <span class="small">მაღალი შეფასება მოთამაშეებისგან</span>
+            <strong>9.1/10</strong>
+            <span class="small">მაღალი შეფასება მოთამაშეებისა და მშობლებისგან</span>
           </div>
           <div class="stat">
             <strong>Pro Mindset</strong>
@@ -845,7 +1079,7 @@
         <div class="floating f1">
           <div class="pill">დღის გეგმა</div>
           <h3 style="margin-top:10px;">სრული სესია მზადაა</h3>
-          <p class="small" style="margin-top:8px;">ბურთის კონტროლი, სკანინგი, mindset.</p>
+          <p class="small" style="margin-top:8px;">ბურთის კონტროლი, სკანინგი, მენტალობა.</p>
         </div>
 
         <div class="floating f2">
@@ -876,12 +1110,12 @@
                   <p class="small" style="margin-top:8px;">პასი, პირველი შეხება, დრიბლინგი, დარტყმა</p>
                 </div>
                 <div class="mini-card">
-                  <div class="tag">Game IQ</div>
+                  <div class="tag">თამაშის IQ</div>
                   <h3>ტაქტიკა</h3>
                   <p class="small" style="margin-top:8px;">სივრცე, პოზიციონირება, გადაწყვეტილება</p>
                 </div>
                 <div class="mini-card">
-                  <div class="tag">Mindset</div>
+                  <div class="tag">მენტალობა</div>
                   <h3>ფსიქოლოგია</h3>
                   <p class="small" style="margin-top:8px;">სტაბილურობა, სიმშვიდე, თავდაჯერებულობა</p>
                 </div>
@@ -902,13 +1136,13 @@
         </div>
 
         <div class="floating f3">
-          <div class="pill">Masterclass</div>
+          <div class="pill">მასტერკლასი</div>
           <h3 style="margin-top:10px;">იდეალური ვინგერი</h3>
           <p class="small" style="margin-top:8px;">1v1, ფინალური ფაზა, დროის კონტროლი.</p>
         </div>
 
         <div class="floating f4">
-          <div class="pill">Exposure</div>
+          <div class="pill">გამოჩენა</div>
           <h3 style="margin-top:10px;">აჩვენე შენი თავი</h3>
           <p class="small" style="margin-top:8px;">შეფასება, ბანაკები, კარიერული ხედვა.</p>
         </div>
@@ -918,117 +1152,167 @@
 
   <section class="weekly-preview">
     <div class="container">
-      <div class="weekly-card">
-        <div class="weekly-head">
-          <div>
-            <div class="eyebrow" style="margin-bottom:10px;">კვირის გუნდი</div>
-            <h3 style="font-size:1.45rem;">სიმბოლური 11-ეული ერთ ფანჯარაში</h3>
-            <p class="weekly-lead">
-              კვირის საუკეთესო არჩევანი ასაკის შეზღუდვის გარეშე. აქ ერთ symbolic XI-ში ერთად იყრის თავს
-              გამორჩეული ფორმა, ლიდერობა და შედეგი.
-            </p>
+      <div class="monthly-grid">
+        <article class="month-card month-club-card">
+          <div class="month-card-inner">
+            <div class="month-club-top">
+              <div class="month-club-copy">
+                <div class="month-label">საუკეთესო თვის გუნდი</div>
+                <h3>დინამო თბილისი</h3>
+                <p>აპრილის საუკეთესო გუნდად ავირჩიეთ დინამო თბილისი: სტაბილური შედეგი, მაღალი ინტენსივობა და გამორჩეული ასაკობრივი სტრუქტურა.</p>
+              </div>
+              <div class="month-club-badge">DM</div>
+            </div>
+
+            <div class="month-team-meta">
+              <div class="month-meta">
+                <span>ფორმა</span>
+                <strong>9 მოგება</strong>
+              </div>
+              <div class="month-meta">
+                <span>ბურთები</span>
+                <strong>24:7</strong>
+              </div>
+              <div class="month-meta">
+                <span>გამორჩეული</span>
+                <strong>U17 + U14</strong>
+              </div>
+            </div>
+
+            <div class="month-team-note">
+              გუნდმა ამ თვეში განსაკუთრებით მოიგო მაღალი პრესინგით, კარგი გარდაქმნით შეტევაში და რამდენიმე ასაკობრივი ჯგუფის ერთდროული პროგრესით.
+            </div>
+
+            <div class="month-card-actions">
+              <a href="team-dinamo-tbilisi.html" class="btn btn-primary">გუნდის გვერდი</a>
+              <a href="gundebi.html" class="btn btn-secondary">სხვა გუნდები</a>
+            </div>
           </div>
-          <div class="pill">ფორმაცია 4-3-3</div>
-        </div>
+        </article>
 
-        <div class="weekly-pitch">
-          <div class="pitch-circle"></div>
-          <div class="pitch-box top"></div>
-          <div class="pitch-box bottom"></div>
+        <details class="month-card month-squad-card">
+          <summary class="month-card-summary">
+            <div class="month-label">თვის გუნდი</div>
+            <h3>სიმბოლური 11-ეული</h3>
+            <p>მარჯვენა ბარათი ახლა პატარაა. დააკლიკე და გახსენი თვის სრული 4-3-3 შემადგენლობა მოთამაშეების ფოტოებით.</p>
+            <span class="month-expand">დაკლიკე გასადიდებლად</span>
 
-          <a class="pitch-player gk" href="player-profile.html?player=6&from=index.html" aria-label="გიორგი მამარდაშვილი">
-            <img src="https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?auto=format&fit=crop&w=300&h=400&q=80" alt="გიორგი მამარდაშვილი">
-            <div class="pitch-badge">
-              <strong>გიორგი მამარდაშვილი</strong>
-              <span>GK • U17</span>
+            <div class="month-mini-pitch">
+              <span class="month-mini-dot gk"></span>
+              <span class="month-mini-dot rb"></span>
+              <span class="month-mini-dot rcb"></span>
+              <span class="month-mini-dot lcb"></span>
+              <span class="month-mini-dot lb"></span>
+              <span class="month-mini-dot rcm"></span>
+              <span class="month-mini-dot cm"></span>
+              <span class="month-mini-dot lcm"></span>
+              <span class="month-mini-dot rw"></span>
+              <span class="month-mini-dot st"></span>
+              <span class="month-mini-dot lw"></span>
             </div>
-          </a>
+          </summary>
 
-          <a class="pitch-player rb" href="player-profile.html?player=7&from=index.html" aria-label="ოთარ კაკაბაძე">
-            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&h=400&q=80" alt="ოთარ კაკაბაძე">
-            <div class="pitch-badge">
-              <strong>ოთარ კაკაბაძე</strong>
-              <span>RB • U12</span>
+          <div class="month-squad-expanded">
+            <div class="month-squad-note">
+              <p>თვის სიმბოლური 11-ეული დალაგებულია 4-3-3-ზე. თითოეულ მოთამაშეზე კლიკით იხსნება მისი საკუთარი გვერდი.</p>
+              <div class="pill">ფორმაცია 4-3-3</div>
             </div>
-          </a>
 
-          <a class="pitch-player rcb" href="player-profile.html?player=8&from=index.html" aria-label="გურამ კაშია">
-            <img src="https://images.unsplash.com/photo-1528892952291-009c663ce843?auto=format&fit=crop&w=300&h=400&q=80" alt="გურამ კაშია">
-            <div class="pitch-badge">
-              <strong>გურამ კაშია</strong>
-              <span>CB • U11</span>
+            <div class="weekly-pitch">
+              <div class="pitch-circle"></div>
+              <div class="pitch-box top"></div>
+              <div class="pitch-box bottom"></div>
+
+              <a class="pitch-player gk" href="player-profile.html?player=6&from=index.html" aria-label="გიორგი მამარდაშვილი">
+                <img src="https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?auto=format&fit=crop&w=300&h=400&q=80" alt="გიორგი მამარდაშვილი">
+                <div class="pitch-badge">
+                  <strong>გიორგი მამარდაშვილი</strong>
+                  <span>GK • U17</span>
+                </div>
+              </a>
+
+              <a class="pitch-player rb" href="player-profile.html?player=7&from=index.html" aria-label="ოთარ კაკაბაძე">
+                <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&h=400&q=80" alt="ოთარ კაკაბაძე">
+                <div class="pitch-badge">
+                  <strong>ოთარ კაკაბაძე</strong>
+                  <span>RB • U12</span>
+                </div>
+              </a>
+
+              <a class="pitch-player rcb" href="player-profile.html?player=8&from=index.html" aria-label="გურამ კაშია">
+                <img src="https://images.unsplash.com/photo-1528892952291-009c663ce843?auto=format&fit=crop&w=300&h=400&q=80" alt="გურამ კაშია">
+                <div class="pitch-badge">
+                  <strong>გურამ კაშია</strong>
+                  <span>CB • U11</span>
+                </div>
+              </a>
+
+              <a class="pitch-player lcb" href="player-profile.html?player=15&from=index.html" aria-label="ლაშა დვალი">
+                <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=300&h=400&q=80" alt="ლაშა დვალი">
+                <div class="pitch-badge">
+                  <strong>ლაშა დვალი</strong>
+                  <span>CB • U17</span>
+                </div>
+              </a>
+
+              <a class="pitch-player lb" href="player-profile.html?player=28&from=index.html" aria-label="ირაკლი აზაროვი">
+                <img src="https://images.unsplash.com/photo-1510566337590-2fc1f21d0faa?auto=format&fit=crop&w=300&h=400&q=80" alt="ირაკლი აზაროვი">
+                <div class="pitch-badge">
+                  <strong>ირაკლი აზაროვი</strong>
+                  <span>LB • U14</span>
+                </div>
+              </a>
+
+              <a class="pitch-player rcm" href="player-profile.html?player=26&from=index.html" aria-label="ჯაბა კანკავა">
+                <img src="https://images.unsplash.com/photo-1543326727-cf6c39e8f84c?auto=format&fit=crop&w=300&h=400&q=80" alt="ჯაბა კანკავა">
+                <div class="pitch-badge">
+                  <strong>ჯაბა კანკავა</strong>
+                  <span>CM • U15</span>
+                </div>
+              </a>
+
+              <a class="pitch-player cm" href="player-profile.html?player=17&from=index.html" aria-label="ანზორ მექვაბიშვილი">
+                <img src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=300&h=400&q=80" alt="ანზორ მექვაბიშვილი">
+                <div class="pitch-badge">
+                  <strong>ანზორ მექვაბიშვილი</strong>
+                  <span>CM • U12</span>
+                </div>
+              </a>
+
+              <a class="pitch-player lcm" href="player-profile.html?player=10&from=index.html" aria-label="გიორგი ჩაკვეტაძე">
+                <img src="https://images.unsplash.com/photo-1480455624313-e29b44bbfde1?auto=format&fit=crop&w=300&h=400&q=80" alt="გიორგი ჩაკვეტაძე">
+                <div class="pitch-badge">
+                  <strong>გიორგი ჩაკვეტაძე</strong>
+                  <span>AM • U9</span>
+                </div>
+              </a>
+
+              <a class="pitch-player rw" href="player-profile.html?player=2&from=index.html" aria-label="ხვიჩა კვარაცხელია">
+                <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=300&h=400&q=80" alt="ხვიჩა კვარაცხელია">
+                <div class="pitch-badge">
+                  <strong>ხვიჩა კვარაცხელია</strong>
+                  <span>RW • U16</span>
+                </div>
+              </a>
+
+              <a class="pitch-player st" href="player-profile.html?player=1&from=index.html" aria-label="გიორგი მიქაუტაძე">
+                <img src="https://images.unsplash.com/photo-1543326727-cf6c39e8f84c?auto=format&fit=crop&w=300&h=400&q=80" alt="გიორგი მიქაუტაძე">
+                <div class="pitch-badge">
+                  <strong>გიორგი მიქაუტაძე</strong>
+                  <span>ST • U17</span>
+                </div>
+              </a>
+
+              <a class="pitch-player lw" href="player-profile.html?player=5&from=index.html" aria-label="ზურიკო დავითაშვილი">
+                <img src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=300&h=400&q=80" alt="ზურიკო დავითაშვილი">
+                <div class="pitch-badge">
+                  <strong>ზურიკო დავითაშვილი</strong>
+                  <span>LW • U13</span>
+                </div>
+              </a>
             </div>
-          </a>
-
-          <a class="pitch-player lcb" href="player-profile.html?player=15&from=index.html" aria-label="ლაშა დვალი">
-            <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=300&h=400&q=80" alt="ლაშა დვალი">
-            <div class="pitch-badge">
-              <strong>ლაშა დვალი</strong>
-              <span>CB • U17</span>
-            </div>
-          </a>
-
-          <a class="pitch-player lb" href="player-profile.html?player=28&from=index.html" aria-label="ირაკლი აზაროვი">
-            <img src="https://images.unsplash.com/photo-1510566337590-2fc1f21d0faa?auto=format&fit=crop&w=300&h=400&q=80" alt="ირაკლი აზაროვი">
-            <div class="pitch-badge">
-              <strong>ირაკლი აზაროვი</strong>
-              <span>LB • U14</span>
-            </div>
-          </a>
-
-          <a class="pitch-player rcm" href="player-profile.html?player=26&from=index.html" aria-label="ჯაბა კანკავა">
-            <img src="https://images.unsplash.com/photo-1543326727-cf6c39e8f84c?auto=format&fit=crop&w=300&h=400&q=80" alt="ჯაბა კანკავა">
-            <div class="pitch-badge">
-              <strong>ჯაბა კანკავა</strong>
-              <span>CM • U15</span>
-            </div>
-          </a>
-
-          <a class="pitch-player cm" href="player-profile.html?player=17&from=index.html" aria-label="ანზორ მექვაბიშვილი">
-            <img src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=300&h=400&q=80" alt="ანზორ მექვაბიშვილი">
-            <div class="pitch-badge">
-              <strong>ანზორ მექვაბიშვილი</strong>
-              <span>CM • U12</span>
-            </div>
-          </a>
-
-          <a class="pitch-player lcm" href="player-profile.html?player=10&from=index.html" aria-label="გიორგი ჩაკვეტაძე">
-            <img src="https://images.unsplash.com/photo-1480455624313-e29b44bbfde1?auto=format&fit=crop&w=300&h=400&q=80" alt="გიორგი ჩაკვეტაძე">
-            <div class="pitch-badge">
-              <strong>გიორგი ჩაკვეტაძე</strong>
-              <span>AM • U9</span>
-            </div>
-          </a>
-
-          <a class="pitch-player rw" href="player-profile.html?player=2&from=index.html" aria-label="ხვიჩა კვარაცხელია">
-            <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=300&h=400&q=80" alt="ხვიჩა კვარაცხელია">
-            <div class="pitch-badge">
-              <strong>ხვიჩა კვარაცხელია</strong>
-              <span>RW • U16</span>
-            </div>
-          </a>
-
-          <a class="pitch-player st" href="player-profile.html?player=1&from=index.html" aria-label="გიორგი მიქაუტაძე">
-            <img src="https://images.unsplash.com/photo-1543326727-cf6c39e8f84c?auto=format&fit=crop&w=300&h=400&q=80" alt="გიორგი მიქაუტაძე">
-            <div class="pitch-badge">
-              <strong>გიორგი მიქაუტაძე</strong>
-              <span>ST • U17</span>
-            </div>
-          </a>
-
-          <a class="pitch-player lw" href="player-profile.html?player=5&from=index.html" aria-label="ზურიკო დავითაშვილი">
-            <img src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=300&h=400&q=80" alt="ზურიკო დავითაშვილი">
-            <div class="pitch-badge">
-              <strong>ზურიკო დავითაშვილი</strong>
-              <span>LW • U13</span>
-            </div>
-          </a>
-        </div>
-
-        <div class="weekly-legend">
-          <span>მწვანე მოედანზე დალაგებული 4-3-3 სიმბოლური 11-ეული. თითოეულ მოთამაშეზე კლიკით იხსნება მისი გვერდი.</span>
-          <span>ასაკობრივი ტეგი გვერდზევე ჩანს: U17, U14, U9 და სხვა.</span>
-        </div>
+          </div>
+        </details>
       </div>
     </div>
   </section>
@@ -1369,7 +1653,7 @@
       <div class="footer-grid">
         <div>
           <a href="index.html" class="brand" style="display:inline-flex;margin-bottom:14px;">
-            <img src="logo.webp" alt="DM Football Georgia" class="logo">
+            <span class="logo">DM</span>
             <span>DM Football Georgia</span>
           </a>
           <p class="small">

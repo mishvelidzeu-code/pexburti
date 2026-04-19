@@ -53,11 +53,19 @@
       letter-spacing:-.03em;
     }
     .logo{
-      width:58px;
-      height:58px;
-      display:block;
-      object-fit:contain;
-      flex:0 0 auto;
+      width:42px;
+      height:42px;
+      display:grid;
+      place-items:center;
+      border-radius:14px;
+      background:#b91c1c;
+      color:#fff;
+      box-shadow:0 10px 24px rgba(185,28,28,.28);
+      font-weight:900;
+      font-size:.92rem;
+      line-height:1;
+      letter-spacing:-.04em;
+      text-transform:uppercase;
     }
     .nav-links{
       display:flex;
@@ -314,7 +322,7 @@
   <header class="header">
     <div class="container nav">
       <a href="index.html" class="brand">
-        <img src="logo.webp" alt="DM Football Georgia" class="logo">
+        <span class="logo">DM</span>
         <span>DM Football Georgia</span>
       </a>
       <nav class="nav-links">
