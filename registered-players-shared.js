@@ -241,20 +241,20 @@
 
   function mapPublicPlayer(player) {
     return sanitizeCandidate({
-      key: `public-player:${player.id || player.user_id}`,
-      playerId: player.id || '',
-      userId: player.auth_user_id || player.user_id || player.owner_user_id || '',
-      roleSource: player.owner_role || 'player',
-      fullName: player.full_name || player.display_name,
-      age: player.current_age ?? player.age,
-      ageCat: String(player.age_group || 'pro').trim().toLowerCase(),
-      foot: player.preferred_foot,
-      positionLabel: player.position_label,
-      team: player.club_name || player.current_club_name,
-      photo: player.avatar_path,
-      votes: Number(player.votes_count || 0) || 0,
-      source: 'supabase',
-      registeredAt: player.updated_at || player.created_at || new Date().toISOString()
+      key: `public-player:${player.id || player.user_id || player.userId || player.sourceKey || normalizeText(player.full_name || player.fullName || player.display_name || player.displayName)}`,
+      playerId: player.id || player.playerId || '',
+      userId: player.auth_user_id || player.authUserId || player.user_id || player.userId || player.owner_user_id || player.ownerUserId || '',
+      roleSource: player.owner_role || player.ownerRole || 'player',
+      fullName: player.full_name || player.fullName || player.display_name || player.displayName,
+      age: player.current_age ?? player.currentAge ?? player.age,
+      ageCat: String(player.age_group || player.ageGroup || player.ageCat || 'pro').trim().toLowerCase(),
+      foot: player.preferred_foot || player.foot,
+      positionLabel: player.position_label || player.positionLabel,
+      team: player.club_name || player.clubName || player.current_club_name || player.currentClubName || player.team,
+      photo: player.avatar_path || player.photo,
+      votes: Number(player.votes_count || player.votesCount || player.votes || 0) || 0,
+      source: player.source || 'supabase',
+      registeredAt: player.updated_at || player.updatedAt || player.created_at || player.createdAt || new Date().toISOString()
     });
   }
 
