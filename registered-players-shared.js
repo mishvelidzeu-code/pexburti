@@ -1,5 +1,27 @@
 (function () {
   const DIRECTORY_KEY = 'mfg-registered-player-directory-v1';
+  const SEEDED_AVATAR_BY_NAME = {
+    'giorgi mikeladze': 'seed-avatars/avatar-01.svg',
+    'luka beridze': 'seed-avatars/avatar-02.svg',
+    'nika kapanadze': 'seed-avatars/avatar-03.svg',
+    'saba janelidze': 'seed-avatars/avatar-04.svg',
+    'data gelashvili': 'seed-avatars/avatar-05.svg',
+    'giga chikvaidze': 'seed-avatars/avatar-01.svg',
+    'andria tsereteli': 'seed-avatars/avatar-02.svg',
+    'mate abashidze': 'seed-avatars/avatar-03.svg',
+    'ilia nemsadze': 'seed-avatars/avatar-04.svg',
+    'sandro kharadze': 'seed-avatars/avatar-05.svg',
+    'nikoloz mchedlishvili': 'seed-avatars/avatar-06.svg',
+    'sandro kiknadze': 'seed-avatars/avatar-07.svg',
+    'giorgi basilashvili': 'seed-avatars/avatar-08.svg',
+    'luka gogoladze': 'seed-avatars/avatar-09.svg',
+    'dato zviadauri': 'seed-avatars/avatar-10.svg',
+    'mate odisharia': 'seed-avatars/avatar-06.svg',
+    'nika kharshiladze': 'seed-avatars/avatar-07.svg',
+    'saba shonia': 'seed-avatars/avatar-08.svg',
+    'andria mestvirishvili': 'seed-avatars/avatar-09.svg',
+    'ilia sulava': 'seed-avatars/avatar-10.svg'
+  };
 
   function normalizeText(value) {
     return String(value || '')
@@ -58,6 +80,16 @@
     return String(value || '').trim();
   }
 
+  function resolveSeedAvatar(fullName, existingPhoto) {
+    const cleanPhoto = String(existingPhoto || '').trim();
+    if (cleanPhoto) {
+      return cleanPhoto;
+    }
+
+    const mapped = SEEDED_AVATAR_BY_NAME[normalizeText(fullName)];
+    return mapped || '';
+  }
+
   function resolveAge(value, birthDate) {
     const ageFromBirthDate = window.siteAgeGroups?.calculateActualAgeFromBirthDate
       ? window.siteAgeGroups.calculateActualAgeFromBirthDate(birthDate)
@@ -114,7 +146,7 @@
       position: String(candidate.position || '').trim(),
       positionLabel: String(candidate.positionLabel || candidate.position || 'არ არის მითითებული').trim(),
       team: String(candidate.team || 'უგუნდოდ').trim() || 'უგუნდოდ',
-      photo: String(candidate.photo || '').trim(),
+      photo: resolveSeedAvatar(fullName, candidate.photo),
       votes: Number(candidate.votes || 0) || 0,
       source: String(candidate.source || 'local').trim(),
       registeredAt: String(candidate.registeredAt || new Date().toISOString()).trim()

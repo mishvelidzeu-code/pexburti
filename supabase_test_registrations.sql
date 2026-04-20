@@ -550,6 +550,62 @@ from public.player_registry pr
 where pr.owner_user_id in (select user_id from seed_auth_accounts)
 on conflict (player_id) do nothing;
 
+with seeded_avatars(full_name, avatar_path) as (
+  values
+    ('Giorgi Mikeladze', 'seed-avatars/avatar-01.svg'),
+    ('Luka Beridze', 'seed-avatars/avatar-02.svg'),
+    ('Nika Kapanadze', 'seed-avatars/avatar-03.svg'),
+    ('Saba Janelidze', 'seed-avatars/avatar-04.svg'),
+    ('Data Gelashvili', 'seed-avatars/avatar-05.svg'),
+    ('Giga Chikvaidze', 'seed-avatars/avatar-01.svg'),
+    ('Andria Tsereteli', 'seed-avatars/avatar-02.svg'),
+    ('Mate Abashidze', 'seed-avatars/avatar-03.svg'),
+    ('Ilia Nemsadze', 'seed-avatars/avatar-04.svg'),
+    ('Sandro Kharadze', 'seed-avatars/avatar-05.svg'),
+    ('Nikoloz Mchedlishvili', 'seed-avatars/avatar-06.svg'),
+    ('Sandro Kiknadze', 'seed-avatars/avatar-07.svg'),
+    ('Giorgi Basilashvili', 'seed-avatars/avatar-08.svg'),
+    ('Luka Gogoladze', 'seed-avatars/avatar-09.svg'),
+    ('Dato Zviadauri', 'seed-avatars/avatar-10.svg'),
+    ('Mate Odisharia', 'seed-avatars/avatar-06.svg'),
+    ('Nika Kharshiladze', 'seed-avatars/avatar-07.svg'),
+    ('Saba Shonia', 'seed-avatars/avatar-08.svg'),
+    ('Andria Mestvirishvili', 'seed-avatars/avatar-09.svg'),
+    ('Ilia Sulava', 'seed-avatars/avatar-10.svg')
+),
+updated_registry as (
+  update public.player_registry pr
+  set avatar_path = sa.avatar_path
+  from seeded_avatars sa
+  where lower(pr.full_name) = lower(sa.full_name)
+    and pr.owner_user_id in (select user_id from seed_auth_accounts)
+  returning pr.owner_user_id, pr.owner_role, pr.avatar_path
+)
+update public.player_profiles pp
+set avatar_path = ur.avatar_path
+from updated_registry ur
+where ur.owner_role = 'player'
+  and pp.user_id = ur.owner_user_id;
+
+with seeded_avatars(full_name, avatar_path) as (
+  values
+    ('Nikoloz Mchedlishvili', 'seed-avatars/avatar-06.svg'),
+    ('Sandro Kiknadze', 'seed-avatars/avatar-07.svg'),
+    ('Giorgi Basilashvili', 'seed-avatars/avatar-08.svg'),
+    ('Luka Gogoladze', 'seed-avatars/avatar-09.svg'),
+    ('Dato Zviadauri', 'seed-avatars/avatar-10.svg'),
+    ('Mate Odisharia', 'seed-avatars/avatar-06.svg'),
+    ('Nika Kharshiladze', 'seed-avatars/avatar-07.svg'),
+    ('Saba Shonia', 'seed-avatars/avatar-08.svg'),
+    ('Andria Mestvirishvili', 'seed-avatars/avatar-09.svg'),
+    ('Ilia Sulava', 'seed-avatars/avatar-10.svg')
+)
+update public.parent_profiles pp
+set child_avatar_path = sa.avatar_path
+from seeded_avatars sa
+where lower(pp.child_full_name) = lower(sa.full_name)
+  and pp.user_id in (select user_id from seed_auth_accounts where app_role = 'parent');
+
 select
   p.email,
   p.role,

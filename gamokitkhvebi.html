@@ -79,7 +79,6 @@
     }
     .poll-layout {
       display:grid;
-      grid-template-columns:minmax(0,1.15fr) minmax(320px,.85fr);
       gap:24px;
       align-items:start;
     }
@@ -90,6 +89,9 @@
       background:#fff;
       border:1px solid var(--line);
       box-shadow:var(--shadow-sm);
+    }
+    .poll-top-panel {
+      order:-1;
     }
     .poll-section-head {
       display:flex;
@@ -104,7 +106,7 @@
     }
     .poll-results-grid {
       display:grid;
-      grid-template-columns:repeat(2,minmax(0,1fr));
+      grid-template-columns:repeat(4,minmax(0,1fr));
       gap:16px;
     }
     .poll-empty {
@@ -117,13 +119,15 @@
       line-height:1.75;
     }
     .poll-card {
-      display:grid;
-      gap:16px;
-      padding:18px;
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+      padding:14px;
       border-radius:22px;
       background:var(--bg-alt);
       border:1px solid var(--line);
       transition:.25s ease;
+      min-height:100%;
     }
     .poll-card:hover {
       transform:translateY(-4px);
@@ -131,27 +135,54 @@
       box-shadow:var(--shadow-hover);
     }
     .poll-card-head {
-      display:flex;
+      display:grid;
+      gap:12px;
+    }
+    .poll-card-media {
+      position:relative;
+      overflow:hidden;
+      border-radius:18px;
+      aspect-ratio:4/5;
+      background:linear-gradient(180deg,#e2e8f0 0%,#cbd5e1 100%);
+    }
+    .poll-rank-chip {
+      position:absolute;
+      top:10px;
+      left:10px;
+      z-index:2;
+      min-width:34px;
+      height:34px;
+      padding:0 10px;
+      border-radius:999px;
+      display:inline-flex;
       align-items:center;
-      gap:14px;
+      justify-content:center;
+      background:rgba(15,23,42,.82);
+      color:#fff;
+      font-size:.78rem;
+      font-weight:900;
+      box-shadow:0 10px 20px rgba(15,23,42,.16);
     }
     .poll-avatar {
-      width:72px;
-      height:72px;
-      border-radius:22px;
+      width:100%;
+      height:100%;
+      border-radius:0;
       object-fit:cover;
+      overflow:hidden;
+      display:block;
       background:#e2e8f0;
+    }
+    .poll-avatar-fallback {
       display:grid;
       place-items:center;
       color:#0f172a;
       font-weight:900;
-      font-size:1.15rem;
-      flex:0 0 auto;
-      overflow:hidden;
+      font-size:2rem;
     }
     .poll-card-copy h3 {
-      font-size:1.05rem;
-      margin-bottom:6px;
+      font-size:.98rem;
+      margin-bottom:8px;
+      line-height:1.3;
     }
     .poll-meta {
       display:flex;
@@ -175,6 +206,7 @@
       justify-content:space-between;
       gap:14px;
       flex-wrap:wrap;
+      margin-top:auto;
     }
     .poll-count {
       display:inline-flex;
@@ -200,7 +232,8 @@
     }
     .poll-top-list {
       display:grid;
-      gap:12px;
+      grid-template-columns:repeat(5,minmax(0,1fr));
+      gap:16px;
     }
     .poll-rank-card {
       display:grid;
@@ -241,10 +274,11 @@
       white-space:nowrap;
     }
     @media (max-width:1080px) {
-      .poll-layout,
-      .poll-hero-grid,
       .poll-results-grid {
-        grid-template-columns:1fr;
+        grid-template-columns:repeat(3,minmax(0,1fr));
+      }
+      .poll-top-list {
+        grid-template-columns:repeat(3,minmax(0,1fr));
       }
       .poll-section-head .small {
         text-align:left;
@@ -257,16 +291,9 @@
       .poll-top-panel {
         padding:22px 18px;
       }
-      .poll-stat-grid {
-        grid-template-columns:1fr;
-      }
-      .poll-card-head {
-        align-items:flex-start;
-      }
-      .poll-avatar {
-        width:64px;
-        height:64px;
-        border-radius:18px;
+      .poll-results-grid,
+      .poll-top-list {
+        grid-template-columns:repeat(2,minmax(0,1fr));
       }
       .poll-rank-card {
         grid-template-columns:auto 1fr;
@@ -511,10 +538,11 @@
         return `<img src="${escapeHtml(candidate.photo)}" alt="${escapeHtml(candidate.fullName)}" class="poll-avatar">`;
       }
 
-      return `<div class="poll-avatar">${escapeHtml(getInitials(candidate.fullName))}</div>`;
+      return `<div class="poll-avatar poll-avatar-fallback">${escapeHtml(getInitials(candidate.fullName))}</div>`;
     }
 
-    function createCandidateCard(candidate) {
+    function createCandidateCard(candidate, options) {
+      const settings = options || {};
       const meta = formatCandidateMeta(candidate);
       const voteCount = getVoteCountForCandidate(candidate);
       const voted = hasCurrentUserVoted(candidate);
@@ -525,10 +553,17 @@
           ? (voted ? 'ხმა მიცემულია' : 'ხმის მიცემა')
           : 'შესვლა და ხმა';
 
+      const rankMarkup = settings.rank
+        ? `<span class="poll-rank-chip">#${settings.rank}</span>`
+        : '';
+
       return `
         <article class="poll-card">
           <div class="poll-card-head">
-            ${createAvatarMarkup(candidate)}
+            <div class="poll-card-media">
+              ${rankMarkup}
+              ${createAvatarMarkup(candidate)}
+            </div>
             <div class="poll-card-copy">
               <h3>${escapeHtml(candidate.fullName)}</h3>
               <div class="poll-meta">
@@ -589,16 +624,20 @@
       resultsMeta.textContent = `ნაპოვნია ${matches.length} ფეხბურთელი`;
     }
 
-    function renderTopTen() {
+    function updateCounters() {
+      candidatesCount.textContent = String(registeredCandidates.length);
+      votesCount.textContent = String(registeredCandidates.reduce(function (sum, candidate) {
+        return sum + getVoteCountForCandidate(candidate);
+      }, 0));
+    }
+
+    function renderTopTenCards() {
       const ranked = registeredCandidates
         .map(function (candidate) {
           return {
             ...candidate,
             votes: getVoteCountForCandidate(candidate)
           };
-        })
-        .filter(function (candidate) {
-          return candidate.votes > 0;
         })
         .sort(function (a, b) {
           if (b.votes !== a.votes) {
@@ -609,34 +648,13 @@
         .slice(0, 10);
 
       if (!ranked.length) {
-        topList.innerHTML = '<div class="poll-empty">ტოპ 10 გამოჩნდება მას შემდეგ, რაც რეგისტრირებული ფეხბურთელები და მათი ხმები დაემატება.</div>';
+        topList.innerHTML = '<div class="poll-empty">ტოპ 10 გამოჩნდება მას შემდეგ, რაც რეგისტრირებული ფეხბურთელები დაემატება.</div>';
         return;
       }
 
       topList.innerHTML = ranked.map(function (candidate, index) {
-        const meta = [
-          candidate.ageLabel || '',
-          candidate.positionLabel || ''
-        ].filter(Boolean).join(' • ');
-
-        return `
-          <article class="poll-rank-card">
-            <div class="poll-rank">${index + 1}</div>
-            <div class="poll-rank-copy">
-              <strong>${escapeHtml(candidate.fullName)}</strong>
-              <span>${escapeHtml(meta || candidate.team || 'რეგისტრირებული კანდიდატი')}</span>
-            </div>
-            <div class="poll-rank-votes">${candidate.votes} ხმა</div>
-          </article>
-        `;
+        return createCandidateCard(candidate, { rank: index + 1 });
       }).join('');
-    }
-
-    function updateCounters() {
-      candidatesCount.textContent = String(registeredCandidates.length);
-      votesCount.textContent = String(registeredCandidates.reduce(function (sum, candidate) {
-        return sum + getVoteCountForCandidate(candidate);
-      }, 0));
     }
 
     async function loadCurrentUser() {
@@ -703,8 +721,9 @@
       }
 
       if (hasCurrentUserVoted(candidate)) {
+        setPollHelper('ამ ფეხბურთელზე ხმა უკვე მიცემული გაქვს.');
         renderSearchResults();
-        renderTopTen();
+        renderTopTenCards();
         return;
       }
 
@@ -718,15 +737,34 @@
         return;
       }
 
+      if (voteResult.reason === 'duplicate') {
+        currentUserVotes.add(String(candidate.playerId));
+        setPollHelper('ამ ფეხბურთელზე ხმა უკვე მიცემული გაქვს.');
+        await loadCandidates();
+        updateCounters();
+        renderSearchResults();
+        renderTopTenCards();
+        return;
+      }
+
       currentUserVotes.add(String(candidate.playerId));
       await loadCandidates();
       setPollHelper('ხმა წარმატებით დაფიქსირდა.');
       updateCounters();
       renderSearchResults();
-      renderTopTen();
+      renderTopTenCards();
     }
 
     resultsGrid.addEventListener('click', function (event) {
+      const button = event.target.closest('[data-candidate-key]');
+      if (!button) {
+        return;
+      }
+
+      handleVote(button.getAttribute('data-candidate-key'));
+    });
+
+    topList.addEventListener('click', function (event) {
       const button = event.target.closest('[data-candidate-key]');
       if (!button) {
         return;
@@ -753,7 +791,7 @@
       setPollHelper('');
       updateCounters();
       renderSearchResults();
-      renderTopTen();
+      renderTopTenCards();
     }
 
     init();
