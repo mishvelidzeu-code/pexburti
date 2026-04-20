@@ -638,7 +638,7 @@
         <div class="hero-stats">
           <div class="hero-stat">
             <strong>20</strong>
-            <span>სატესტო გუნდი</span>
+            <span>დარეგისტრირებული გუნდი</span>
           </div>
           <div class="hero-stat">
             <strong>14</strong>
@@ -738,7 +738,7 @@
   <script src="auth-shared.js"></script>
   <script src="supabase-clubs-shared.js"></script>
   <script src="supabase-site-data.js"></script>
-  <script>
+  <script type="application/json" id="legacy-gundebi-static" hidden>
     const teams = window.siteTeams?.getTeams ? window.siteTeams.getTeams() : [
       { mark: 'DT', name: 'დინამო თბილისი', city: 'თბილისი, საქართველო', age: 'pro', ageLabel: 'PRO', players: 24, coach: 'გ. აბრამიძე' },
       { mark: 'TQ', name: 'ტორპედო ქუთაისი', city: 'ქუთაისი, საქართველო', age: 'pro', ageLabel: 'PRO', players: 23, coach: 'ლ. კალანდაძე' },
@@ -875,6 +875,17 @@
   <script>
     (async function () {
       const client = window.siteAuth?.getClient ? window.siteAuth.getClient() : null;
+      if (window.siteAuth?.renderAuthNav) {
+        window.siteAuth.renderAuthNav('#teamsAuthNav', {
+          currentPath: 'gundebi.html',
+          loginClass: 'btn btn-white',
+          registerClass: 'btn btn-red',
+          profileClass: 'btn btn-red',
+          logoutClass: 'btn btn-white',
+          afterLogout: 'gundebi.html'
+        });
+      }
+
       if (!client || !window.siteData?.fetchPublicClubs) {
         return;
       }
@@ -885,9 +896,12 @@
       }
 
       const teamsGrid = document.getElementById('teamsGrid');
+      const searchInput = document.querySelector('.search-input');
+      const filterButtons = document.querySelectorAll('.filter-btn');
       const resultCount = document.querySelector('[data-result-count]');
       const heroStats = document.querySelectorAll('.hero-stat strong');
       const leadNode = document.querySelector('.hero .lead');
+      let activeFilter = 'all';
 
       function escapeHtml(value) {
         return String(value || '')
@@ -918,7 +932,7 @@
             <div class="team-top">
               <div class="team-emblem">${createDynamicEmblem(club)}</div>
               <div class="team-head">
-                <div class="team-badge">Supabase გუნდი</div>
+                <div class="team-badge">დარეგისტრირებული გუნდი</div>
                 <h3 class="team-name"><a href="${route}">${escapeHtml(club.name)}</a></h3>
                 <div class="team-location">${escapeHtml(club.location || 'საქართველო')}</div>
               </div>
@@ -936,15 +950,46 @@
         `;
       }).join('');
 
-      if (resultCount) {
-        resultCount.textContent = `ნაპოვნია: ${clubs.length} გუნდი`;
+      function applyFilters() {
+        const term = String(searchInput?.value || '').trim().toLowerCase();
+        const cards = teamsGrid.querySelectorAll('.team-card');
+        let visible = 0;
+
+        cards.forEach(function (card) {
+          const matchesSearch = String(card.dataset.search || '').includes(term);
+          const matchesFilter = activeFilter === 'all' || card.dataset.age === activeFilter;
+          const show = matchesSearch && matchesFilter;
+          card.hidden = !show;
+          if (show) visible += 1;
+        });
+
+        if (resultCount) {
+          resultCount.textContent = `ნაპოვნია: ${visible} გუნდი`;
+        }
       }
+
+      filterButtons.forEach(function (button) {
+        button.addEventListener('click', function () {
+          filterButtons.forEach(function (item) {
+            item.classList.remove('active');
+          });
+          button.classList.add('active');
+          activeFilter = button.dataset.filter;
+          applyFilters();
+        });
+      });
+
+      if (searchInput) {
+        searchInput.addEventListener('input', applyFilters);
+      }
+
+      applyFilters();
 
       if (leadNode) {
         const uniqueCities = new Set(clubs.map(function (club) {
           return String(club.city || '').trim();
         }).filter(Boolean));
-        leadNode.textContent = `ეს გვერდი ახლა სრულად კითხულობს Supabase-ში არსებულ კლუბებს. გამოჩნდება მხოლოდ რეალური გუნდები, მათი აქტიური მოთამაშეების რაოდენობა და გუნდთან დაკავშირებული საჯარო ინფორმაცია.`;
+        leadNode.textContent = `აქ ჩანს მხოლოდ რეალური, დარეგისტრირებული გუნდები, მათი აქტიური მოთამაშეების რაოდენობა და გუნდთან დაკავშირებული საჯარო ინფორმაცია.`;
         if (heroStats[0]) heroStats[0].textContent = String(clubs.length);
         if (heroStats[1]) heroStats[1].textContent = String(uniqueCities.size);
         if (heroStats[2]) {
@@ -952,8 +997,9 @@
             return String(club.ageLabel || 'PRO');
           })).size);
         }
-        if (heroStats[3]) heroStats[3].textContent = 'Supabase';
+        if (heroStats[3]) heroStats[3].textContent = 'ცოცხალი ბაზა';
       }
+
     })();
   </script>
 </body>

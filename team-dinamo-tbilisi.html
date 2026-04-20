@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>დინამო თბილისი | Football Georgia</title>
-  <meta name="description" content="დინამო თბილისის სატესტო გუნდის გვერდი Football Georgia-ზე.">
+  <title>გუნდის გვერდი | Football Georgia</title>
+  <meta name="description" content="გუნდის საჯარო გვერდი Football Georgia-ზე.">
   <style>
     :root{
       --bg:#ffffff;
@@ -613,11 +613,11 @@
   <section class="hero">
     <div class="container hero-grid">
       <div>
-        <div class="eyebrow">სატესტო გუნდის გვერდი</div>
+        <div class="eyebrow">გუნდის გვერდი</div>
         <h1 id="teamName">დინამო თბილისი</h1>
         <p class="lead">
-          ეს არის სატესტო გუნდური პროფილი. თუ მოთამაშის რეგისტრაციაში აირჩიე ზუსტად
-          <strong>დინამო თბილისი</strong>, ეს გვერდი მას უკვე დაკავშირებულ მოთამაშედ აჩვენებს.
+          ამ გვერდზე ჩანს კლუბის საჯარო ინფორმაცია, ასაკობრივი ჯგუფები და მასთან
+          დაკავშირებული ფეხბურთელები.
         </p>
 
         <div class="hero-actions">
@@ -650,13 +650,13 @@
           <div class="shield">DT</div>
           <div>
             <strong>დინამო თბილისი</strong>
-            <span>სატესტო გუნდის პროფილი Football Georgia-ზე</span>
+            <span>გუნდის საჯარო პროფილი Football Georgia-ზე</span>
           </div>
         </div>
 
         <ul class="quick-list">
           <li><span>სტატუსი</span><strong>დარეგისტრირებული გუნდი</strong></li>
-          <li><span>გვერდის ტიპი</span><strong>სატესტო ინტეგრაცია</strong></li>
+          <li><span>გვერდის ტიპი</span><strong>საჯარო გუნდის პროფილი</strong></li>
           <li><span>მიბმის ლოგიკა</span><strong>რეგისტრაციიდან ზუსტი დამთხვევა</strong></li>
           <li><span>მომავალი ნაბიჯი</span><strong>რეალური roster და DB ბმა</strong></li>
         </ul>
@@ -739,7 +739,7 @@
 <script src="age-groups-shared.js"></script>
 <script src="supabase-domain-shared.js"></script>
 <script src="auth-shared.js"></script>
-  <script>
+<script type="application/json" id="legacy-team-static" hidden>
     const fallbackTeam = {
       mark: 'DT',
       name: 'დინამო თბილისი',
@@ -1342,7 +1342,7 @@
       document.getElementById('teamCoach').textContent = club.coach || 'არ არის მითითებული';
 
       if (leadNode) {
-        leadNode.innerHTML = `${escapeHtml(club.name)}-ის გუნდის გვერდი ახლა სრულად იკითხება Supabase-იდან. შემადგენლობა, ასაკობრივი ჯგუფები და მოთამაშეების ბარათები პირდაპირ მოდის საჯარო მონაცემებიდან.`;
+        leadNode.innerHTML = `${escapeHtml(club.name)}-ის გუნდის გვერდზე ჩანს გუნდის საჯარო ინფორმაცია, ასაკობრივი ჯგუფები და მასთან დაკავშირებული ფეხბურთელები.`;
       }
       if (shieldNode) {
         if (club.logoPath) {
@@ -1355,7 +1355,7 @@
         badgeStrong.textContent = club.name;
       }
       if (badgeSpan) {
-        badgeSpan.textContent = 'Supabase-ზე მიბმული გუნდის საჯარო გვერდი';
+        badgeSpan.textContent = 'გუნდის საჯარო გვერდი Football Georgia-ზე';
       }
       if (quickList) {
         quickList.innerHTML = `
