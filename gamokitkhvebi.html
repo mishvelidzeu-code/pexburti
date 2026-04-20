@@ -21,12 +21,18 @@
       font-size:1.3rem;
       font-weight:900;
     }
+    
+    /* Search Panel & Dropdown Styles */
     .poll-search-panel {
       padding:34px 32px;
       border-radius:28px;
       background:#fff;
       border:1px solid var(--line);
       box-shadow:var(--shadow);
+    }
+    .poll-search-wrapper {
+      position: relative;
+      z-index: 100;
     }
     .poll-search-shell {
       display:flex;
@@ -37,6 +43,11 @@
       background:var(--bg-alt);
       border:1px solid var(--line);
       margin-top:22px;
+      transition: box-shadow 0.2s;
+    }
+    .poll-search-shell:focus-within {
+      box-shadow: 0 0 0 3px rgba(185,28,28,.15);
+      border-color: var(--red);
     }
     .poll-search-shell input {
       width:100%;
@@ -50,6 +61,23 @@
       color:var(--muted);
       font-size:1rem;
     }
+    
+    /* Dropdown ფანჯარა */
+    .poll-search-dropdown {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      margin-top: 12px;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      box-shadow: 0 20px 40px rgba(15,23,42,0.15);
+      padding: 24px;
+      max-height: 500px;
+      overflow-y: auto;
+    }
+    
     .poll-helper {
       margin-top:16px;
       color:var(--muted);
@@ -77,21 +105,13 @@
       background:var(--red);
       box-shadow:0 0 0 4px rgba(185,28,28,.12);
     }
-    .poll-layout {
-      display:grid;
-      gap:24px;
-      align-items:start;
-    }
-    .poll-results-panel,
+    
     .poll-top-panel {
       padding:28px;
       border-radius:28px;
       background:#fff;
       border:1px solid var(--line);
       box-shadow:var(--shadow-sm);
-    }
-    .poll-top-panel {
-      order:-1;
     }
     .poll-section-head {
       display:flex;
@@ -100,13 +120,11 @@
       gap:16px;
       margin-bottom:18px;
     }
-    .poll-section-head .small {
-      max-width:260px;
-      text-align:right;
-    }
+    
+    /* Grid-ები და ბარათები */
     .poll-results-grid {
       display:grid;
-      grid-template-columns:repeat(4,minmax(0,1fr));
+      grid-template-columns:repeat(2,minmax(0,1fr));
       gap:16px;
     }
     .poll-empty {
@@ -219,8 +237,28 @@
       font-size:.8rem;
       font-weight:800;
     }
+    .poll-actions-group {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .profile-link-btn {
+      display: inline-flex;
+      align-items: center;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: #f1f5f9;
+      color: #0f172a;
+      font-size: .8rem;
+      font-weight: 700;
+      text-decoration: none;
+      transition: .2s;
+    }
+    .profile-link-btn:hover {
+      background: #e2e8f0;
+    }
     .poll-vote-button {
-      min-width:150px;
+      min-width:130px;
     }
     .poll-vote-button.is-voted,
     .poll-vote-button[disabled] {
@@ -235,71 +273,20 @@
       grid-template-columns:repeat(5,minmax(0,1fr));
       gap:16px;
     }
-    .poll-rank-card {
-      display:grid;
-      grid-template-columns:auto minmax(0,1fr) auto;
-      align-items:center;
-      gap:14px;
-      padding:14px 16px;
-      border-radius:20px;
-      background:var(--bg-alt);
-      border:1px solid var(--line);
-    }
-    .poll-rank {
-      width:40px;
-      height:40px;
-      display:grid;
-      place-items:center;
-      border-radius:14px;
-      background:linear-gradient(135deg,#b91c1c 0%,#991b1b 100%);
-      color:#fff;
-      font-weight:900;
-      font-size:.95rem;
-    }
-    .poll-rank-copy strong {
-      display:block;
-      font-size:.95rem;
-      line-height:1.25;
-    }
-    .poll-rank-copy span {
-      display:block;
-      margin-top:4px;
-      color:var(--muted);
-      font-size:.8rem;
-    }
-    .poll-rank-votes {
-      font-size:.88rem;
-      font-weight:900;
-      color:var(--red-2);
-      white-space:nowrap;
-    }
+    
     @media (max-width:1080px) {
-      .poll-results-grid {
-        grid-template-columns:repeat(3,minmax(0,1fr));
-      }
       .poll-top-list {
         grid-template-columns:repeat(3,minmax(0,1fr));
-      }
-      .poll-section-head .small {
-        text-align:left;
-        max-width:none;
       }
     }
     @media (max-width:760px) {
       .poll-search-panel,
-      .poll-results-panel,
       .poll-top-panel {
         padding:22px 18px;
       }
-      .poll-results-grid,
-      .poll-top-list {
-        grid-template-columns:repeat(2,minmax(0,1fr));
-      }
-      .poll-rank-card {
-        grid-template-columns:auto 1fr;
-      }
-      .poll-rank-votes {
-        grid-column:2;
+      .poll-top-list,
+      .poll-results-grid {
+        grid-template-columns:repeat(1,minmax(0,1fr));
       }
     }
   </style>
@@ -372,10 +359,21 @@
       <div class="poll-search-panel">
         <div class="eyebrow">გამოკითხვები</div>
         <h2>მოძებნე ფეხბურთელი და მიეცი ხმა</h2>
-        <div class="poll-search-shell">
-          <span>⌕</span>
-          <input id="pollSearchInput" type="search" placeholder="მაგ: გიორგი მიქაუტაძე" autocomplete="off" />
+        
+        <div class="poll-search-wrapper" id="searchWrapper">
+          <div class="poll-search-shell">
+            <span>⌕</span>
+            <input id="pollSearchInput" type="search" placeholder="მაგ: გიორგი მიქაუტაძე" autocomplete="off" />
+          </div>
+
+          <div id="pollResultsDropdown" class="poll-search-dropdown" hidden>
+            <div id="pollResultsState" class="poll-empty">
+              ჩაწერე ფეხბურთელის სახელი ან გვარი.
+            </div>
+            <div class="poll-results-grid" id="pollResultsGrid" hidden></div>
+          </div>
         </div>
+
         <div class="poll-helper" id="pollSearchHelper">
           ჩაწერე სახელი ან გვარი. თუ მსგავსი ფეხბურთელი არ არის რეგისტრირებული, აქვე გამოჩნდება შესაბამისი შეტყობინება.
         </div>
@@ -384,24 +382,7 @@
   </section>
 
   <section class="section">
-    <div class="container poll-layout">
-      <div class="poll-results-panel">
-        <div class="poll-section-head">
-          <div>
-            <div class="eyebrow">შედეგები</div>
-            <h2>საძიებო შედეგები</h2>
-          </div>
-          <p class="small" id="pollResultsMeta">ჯერ არაფერი ეძებება.</p>
-        </div>
-
-        <div id="pollResultsState" class="poll-empty">
-          ჩაწერე ფეხბურთელის სახელი ან გვარი. თუ მსგავსი ფეხბურთელი არ არის რეგისტრირებული,
-          აქ დაიწერება შესაბამისი შეტყობინება.
-        </div>
-
-        <div class="poll-results-grid" id="pollResultsGrid" hidden></div>
-      </div>
-
+    <div class="container">
       <aside class="poll-top-panel">
         <div class="poll-section-head">
           <div>
@@ -459,10 +440,11 @@
   <script>
     const searchInput = document.getElementById('pollSearchInput');
     const searchHelper = document.getElementById('pollSearchHelper');
+    const dropdown = document.getElementById('pollResultsDropdown');
     const resultsGrid = document.getElementById('pollResultsGrid');
     const resultsState = document.getElementById('pollResultsState');
-    const resultsMeta = document.getElementById('pollResultsMeta');
     const topList = document.getElementById('pollTopList');
+    const searchWrapper = document.getElementById('searchWrapper');
     const candidatesCount = document.getElementById('pollCandidatesCount');
     const votesCount = document.getElementById('pollVotesCount');
 
@@ -471,12 +453,7 @@
     let currentUserVotes = new Set();
 
     function escapeHtml(value) {
-      return String(value || '')
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
+      return String(value || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
     }
 
     function normalizeText(value) {
@@ -486,25 +463,12 @@
     }
 
     function setPollHelper(message) {
-      if (!searchHelper) {
-        return;
-      }
-      if (!message) {
-        searchHelper.textContent = 'ჩაწერე სახელი ან გვარი. თუ მსგავსი ფეხბურთელი არ არის რეგისტრირებული, აქვე გამოჩნდება შესაბამისი შეტყობინება.';
-        return;
-      }
-      searchHelper.textContent = message;
+      if (!searchHelper) return;
+      searchHelper.textContent = message || 'ჩაწერე სახელი ან გვარი. თუ მსგავსი ფეხბურთელი არ არის რეგისტრირებული, აქვე გამოჩნდება შესაბამისი შეტყობინება.';
     }
 
     function getInitials(name) {
-      return String(name || 'FG')
-        .split(/\s+/)
-        .filter(Boolean)
-        .slice(0, 2)
-        .map(function (part) {
-          return part.charAt(0).toUpperCase();
-        })
-        .join('') || 'FG';
+      return String(name || 'FG').split(/\s+/).filter(Boolean).slice(0, 2).map(part => part.charAt(0).toUpperCase()).join('') || 'FG';
     }
 
     function getVoteCountForCandidate(candidate) {
@@ -517,15 +481,9 @@
 
     function formatCandidateMeta(candidate) {
       const meta = [];
-      if (candidate.ageLabel) {
-        meta.push(candidate.age ? `${candidate.ageLabel} • ${candidate.age} წ.` : candidate.ageLabel);
-      }
-      if (candidate.positionLabel && candidate.positionLabel !== 'არ არის მითითებული') {
-        meta.push(candidate.positionLabel);
-      }
-      if (candidate.team) {
-        meta.push(candidate.team);
-      }
+      if (candidate.ageLabel) meta.push(candidate.age ? `${candidate.ageLabel} • ${candidate.age} წ.` : candidate.ageLabel);
+      if (candidate.positionLabel && candidate.positionLabel !== 'არ არის მითითებული') meta.push(candidate.positionLabel);
+      if (candidate.team) meta.push(candidate.team);
       return meta;
     }
 
@@ -533,7 +491,6 @@
       if (candidate.photo) {
         return `<img src="${escapeHtml(candidate.photo)}" alt="${escapeHtml(candidate.fullName)}" class="poll-avatar">`;
       }
-
       return `<div class="poll-avatar poll-avatar-fallback">${escapeHtml(getInitials(candidate.fullName))}</div>`;
     }
 
@@ -549,8 +506,11 @@
           ? (voted ? 'ხმა მიცემულია' : 'ხმის მიცემა')
           : 'შესვლა და ხმა';
 
-      const rankMarkup = settings.rank
-        ? `<span class="poll-rank-chip">#${settings.rank}</span>`
+      const rankMarkup = settings.rank ? `<span class="poll-rank-chip">#${settings.rank}</span>` : '';
+      
+      const profileHref = `player.html?id=${escapeHtml(candidate.playerId)}`;
+      const profileButton = votable 
+        ? `<a href="${profileHref}" class="profile-link-btn">პროფილი ⇾</a>` 
         : '';
 
       return `
@@ -563,20 +523,21 @@
             <div class="poll-card-copy">
               <h3>${escapeHtml(candidate.fullName)}</h3>
               <div class="poll-meta">
-                ${meta.map(function (item) {
-                  return `<span class="poll-badge">${escapeHtml(item)}</span>`;
-                }).join('')}
+                ${meta.map(item => `<span class="poll-badge">${escapeHtml(item)}</span>`).join('')}
               </div>
             </div>
           </div>
           <div class="poll-vote-row">
             <span class="poll-count">${voteCount} ხმა</span>
-            <button
-              type="button"
-              class="btn btn-secondary poll-vote-button${voted ? ' is-voted' : ''}"
-              data-candidate-key="${escapeHtml(candidate.key)}"
-              ${(votable && !voted) ? '' : 'disabled'}
-            >${buttonLabel}</button>
+            <div class="poll-actions-group">
+              ${profileButton}
+              <button
+                type="button"
+                class="btn btn-secondary poll-vote-button${voted ? ' is-voted' : ''}"
+                data-candidate-key="${escapeHtml(candidate.key)}"
+                ${(votable && !voted) ? '' : 'disabled'}
+              >${buttonLabel}</button>
+            </div>
           </div>
         </article>
       `;
@@ -584,18 +545,13 @@
 
     function renderSearchResults() {
       const term = normalizeText(searchInput.value);
-      const totalCandidates = registeredCandidates.length;
 
       if (!term) {
-        resultsGrid.hidden = true;
-        resultsGrid.innerHTML = '';
-        resultsState.hidden = false;
-        resultsState.textContent = 'ჩაწერე ფეხბურთელის სახელი ან გვარი. თუ მსგავსი ფეხბურთელი არ არის რეგისტრირებული, აქვე დაიწერება შესაბამისი შეტყობინება.';
-        resultsMeta.textContent = totalCandidates
-          ? `საძიებო ველი ელოდება ჩაწერას. ხელმისაწვდომია ${totalCandidates} რეგისტრირებული კანდიდატი.`
-          : 'ჯერ რეგისტრირებული ფეხბურთელი არ მოიძებნა.';
+        dropdown.hidden = true;
         return;
       }
+
+      dropdown.hidden = false;
 
       const matches = registeredCandidates.filter(function (candidate) {
         return normalizeText([
@@ -610,35 +566,24 @@
         resultsGrid.innerHTML = '';
         resultsState.hidden = false;
         resultsState.textContent = 'მსგავსი ფეხბურთელი არ არის დარეგისტრირებული.';
-        resultsMeta.textContent = '0 შედეგი';
         return;
       }
 
       resultsState.hidden = true;
       resultsGrid.hidden = false;
       resultsGrid.innerHTML = matches.map(createCandidateCard).join('');
-      resultsMeta.textContent = `ნაპოვნია ${matches.length} ფეხბურთელი`;
     }
 
     function updateCounters() {
-      candidatesCount.textContent = String(registeredCandidates.length);
-      votesCount.textContent = String(registeredCandidates.reduce(function (sum, candidate) {
-        return sum + getVoteCountForCandidate(candidate);
-      }, 0));
+      if(candidatesCount) candidatesCount.textContent = String(registeredCandidates.length);
+      if(votesCount) votesCount.textContent = String(registeredCandidates.reduce((sum, candidate) => sum + getVoteCountForCandidate(candidate), 0));
     }
 
     function renderTopTenCards() {
       const ranked = registeredCandidates
-        .map(function (candidate) {
-          return {
-            ...candidate,
-            votes: getVoteCountForCandidate(candidate)
-          };
-        })
-        .sort(function (a, b) {
-          if (b.votes !== a.votes) {
-            return b.votes - a.votes;
-          }
+        .map(candidate => ({ ...candidate, votes: getVoteCountForCandidate(candidate) }))
+        .sort((a, b) => {
+          if (b.votes !== a.votes) return b.votes - a.votes;
           return normalizeText(a.fullName).localeCompare(normalizeText(b.fullName), 'ka');
         })
         .slice(0, 10);
@@ -648,17 +593,12 @@
         return;
       }
 
-      topList.innerHTML = ranked.map(function (candidate, index) {
-        return createCandidateCard(candidate, { rank: index + 1 });
-      }).join('');
+      topList.innerHTML = ranked.map((candidate, index) => createCandidateCard(candidate, { rank: index + 1 })).join('');
     }
 
     async function loadCurrentUser() {
       const client = window.siteAuth?.getClient ? window.siteAuth.getClient() : null;
-      if (!client) {
-        currentUser = null;
-        return;
-      }
+      if (!client) { currentUser = null; return; }
 
       const { data } = await client.auth.getSession();
       currentUser = data?.session?.user || null;
@@ -681,8 +621,7 @@
         : [];
 
       registeredCandidates = Array.isArray(publicPlayers)
-        ? publicPlayers.map(function (player) {
-          return {
+        ? publicPlayers.map(player => ({
             key: `public-player:${player.id}`,
             playerId: player.id,
             userId: player.authUserId || player.ownerUserId || '',
@@ -701,19 +640,12 @@
             votes: Number(player.votesCount || 0) || 0,
             source: 'supabase',
             registeredAt: player.updatedAt || ''
-          };
-        }).filter(function (candidate) {
-          return Boolean(String(candidate?.playerId || '').trim());
-        })
+          })).filter(candidate => Boolean(String(candidate?.playerId || '').trim()))
         : [];
 
       registeredCandidates = registeredCandidates
-        .filter(function (candidate) {
-          return String(candidate.fullName || '').trim().length > 0;
-        })
-        .sort(function (a, b) {
-          return normalizeText(a.fullName).localeCompare(normalizeText(b.fullName), 'ka');
-        });
+        .filter(candidate => String(candidate.fullName || '').trim().length > 0)
+        .sort((a, b) => normalizeText(a.fullName).localeCompare(normalizeText(b.fullName), 'ka'));
     }
 
     async function handleVote(candidateKey) {
@@ -725,9 +657,7 @@
         return;
       }
 
-      const candidate = registeredCandidates.find(function (item) {
-        return item.key === candidateKey;
-      });
+      const candidate = registeredCandidates.find(item => item.key === candidateKey);
 
       if (!candidate || !candidate.playerId) {
         setPollHelper('ამ ფეხბურთელზე ხმის მიცემა ჯერ ხელმისაწვდომი არ არის.');
@@ -769,25 +699,27 @@
       renderTopTenCards();
     }
 
-    resultsGrid.addEventListener('click', function (event) {
-      const button = event.target.closest('[data-candidate-key]');
-      if (!button) {
-        return;
-      }
-
-      handleVote(button.getAttribute('data-candidate-key'));
+    // ხმის მიცემის Click Event-ები
+    resultsGrid.addEventListener('click', event => {
+      const button = event.target.closest('.poll-vote-button');
+      if (button) handleVote(button.getAttribute('data-candidate-key'));
     });
 
-    topList.addEventListener('click', function (event) {
-      const button = event.target.closest('[data-candidate-key]');
-      if (!button) {
-        return;
-      }
-
-      handleVote(button.getAttribute('data-candidate-key'));
+    topList.addEventListener('click', event => {
+      const button = event.target.closest('.poll-vote-button');
+      if (button) handleVote(button.getAttribute('data-candidate-key'));
     });
 
     searchInput.addEventListener('input', renderSearchResults);
+
+    // ფანჯრის გარეთ დაკლიკებისას Dropdown-ის დამალვა
+    document.addEventListener('click', (event) => {
+      if (!searchWrapper.contains(event.target)) {
+        dropdown.hidden = true;
+      } else if (searchInput.value.trim() !== '') {
+        dropdown.hidden = false;
+      }
+    });
 
     async function init() {
       if (window.siteAuth?.renderAuthNav) {
