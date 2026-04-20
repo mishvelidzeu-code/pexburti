@@ -1,28 +1,5 @@
 (function () {
   const DIRECTORY_KEY = 'mfg-registered-player-directory-v1';
-  const SEEDED_AVATAR_BY_NAME = {
-    'giorgi mikeladze': 'seed-avatars/avatar-01.svg',
-    'luka beridze': 'seed-avatars/avatar-02.svg',
-    'nika kapanadze': 'seed-avatars/avatar-03.svg',
-    'saba janelidze': 'seed-avatars/avatar-04.svg',
-    'data gelashvili': 'seed-avatars/avatar-05.svg',
-    'giga chikvaidze': 'seed-avatars/avatar-01.svg',
-    'andria tsereteli': 'seed-avatars/avatar-02.svg',
-    'mate abashidze': 'seed-avatars/avatar-03.svg',
-    'ilia nemsadze': 'seed-avatars/avatar-04.svg',
-    'sandro kharadze': 'seed-avatars/avatar-05.svg',
-    'nikoloz mchedlishvili': 'seed-avatars/avatar-06.svg',
-    'sandro kiknadze': 'seed-avatars/avatar-07.svg',
-    'giorgi basilashvili': 'seed-avatars/avatar-08.svg',
-    'luka gogoladze': 'seed-avatars/avatar-09.svg',
-    'dato zviadauri': 'seed-avatars/avatar-10.svg',
-    'mate odisharia': 'seed-avatars/avatar-06.svg',
-    'nika kharshiladze': 'seed-avatars/avatar-07.svg',
-    'saba shonia': 'seed-avatars/avatar-08.svg',
-    'andria mestvirishvili': 'seed-avatars/avatar-09.svg',
-    'ilia sulava': 'seed-avatars/avatar-10.svg'
-  };
-
   function normalizeText(value) {
     return String(value || '')
       .trim()
@@ -85,9 +62,13 @@
     if (cleanPhoto) {
       return cleanPhoto;
     }
-
-    const mapped = SEEDED_AVATAR_BY_NAME[normalizeText(fullName)];
-    return mapped || '';
+    const raw = String(fullName || '');
+    let hash = 0;
+    for (let index = 0; index < raw.length; index += 1) {
+      hash = ((hash << 5) - hash) + raw.charCodeAt(index);
+      hash |= 0;
+    }
+    return 'https://i.pravatar.cc/400?img=' + ((Math.abs(hash) % 70) + 1);
   }
 
   function resolveAge(value, birthDate) {

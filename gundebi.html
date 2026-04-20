@@ -726,7 +726,8 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="auth-shared.js"></script>
-  <script src="teams-shared.js"></script>
+  <script src="supabase-clubs-shared.js"></script>
+  <script src="supabase-site-data.js"></script>
   <script>
     const teams = window.siteTeams?.getTeams ? window.siteTeams.getTeams() : [
       { mark: 'DT', name: 'დინამო თბილისი', city: 'თბილისი, საქართველო', age: 'pro', ageLabel: 'PRO', players: 24, coach: 'გ. აბრამიძე' },
@@ -860,6 +861,87 @@
         afterLogout: 'gundebi.html'
       });
     }
+  </script>
+  <script>
+    (async function () {
+      const client = window.siteAuth?.getClient ? window.siteAuth.getClient() : null;
+      if (!client || !window.siteData?.fetchPublicClubs) {
+        return;
+      }
+
+      const clubs = await window.siteData.fetchPublicClubs(client);
+      if (!Array.isArray(clubs) || !clubs.length) {
+        return;
+      }
+
+      const teamsGrid = document.getElementById('teamsGrid');
+      const resultCount = document.querySelector('[data-result-count]');
+      const heroStats = document.querySelectorAll('.hero-stat strong');
+      const leadNode = document.querySelector('.hero .lead');
+
+      function escapeHtml(value) {
+        return String(value || '')
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;');
+      }
+
+      function createDynamicEmblem(club) {
+        return `
+          <div style="width:74px;height:86px;border-radius:22px;background:linear-gradient(135deg,#b91c1c,#0f172a);display:grid;place-items:center;color:#fff;font-size:1.05rem;font-weight:900;letter-spacing:-.04em;box-shadow:0 16px 28px rgba(15,23,42,.16);">
+            ${escapeHtml(club.shortCode || 'FG')}
+          </div>
+        `;
+      }
+
+      teamsGrid.innerHTML = clubs.map(function (club) {
+        const ageKey = String(club.ageBand || 'pro').trim().toLowerCase();
+        const searchText = [club.name, club.location, club.ageLabel, club.coach, club.summary].join(' ').toLowerCase();
+        const route = club.route || 'gundebi.html';
+        return `
+          <article class="team-card" data-age="${escapeHtml(ageKey)}" data-search="${escapeHtml(searchText)}">
+            <div class="team-top">
+              <div class="team-emblem">${createDynamicEmblem(club)}</div>
+              <div class="team-head">
+                <div class="team-badge">Supabase გუნდი</div>
+                <h3 class="team-name"><a href="${route}">${escapeHtml(club.name)}</a></h3>
+                <div class="team-location">${escapeHtml(club.location || 'საქართველო')}</div>
+              </div>
+            </div>
+            <div class="team-meta">
+              <div class="meta-row"><span>კატეგორია</span><strong>${escapeHtml(club.ageLabel || 'PRO')}</strong></div>
+              <div class="meta-row"><span>მოთამაშეები</span><strong>${escapeHtml(String(club.playersCount || 0))}</strong></div>
+              <div class="meta-row"><span>მთავარი მწვრთნელი</span><strong>${escapeHtml(club.coach || 'არ არის მითითებული')}</strong></div>
+            </div>
+            <div class="team-footer">
+              <a href="${route}" class="btn btn-red">ნახვა</a>
+              <a href="${route}#contact" class="btn btn-white">კონტაქტი</a>
+            </div>
+          </article>
+        `;
+      }).join('');
+
+      if (resultCount) {
+        resultCount.textContent = `ნაპოვნია: ${clubs.length} გუნდი`;
+      }
+
+      if (leadNode) {
+        const uniqueCities = new Set(clubs.map(function (club) {
+          return String(club.city || '').trim();
+        }).filter(Boolean));
+        leadNode.textContent = `ეს გვერდი ახლა სრულად კითხულობს Supabase-ში არსებულ კლუბებს. გამოჩნდება მხოლოდ რეალური გუნდები, მათი აქტიური მოთამაშეების რაოდენობა და გუნდთან დაკავშირებული საჯარო ინფორმაცია.`;
+        if (heroStats[0]) heroStats[0].textContent = String(clubs.length);
+        if (heroStats[1]) heroStats[1].textContent = String(uniqueCities.size);
+        if (heroStats[2]) {
+          heroStats[2].textContent = String(new Set(clubs.map(function (club) {
+            return String(club.ageLabel || 'PRO');
+          })).size);
+        }
+        if (heroStats[3]) heroStats[3].textContent = 'Supabase';
+      }
+    })();
   </script>
 </body>
 </html>

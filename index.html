@@ -1719,6 +1719,8 @@
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-domain-shared.js"></script>
+  <script src="supabase-site-data.js"></script>
   <script src="auth-shared.js"></script>
   <script>
     if (window.siteAuth?.renderAuthNav) {
@@ -1730,6 +1732,122 @@
         afterLogout: 'index.html'
       });
     }
+  </script>
+  <script>
+    (async function () {
+      const client = window.siteAuth?.getClient ? window.siteAuth.getClient() : null;
+      if (!client || !window.siteData?.fetchPublicPlayers || !window.siteData?.buildFeaturedLineup) {
+        return;
+      }
+
+      const players = await window.siteData.fetchPublicPlayers(client);
+      if (!players.length) {
+        return;
+      }
+
+      const featuredLineup = window.siteData.buildFeaturedLineup(players);
+      const topPlayer = players.slice().sort(function (a, b) {
+        if ((b.votesCount || 0) !== (a.votesCount || 0)) {
+          return (b.votesCount || 0) - (a.votesCount || 0);
+        }
+        return (b.rating || 0) - (a.rating || 0);
+      })[0];
+
+      function escapeHtml(value) {
+        return String(value || '')
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;');
+      }
+
+      const pitchNode = document.querySelector('.weekly-pitch');
+      if (pitchNode && featuredLineup.length) {
+        pitchNode.innerHTML = `
+          <div class="pitch-lines"></div>
+          <div class="pitch-circle"></div>
+          <div class="pitch-box top"></div>
+          <div class="pitch-box bottom"></div>
+          ${featuredLineup.map(function (entry) {
+            const player = entry.player;
+            return `
+              <a class="pitch-player ${escapeHtml(entry.slot)}" href="${window.siteData.buildPlayerHref(player.id, 'index.html')}" aria-label="${escapeHtml(player.fullName)}">
+                <img src="${escapeHtml(player.photo)}" alt="${escapeHtml(player.fullName)}">
+                <div class="pitch-badge">
+                  <strong>${escapeHtml(player.fullName)}</strong>
+                  <span>${escapeHtml(player.positionCode || 'MF')} • ${escapeHtml(player.ageLabel || 'PRO')}</span>
+                </div>
+              </a>
+            `;
+          }).join('')}
+        `;
+      }
+
+      const summaryText = document.querySelector('.month-squad-card .month-card-summary p');
+      const helperText = document.querySelector('.month-squad-expanded .small');
+      if (summaryText) {
+        summaryText.textContent = `${players.length} საჯარო ფეხბურთელიდან ავტომატურად დალაგებული 4-3-3 შემადგენლობა ხმებისა და რეიტინგის მიხედვით.`;
+      }
+      if (helperText) {
+        helperText.textContent = 'მოთამაშეზე კლიკით იხსნება მისი პროფილი Supabase-იდან.';
+      }
+
+      if (topPlayer) {
+        const monthLink = document.querySelector('.month-player-link');
+        const monthImage = document.querySelector('.month-player-media img');
+        const monthRating = document.querySelector('.month-player-rating strong');
+        const monthName = document.querySelector('.month-player-copy h3');
+        const monthSubline = document.querySelector('.month-player-subline');
+        const monthStats = document.querySelector('.month-player-stats');
+        const monthNote = document.querySelector('.month-player-note');
+        const monthPrimaryAction = document.querySelector('.month-player-actions .btn.btn-primary');
+
+        const playerHref = window.siteData.buildPlayerHref(topPlayer.id, 'index.html');
+        if (monthLink) {
+          monthLink.href = playerHref;
+          monthLink.setAttribute('aria-label', `${topPlayer.fullName} პროფილი`);
+        }
+        if (monthImage) {
+          monthImage.src = topPlayer.photo;
+          monthImage.alt = topPlayer.fullName;
+        }
+        if (monthRating) {
+          monthRating.textContent = String(topPlayer.rating || 0);
+        }
+        if (monthName) {
+          monthName.textContent = topPlayer.fullName;
+        }
+        if (monthSubline) {
+          monthSubline.innerHTML = `
+            <span>${escapeHtml(topPlayer.positionLabel || 'მოთამაშე')}</span>
+            <div class="pill">${escapeHtml(topPlayer.ageLabel || 'PRO')}</div>
+          `;
+        }
+        if (monthStats) {
+          monthStats.innerHTML = `
+            <div class="month-player-stat">
+              <span>გუნდი</span>
+              <strong>${escapeHtml(topPlayer.team || 'უგუნდოდ')}</strong>
+            </div>
+            <div class="month-player-stat">
+              <span>მუშა ფეხი</span>
+              <strong>${escapeHtml(topPlayer.foot || 'არ არის მითითებული')}</strong>
+            </div>
+            <div class="month-player-stat">
+              <span>ხმები</span>
+              <strong>${escapeHtml(String(topPlayer.votesCount || 0))}</strong>
+            </div>
+          `;
+        }
+        if (monthNote) {
+          monthNote.textContent = `${topPlayer.fullName} ამ ეტაპზე ყველაზე მაღალი აქტივობით ლიდერობს. ბარათი ივსება მიმდინარე გუნდით, ასაკობრივი კატეგორიით, მუშა ფეხით და მომხმარებლების ხმებით.`;
+        }
+        if (monthPrimaryAction) {
+          monthPrimaryAction.href = playerHref;
+        }
+      }
+    })();
   </script>
 </body>
 </html>

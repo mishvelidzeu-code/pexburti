@@ -454,7 +454,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="age-groups-shared.js"></script>
   <script src="supabase-domain-shared.js"></script>
-  <script src="registered-players-shared.js"></script>
+  <script src="supabase-site-data.js"></script>
   <script src="auth-shared.js"></script>
   <script>
     const searchInput = document.getElementById('pollSearchInput');
@@ -482,11 +482,7 @@
     function normalizeText(value) {
       return window.sitePlayerDomain?.normalizeText
         ? window.sitePlayerDomain.normalizeText(value)
-        : (
-          window.siteRegisteredPlayers?.normalizeText
-            ? window.siteRegisteredPlayers.normalizeText(value)
-            : String(value || '').trim().toLowerCase().replace(/\s+/g, ' ')
-        );
+        : String(value || '').trim().toLowerCase().replace(/\s+/g, ' ');
     }
 
     function setPollHelper(message) {
@@ -667,10 +663,6 @@
       const { data } = await client.auth.getSession();
       currentUser = data?.session?.user || null;
 
-      if (currentUser && window.siteRegisteredPlayers?.syncFromAuthUser) {
-        window.siteRegisteredPlayers.syncFromAuthUser(currentUser);
-      }
-
       if (currentUser && window.sitePlayerDomain?.syncMyAccountDomain) {
         await window.sitePlayerDomain.syncMyAccountDomain(client);
       }
@@ -684,11 +676,33 @@
 
     async function loadCandidates() {
       const client = window.siteAuth?.getClient ? window.siteAuth.getClient() : null;
-      const publicCandidates = window.siteRegisteredPlayers?.fetchPublicCandidates
-        ? await window.siteRegisteredPlayers.fetchPublicCandidates(client)
+      const publicPlayers = window.siteData?.fetchPublicPlayers
+        ? await window.siteData.fetchPublicPlayers(client)
         : [];
-      registeredCandidates = Array.isArray(publicCandidates)
-        ? publicCandidates.filter(function (candidate) {
+
+      registeredCandidates = Array.isArray(publicPlayers)
+        ? publicPlayers.map(function (player) {
+          return {
+            key: `public-player:${player.id}`,
+            playerId: player.id,
+            userId: player.authUserId || player.ownerUserId || '',
+            roleSource: player.ownerRole || 'player',
+            fullName: player.fullName,
+            firstName: player.firstName || '',
+            lastName: player.lastName || '',
+            age: player.age,
+            ageCat: String(player.ageGroup || 'pro').toLowerCase(),
+            ageLabel: player.ageLabel || String(player.ageGroup || 'pro').toUpperCase(),
+            foot: player.foot || 'არ არის მითითებული',
+            position: player.positionKey || '',
+            positionLabel: player.positionLabel || 'არ არის მითითებული',
+            team: player.team || 'უგუნდოდ',
+            photo: player.photo || '',
+            votes: Number(player.votesCount || 0) || 0,
+            source: 'supabase',
+            registeredAt: player.updatedAt || ''
+          };
+        }).filter(function (candidate) {
           return Boolean(String(candidate?.playerId || '').trim());
         })
         : [];

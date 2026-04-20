@@ -727,7 +727,7 @@
   </section>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="teams-shared.js"></script>
+<script src="supabase-site-data.js"></script>
 <script src="age-groups-shared.js"></script>
 <script src="supabase-domain-shared.js"></script>
 <script src="auth-shared.js"></script>
@@ -1164,6 +1164,205 @@
     }
 
     hydratePage();
+  </script>
+  <script>
+    (async function () {
+      const client = window.siteAuth?.getClient ? window.siteAuth.getClient() : null;
+      if (!client || !window.siteData?.fetchClubBySlug || !window.siteData?.fetchPlayersForClub) {
+        return;
+      }
+
+      const params = new URLSearchParams(window.location.search);
+      const clubSlug = String(params.get('club') || 'dinamo-tbilisi').trim().toLowerCase();
+      const currentPath = clubSlug === 'dinamo-tbilisi'
+        ? 'team-dinamo-tbilisi.html'
+        : `team-dinamo-tbilisi.html?club=${encodeURIComponent(clubSlug)}`;
+
+      if (window.siteAuth?.renderAuthNav) {
+        window.siteAuth.renderAuthNav('#teamAuthNav', {
+          currentPath: currentPath,
+          loginClass: 'btn btn-white',
+          registerClass: 'btn btn-red',
+          profileClass: 'btn btn-red',
+          afterLogout: currentPath
+        });
+      }
+
+      const { data } = await client.auth.getSession();
+      if (data?.session?.user && window.sitePlayerDomain?.syncMyAccountDomain) {
+        await window.sitePlayerDomain.syncMyAccountDomain(client);
+      }
+
+      const [club, clubPlayers] = await Promise.all([
+        window.siteData.fetchClubBySlug(client, clubSlug),
+        window.siteData.fetchPlayersForClub(client, clubSlug)
+      ]);
+
+      if (!club) {
+        return;
+      }
+
+      const ageGroups = [
+        { key: 'pro', label: 'PRO', copy: 'ძირითადი გუნდი და უფროსი ასაკის მოთამაშეები.' },
+        { key: 'u19', label: 'U19', copy: 'გარდამავალი ასაკი პროფესიულ საფეხურამდე.' },
+        { key: 'u17', label: 'U17', copy: 'სკაუტინგისთვის ყველაზე აქტიური კატეგორია.' },
+        { key: 'u16', label: 'U16', copy: 'ტაქტიკური ზრდისა და ინტენსივობის ეტაპი.' },
+        { key: 'u15', label: 'U15', copy: 'სისწრაფისა და ტექნიკის გაძლიერების ეტაპი.' },
+        { key: 'u14', label: 'U14', copy: 'სათამაშო ინტელექტისა და პოზიციური სწავლების ეტაპი.' },
+        { key: 'u13', label: 'U13', copy: 'სტაბილური განვითარების ასაკობრივი ჯგუფი.' },
+        { key: 'u12', label: 'U12', copy: 'ბაზისური უნარების გამყარების ეტაპი.' },
+        { key: 'u11', label: 'U11', copy: 'რიტმისა და მცირე სივრცეში თამაშის სწავლა.' },
+        { key: 'u10', label: 'U10', copy: 'ტექნიკა, კონტროლი და სწორი გადაწყვეტილებები.' },
+        { key: 'u9', label: 'U9', copy: 'საბაზისო პროგრესის მნიშვნელოვანი ასაკი.' },
+        { key: 'u8', label: 'U8', copy: 'პირველი საფეხური აკადემიური განვითარებისთვის.' }
+      ];
+
+      function escapeHtml(value) {
+        return String(value || '')
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;');
+      }
+
+      function initials(name) {
+        return String(name || 'FG')
+          .split(/\s+/)
+          .filter(Boolean)
+          .slice(0, 2)
+          .map(function (part) { return part[0] ? part[0].toUpperCase() : ''; })
+          .join('') || 'FG';
+      }
+
+      function positionCode(player) {
+        return String(player.positionCode || 'MF').toUpperCase();
+      }
+
+      function createPlayerCard(player) {
+        const actionHref = window.siteData.buildPlayerHref(player.id, currentPath);
+        const photoMarkup = player.photo
+          ? `<img src="${escapeHtml(player.photo)}" alt="${escapeHtml(player.fullName)}" class="player-photo" loading="lazy">`
+          : `<div class="player-photo player-photo--fallback">${initials(player.fullName)}</div>`;
+
+        return `
+          <article class="player-card">
+            ${photoMarkup}
+            <div class="pos-indicator">${escapeHtml(positionCode(player))}</div>
+            <div class="player-info">
+              <h3 class="player-name">${escapeHtml(player.fullName)}</h3>
+              <div class="meta-grid">
+                <div class="meta-item">
+                  <span>კატეგორია</span>
+                  <strong>${escapeHtml(player.ageLabel || 'PRO')} (${escapeHtml(String(player.age ?? '-'))} წ.)</strong>
+                </div>
+                <div class="meta-item">
+                  <span>ფეხი</span>
+                  <strong>${escapeHtml(player.foot || 'არ არის მითითებული')}</strong>
+                </div>
+              </div>
+              <a href="${actionHref}" class="btn-enter">პროფილი</a>
+            </div>
+          </article>
+        `;
+      }
+
+      function renderAgeNav(groupedPlayers) {
+        const ageNav = document.getElementById('ageNav');
+        ageNav.innerHTML = ageGroups.map(function (group) {
+          const count = groupedPlayers[group.key]?.length || 0;
+          return `
+            <a href="#group-${group.key}" class="age-chip">
+              <span>${group.label}</span>
+              <strong>${count}</strong>
+            </a>
+          `;
+        }).join('');
+      }
+
+      function renderRoster(players) {
+        const groupedPlayers = ageGroups.reduce(function (acc, group) {
+          acc[group.key] = [];
+          return acc;
+        }, {});
+
+        players.forEach(function (player) {
+          const key = groupedPlayers[player.ageGroup] ? player.ageGroup : 'pro';
+          groupedPlayers[key].push(player);
+        });
+
+        renderAgeNav(groupedPlayers);
+
+        document.getElementById('rosterGroups').innerHTML = ageGroups.map(function (group) {
+          const groupPlayers = groupedPlayers[group.key];
+          const body = groupPlayers.length
+            ? groupPlayers.map(createPlayerCard).join('')
+            : '<div class="empty-group">ამ კატეგორიაში აქტიური მოთამაშე ჯერ არ არის საჯაროდ დამატებული.</div>';
+
+          return `
+            <section class="group-section" id="group-${group.key}">
+              <div class="group-head">
+                <div>
+                  <h3>${group.label}</h3>
+                  <p>${group.copy}</p>
+                </div>
+                <div class="group-count">${groupPlayers.length} მოთამაშე</div>
+              </div>
+              <div class="roster-grid">${body}</div>
+            </section>
+          `;
+        }).join('');
+      }
+
+      const leadNode = document.querySelector('.hero .lead');
+      const shieldNode = document.querySelector('.shield');
+      const badgeStrong = document.querySelector('.team-badge strong');
+      const badgeSpan = document.querySelector('.team-badge span');
+      const quickList = document.querySelector('.quick-list');
+      const headingNode = document.querySelector('.section-heading p');
+      const connectedBanner = document.getElementById('connectedBanner');
+      const connectedBannerText = document.getElementById('connectedBannerText');
+      const visibleGroups = new Set(clubPlayers.map(function (player) {
+        return String(player.ageLabel || '').trim();
+      }).filter(Boolean));
+
+      document.title = `${club.name} | Football Georgia`;
+      document.getElementById('teamName').textContent = club.name;
+      document.getElementById('teamAge').textContent = visibleGroups.size ? Array.from(visibleGroups).join(' • ') : (club.ageLabel || 'PRO');
+      document.getElementById('teamPlayers').textContent = String(clubPlayers.length);
+      document.getElementById('teamCity').textContent = club.city || 'საქართველო';
+      document.getElementById('teamCoach').textContent = club.coach || 'არ არის მითითებული';
+
+      if (leadNode) {
+        leadNode.innerHTML = `${escapeHtml(club.name)}-ის გუნდის გვერდი ახლა სრულად იკითხება Supabase-იდან. შემადგენლობა, ასაკობრივი ჯგუფები და მოთამაშეების ბარათები პირდაპირ მოდის საჯარო მონაცემებიდან.`;
+      }
+      if (shieldNode) {
+        shieldNode.textContent = club.shortCode || initials(club.name);
+      }
+      if (badgeStrong) {
+        badgeStrong.textContent = club.name;
+      }
+      if (badgeSpan) {
+        badgeSpan.textContent = 'Supabase-ზე მიბმული გუნდის საჯარო გვერდი';
+      }
+      if (quickList) {
+        quickList.innerHTML = `
+          <li><span>სტატუსი</span><strong>საჯარო გუნდი</strong></li>
+          <li><span>ქალაქი</span><strong>${escapeHtml(club.city || 'საქართველო')}</strong></li>
+          <li><span>მოთამაშეები</span><strong>${escapeHtml(String(clubPlayers.length))}</strong></li>
+          <li><span>საჯარო ხმები</span><strong>${escapeHtml(String(club.votesCount || 0))}</strong></li>
+        `;
+      }
+      if (headingNode) {
+        headingNode.textContent = `${club.name}-ის ასაკობრივი განყოფილებები და საჯარო მოთამაშეები ახლა ერთი მონაცემთა წყაროდან იკითხება.`;
+      }
+      if (connectedBanner && connectedBannerText) {
+        connectedBanner.hidden = false;
+        connectedBannerText.textContent = `${club.name}-ის ეს გვერდი მთლიანად კითხულობს Supabase-ში არსებულ მოთამაშეებს. ახალი რეგისტრირებული ფეხბურთელი ან მშობლის მიერ დამატებული ბავშვი აქ ავტომატურად გამოჩნდება, თუ ამ კლუბზეა მიბმული.`;
+      }
+
+      renderRoster(clubPlayers);
+    })();
   </script>
 </body>
 </html>

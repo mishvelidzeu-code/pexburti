@@ -350,10 +350,6 @@
       return;
     }
 
-    if (window.siteRegisteredPlayers?.syncFromAuthUser) {
-      window.siteRegisteredPlayers.syncFromAuthUser(user);
-    }
-
     const profileHref = buildProfileHref(
       getProfileRouteForUser(user),
       currentPath

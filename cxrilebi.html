@@ -374,6 +374,8 @@
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-domain-shared.js"></script>
+  <script src="supabase-site-data.js"></script>
   <script src="auth-shared.js"></script>
   <script>
     if (window.siteAuth?.renderAuthNav) {
@@ -386,6 +388,144 @@
         afterLogout: 'cxrilebi.html'
       });
     }
+  </script>
+  <script>
+    (async function () {
+      const client = window.siteAuth?.getClient ? window.siteAuth.getClient() : null;
+      if (!client || !window.siteData?.fetchPublicPlayers || !window.siteData?.fetchPublicClubs) {
+        return;
+      }
+
+      const [players, clubs] = await Promise.all([
+        window.siteData.fetchPublicPlayers(client),
+        window.siteData.fetchPublicClubs(client)
+      ]);
+
+      if (!players.length && !clubs.length) {
+        return;
+      }
+
+      const clubRankings = window.siteData.buildClubRankings(players, clubs).slice(0, 5);
+      const rankedPlayers = players.slice().sort(function (a, b) {
+        if ((b.votesCount || 0) !== (a.votesCount || 0)) {
+          return (b.votesCount || 0) - (a.votesCount || 0);
+        }
+        return (b.rating || 0) - (a.rating || 0);
+      }).slice(0, 5);
+
+      const ageBuckets = {
+        older: ['pro', 'u19', 'u17', 'u16'],
+        mid: ['u15', 'u14', 'u13', 'u12'],
+        young: ['u11', 'u10', 'u9', 'u8']
+      };
+
+      function escapeHtml(value) {
+        return String(value || '')
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;');
+      }
+
+      function rankChip(index) {
+        return `<span class="rank-chip">${index + 1}</span>`;
+      }
+
+      function formatAgeGroupGroup(keys) {
+        return players
+          .filter(function (player) {
+            return keys.includes(String(player.ageGroup || '').toLowerCase());
+          })
+          .sort(function (a, b) {
+            if ((b.votesCount || 0) !== (a.votesCount || 0)) {
+              return (b.votesCount || 0) - (a.votesCount || 0);
+            }
+            return (b.rating || 0) - (a.rating || 0);
+          })
+          .slice(0, 3);
+      }
+
+      const tableBodies = document.querySelectorAll('.data-table tbody');
+      if (tableBodies[0]) {
+        tableBodies[0].innerHTML = clubRankings.map(function (club, index) {
+          const goalBalance = `${club.publicPlayers || 0}:${Math.max(0, Math.round((club.votesCount || 0) / 2))}`;
+          const formLabel = `${club.votesCount || 0} ხმა`;
+          return `
+            <tr>
+              <td>${rankChip(index)}</td>
+              <td>${escapeHtml(club.name)}</td>
+              <td>${escapeHtml(String(club.score || 0))}</td>
+              <td>${escapeHtml(goalBalance)}</td>
+              <td class="${index < 2 ? 'status-good' : 'status-warn'}">${escapeHtml(formLabel)}</td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      if (tableBodies[1]) {
+        tableBodies[1].innerHTML = rankedPlayers.map(function (player, index) {
+          return `
+            <tr>
+              <td>${rankChip(index)}</td>
+              <td>${escapeHtml(player.fullName)}</td>
+              <td>${escapeHtml(player.team || 'უგუნდოდ')}</td>
+              <td>${escapeHtml(player.ageLabel || 'PRO')}</td>
+              <td class="${index < 2 ? 'status-good' : 'status-warn'}">${escapeHtml(String(player.rating || 0))}</td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      const groupedLists = [
+        formatAgeGroupGroup(ageBuckets.older),
+        formatAgeGroupGroup(ageBuckets.mid),
+        formatAgeGroupGroup(ageBuckets.young)
+      ];
+
+      [2, 3, 4].forEach(function (tableIndex, groupIndex) {
+        if (!tableBodies[tableIndex]) {
+          return;
+        }
+        tableBodies[tableIndex].innerHTML = groupedLists[groupIndex].map(function (player, index) {
+          return `
+            <tr>
+              <td>${rankChip(index)}</td>
+              <td>${escapeHtml(player.fullName)}</td>
+              <td class="${index === 0 ? 'status-good' : 'status-warn'}">${escapeHtml(String(player.rating || 0))}</td>
+            </tr>
+          `;
+        }).join('');
+      });
+
+      const redCardTitle = document.querySelector('.hero-stack .card.red h3');
+      const statBoxValues = document.querySelectorAll('.hero-stack .card.red .stat-box strong');
+      const statBoxLabels = document.querySelectorAll('.hero-stack .card.red .stat-box span');
+      const topClubName = document.querySelector('.hero-stack .grid-2 .card:first-child h3');
+      const topClubText = document.querySelector('.hero-stack .grid-2 .card:first-child p');
+      const topPlayerName = document.querySelector('.hero-stack .grid-2 .card:last-child h3');
+      const topPlayerText = document.querySelector('.hero-stack .grid-2 .card:last-child p');
+
+      if (redCardTitle) {
+        redCardTitle.textContent = 'რეალური ლიდერები უკვე დალაგებულია Supabase მონაცემებით';
+      }
+      if (statBoxValues[0]) statBoxValues[0].textContent = String(clubs.length);
+      if (statBoxLabels[0]) statBoxLabels[0].textContent = 'აქტიური გუნდი';
+      if (statBoxValues[1]) statBoxValues[1].textContent = String(players.length);
+      if (statBoxLabels[1]) statBoxLabels[1].textContent = 'საჯარო ფეხბურთელი';
+      if (statBoxValues[2]) statBoxValues[2].textContent = String(new Set(players.map(function (player) { return player.ageGroup; }).filter(Boolean)).size);
+      if (statBoxLabels[2]) statBoxLabels[2].textContent = 'ასაკობრივი დონე';
+
+      if (clubRankings[0] && topClubName && topClubText) {
+        topClubName.textContent = clubRankings[0].name;
+        topClubText.textContent = `${clubRankings[0].publicPlayers || 0} საჯარო მოთამაშე, ${clubRankings[0].votesCount || 0} ხმა და ყველაზე მაღალი საერთო აქტივობა.`;
+      }
+
+      if (rankedPlayers[0] && topPlayerName && topPlayerText) {
+        topPlayerName.textContent = rankedPlayers[0].fullName;
+        topPlayerText.textContent = `${rankedPlayers[0].team || 'უგუნდოდ'} • ${rankedPlayers[0].ageLabel || 'PRO'} • ${rankedPlayers[0].votesCount || 0} ხმა • შეფასება ${rankedPlayers[0].rating || 0}/10`;
+      }
+    })();
   </script>
 </body>
 </html>

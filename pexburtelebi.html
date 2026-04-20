@@ -441,11 +441,11 @@
   </section>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="players-shared.js"></script>
+  <script src="supabase-site-data.js"></script>
   <script src="supabase-domain-shared.js"></script>
   <script src="auth-shared.js"></script>
   <script>
-    const players = Array.isArray(window.playersDirectory) ? window.playersDirectory : [];
+    const players = [];
     let extraPlayer = null;
 
     const playersGrid = document.getElementById('playersGrid');
@@ -663,6 +663,150 @@
     }
 
     hydrateOwnPlayerCard();
+  </script>
+  <script>
+    (async function () {
+      const client = window.siteAuth?.getClient ? window.siteAuth.getClient() : null;
+      if (!client || !window.siteData?.fetchPublicPlayers) {
+        return;
+      }
+
+      const playersGridNode = document.getElementById('playersGrid');
+      const resultCountNode = document.getElementById('resultCount');
+      const searchNode = document.getElementById('searchInput');
+      const positionFilters = document.querySelectorAll('#posFilters .chip-btn');
+      const ageFilters = document.querySelectorAll('#ageFilters .chip-btn');
+
+      let pagePlayers = await window.siteData.fetchPublicPlayers(client);
+      let managedPlayerId = '';
+
+      const { data } = await client.auth.getSession();
+      const user = data?.session?.user || null;
+
+      if (user && window.sitePlayerDomain?.syncMyAccountDomain) {
+        await window.sitePlayerDomain.syncMyAccountDomain(client);
+      }
+
+      if (user && window.sitePlayerDomain?.fetchManagedEntry && window.siteData?.enrichPlayer) {
+        const managedEntry = await window.sitePlayerDomain.fetchManagedEntry(client, user.id);
+        const managedPlayer = managedEntry ? window.siteData.enrichPlayer(managedEntry) : null;
+        if (managedPlayer?.id) {
+          managedPlayerId = managedPlayer.id;
+          const existingIndex = pagePlayers.findIndex(function (player) {
+            return String(player.id) === String(managedPlayer.id);
+          });
+
+          if (existingIndex >= 0) {
+            pagePlayers[existingIndex] = { ...pagePlayers[existingIndex], ...managedPlayer };
+          } else {
+            pagePlayers.unshift(managedPlayer);
+          }
+        }
+      }
+
+      pagePlayers.sort(function (a, b) {
+        if ((b.votesCount || 0) !== (a.votesCount || 0)) {
+          return (b.votesCount || 0) - (a.votesCount || 0);
+        }
+        return String(a.fullName || '').localeCompare(String(b.fullName || ''), 'ka');
+      });
+
+      function escapeHtml(value) {
+        return String(value || '')
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;');
+      }
+
+      function initials(name) {
+        return String(name || 'MF')
+          .split(/\s+/)
+          .filter(Boolean)
+          .slice(0, 2)
+          .map(function (part) { return part[0] ? part[0].toUpperCase() : ''; })
+          .join('') || 'MF';
+      }
+
+      function renderDynamicPlayers() {
+        playersGridNode.innerHTML = pagePlayers.map(function (player) {
+          const fullName = String(player.fullName || '').trim();
+          const ageGroup = String(player.ageGroup || 'pro').toLowerCase();
+          const searchText = [fullName, player.team || '', player.positionLabel || ''].join(' ').toLowerCase();
+          const positionCode = player.positionCode || 'MF';
+          const isManaged = managedPlayerId && String(player.id) === String(managedPlayerId);
+          const actionHref = isManaged
+            ? 'user-profile.html?view=overview&from=pexburtelebi.html'
+            : window.siteData.buildPlayerHref(player.id, 'pexburtelebi.html');
+          const photoMarkup = player.photo
+            ? `<img src="${escapeHtml(player.photo)}" alt="${escapeHtml(fullName)}" class="player-photo" loading="lazy">`
+            : `<div class="player-photo player-photo--fallback">${initials(fullName)}</div>`;
+
+          return `
+            <article class="player-card" data-pos="${escapeHtml(positionCode.toLowerCase())}" data-age="${escapeHtml(ageGroup)}" data-search="${escapeHtml(searchText)}">
+              ${photoMarkup}
+              <div class="pos-indicator">${escapeHtml(positionCode)}</div>
+              <div class="player-info">
+                <h3 class="player-name">${escapeHtml(fullName)}</h3>
+                <div class="meta-grid">
+                  <div class="meta-item">
+                    <span>კატეგორია</span>
+                    <strong>${escapeHtml(player.ageLabel || ageGroup.toUpperCase())} (${escapeHtml(String(player.age ?? '-'))} წ.)</strong>
+                  </div>
+                  <div class="meta-item">
+                    <span>ფეხი</span>
+                    <strong>${escapeHtml(player.foot || 'არ არის მითითებული')}</strong>
+                  </div>
+                </div>
+                <a href="${actionHref}" class="btn-enter">${isManaged ? 'ჩემი პროფილი' : 'პროფილი'}</a>
+              </div>
+            </article>
+          `;
+        }).join('');
+      }
+
+      function activeValue(nodes) {
+        const activeNode = Array.from(nodes).find(function (button) {
+          return button.classList.contains('active');
+        });
+        return activeNode ? String(activeNode.dataset.pos || activeNode.dataset.age || 'all') : 'all';
+      }
+
+      function updateVisibleCount() {
+        const term = String(searchNode?.value || '').trim().toLowerCase();
+        const currentPos = activeValue(positionFilters);
+        const currentAge = activeValue(ageFilters);
+        const cards = playersGridNode.querySelectorAll('.player-card');
+        let visible = 0;
+
+        cards.forEach(function (card) {
+          const matchesSearch = card.dataset.search.includes(term);
+          const matchesPos = currentPos === 'all' || card.dataset.pos === currentPos;
+          const matchesAge = currentAge === 'all' || card.dataset.age === currentAge;
+          const show = matchesSearch && matchesPos && matchesAge;
+          card.style.display = show ? 'flex' : 'none';
+          if (show) {
+            visible += 1;
+          }
+        });
+
+        resultCountNode.textContent = `ნაპოვნია: ${visible}`;
+      }
+
+      renderDynamicPlayers();
+      updateVisibleCount();
+
+      if (searchNode) {
+        searchNode.addEventListener('input', updateVisibleCount);
+      }
+      positionFilters.forEach(function (button) {
+        button.addEventListener('click', updateVisibleCount);
+      });
+      ageFilters.forEach(function (button) {
+        button.addEventListener('click', updateVisibleCount);
+      });
+    })();
   </script>
 </body>
 </html>

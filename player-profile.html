@@ -395,13 +395,14 @@
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="players-shared.js"></script>
+  <script src="supabase-site-data.js"></script>
+  <script src="supabase-domain-shared.js"></script>
   <script src="auth-shared.js"></script>
   <script>
     const params = new URLSearchParams(window.location.search);
     const fallbackBack = 'pexburtelebi.html';
     const backPath = window.siteAuth?.sanitizeInternalPath(params.get('from'), fallbackBack) || fallbackBack;
-    const player = window.getPlayerById ? window.getPlayerById(params.get('player')) : null;
+    const player = null;
 
     function positionFocus(position) {
       if (position === 'gk') return 'რეაქციის სისწრაფე, პირველი პასი და საჯარიმოს მართვა.';
@@ -470,6 +471,117 @@
         afterLogout: backPath || 'pexburtelebi.html'
       });
     }
+  </script>
+  <script>
+    (async function () {
+      const client = window.siteAuth?.getClient ? window.siteAuth.getClient() : null;
+      const params = new URLSearchParams(window.location.search);
+      const fallbackBack = 'pexburtelebi.html';
+      const playerId = String(params.get('player') || '').trim();
+      const fromPath = window.siteAuth?.sanitizeInternalPath
+        ? (window.siteAuth.sanitizeInternalPath(params.get('from'), fallbackBack) || fallbackBack)
+        : fallbackBack;
+
+      if (!client || !window.siteData?.fetchPlayerById || !playerId) {
+        return;
+      }
+
+      const [{ data: sessionData }, player] = await Promise.all([
+        client.auth.getSession(),
+        window.siteData.fetchPlayerById(client, playerId)
+      ]);
+
+      if (!player) {
+        return;
+      }
+
+      const user = sessionData?.session?.user || null;
+      const playerView = document.getElementById('playerView');
+      const playerFallback = document.getElementById('playerFallback');
+      const backLink = document.getElementById('backLink');
+      const secondaryLink = document.querySelector('.action-row a.btn.btn-red');
+
+      function focusCopy(positionKey) {
+        if (positionKey === 'goalkeeper') {
+          return 'რეაქცია, პასის პირველი ფაზა და საჯარიმოს მართვა ამ პროფილის მთავარი აქცენტია.';
+        }
+        if (positionKey === 'defender') {
+          return 'ორთაბრძოლა, ზუსტი პოზიციონირება და თამაშის დაწყება დაცვიდან მის განვითარებაში ყველაზე მნიშვნელოვანია.';
+        }
+        if (positionKey === 'forward') {
+          return 'ფინიში, სივრცის პოვნა და ბოლო მესამედში სწრაფი გადაწყვეტილებები მის მთავარ ძლიერ მხარეს ქმნის.';
+        }
+        return 'ხედვა, ტემპის კონტროლი და ზუსტი გადაწყვეტილებები ცენტრში მის პროგრესს ყველაზე მეტად ამყარებს.';
+      }
+
+      function recommendationCopy(playerData) {
+        const clubName = playerData.team || 'ამ კლუბის';
+        const votes = Number(playerData.votesCount || 0) || 0;
+        if (votes >= 3) {
+          return `${clubName}-ის გარემოში ის უკვე ყურადღების ცენტრშია, ამიტომ შემდეგი სწორი ნაბიჯია ვიდეო პორტფოლიოსა და სტატისტიკის კიდევ უფრო გაძლიერება.`;
+        }
+        return `${clubName}-ის კონტექსტში ახლა ყველაზე ღირებულია მეტი ვიდეო მომენტის, პროგრესის სტატისტიკის და რეგულარული შეფასებების დამატება.`;
+      }
+
+      playerFallback.hidden = true;
+      playerView.hidden = false;
+      document.title = `${player.fullName} | Football Georgia`;
+      document.getElementById('playerImage').src = player.photo;
+      document.getElementById('playerImage').alt = player.fullName;
+      document.getElementById('playerName').textContent = player.fullName;
+      document.getElementById('playerLead').textContent = `${player.team || 'უგუნდოდ'} • ${player.positionLabel || 'მოთამაშე'} • ${player.ageLabel || 'PRO'} კატეგორია. პროფილში ჩანს მიმდინარე ასაკი, პოზიცია, მუშა ფეხი და ხმის მიცემის აქტივობა.`;
+      document.getElementById('photoBadge').textContent = `${player.ageLabel || 'PRO'} • ${player.team || 'უგუნდოდ'}`;
+      document.getElementById('eyebrow').textContent = `${player.ageLabel || 'PRO'} მოთამაშე`;
+      document.getElementById('playerSummary').textContent = `${player.fullName} არის ${String(player.positionLabel || 'მოთამაშე').toLowerCase()}, რომელიც ამ ეტაპზე დაკავშირებულია ${player.team || 'უგუნდოდ'} სტატუსთან. პროფილი სრულად მოდის Supabase-იდან და აჩვენებს მიმდინარე კატეგორიას, მუშა ფეხს, პოზიციას, გუნდს და მომხმარებლების ხმებს.`;
+      document.getElementById('playerFocus').textContent = focusCopy(player.positionKey);
+      document.getElementById('playerRecommendation').textContent = recommendationCopy(player);
+
+      document.getElementById('heroChips').innerHTML = [
+        `<span class="chip">${player.positionLabel || 'მოთამაშე'}</span>`,
+        `<span class="chip">${player.ageLabel || 'PRO'}</span>`,
+        `<span class="chip dark">${player.team || 'უგუნდოდ'}</span>`
+      ].join('');
+
+      document.getElementById('playerInfo').innerHTML = [
+        { label: 'ასაკი', value: `${player.age ?? '-'} წლის` },
+        { label: 'პოზიცია', value: player.positionLabel || 'არ არის მითითებული' },
+        { label: 'ფეხი', value: player.foot || 'არ არის მითითებული' },
+        { label: 'ხმები', value: String(player.votesCount || 0) }
+      ].map(function (item) {
+        return `
+          <div class="info-card">
+            <span>${item.label}</span>
+            <strong>${item.value}</strong>
+          </div>
+        `;
+      }).join('');
+
+      document.getElementById('playerStats').innerHTML = [
+        { label: 'კატეგორია', value: player.ageLabel || 'PRO' },
+        { label: 'გუნდი', value: player.team || 'უგუნდოდ' },
+        { label: 'შეფასება', value: `${player.rating || 0}/10` }
+      ].map(function (item) {
+        return `
+          <div class="stat">
+            <span>${item.label}</span>
+            <strong>${item.value}</strong>
+          </div>
+        `;
+      }).join('');
+
+      if (user) {
+        backLink.href = `user-profile.html?view=overview&from=${encodeURIComponent(`player-profile.html?player=${player.id}`)}`;
+        backLink.textContent = 'პროფილი';
+      } else {
+        backLink.href = fromPath;
+        backLink.textContent = 'დაბრუნება';
+      }
+
+      if (secondaryLink) {
+        secondaryLink.href = player.teamRoute || 'gundebi.html';
+        secondaryLink.textContent = player.team ? 'გუნდის გვერდი' : 'ყველა გუნდი';
+      }
+    })();
   </script>
 </body>
 </html>

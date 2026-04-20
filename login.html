@@ -738,10 +738,9 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="teams-shared.js"></script>
+  <script src="supabase-clubs-shared.js"></script>
   <script src="age-groups-shared.js"></script>
   <script src="supabase-domain-shared.js"></script>
-  <script src="registered-players-shared.js"></script>
   <script src="auth-shared.js"></script>
   <script>
     const roleSelect = document.getElementById('roleSelect');
@@ -1670,9 +1669,6 @@
         }
 
         setStatus(loginStatus, 'წარმატებით შეხვედი. პროფილი უკვე მზად არის. ახლავე გადაგამისამართებ.', 'success');
-        if (window.siteRegisteredPlayers?.syncFromAuthUser) {
-          window.siteRegisteredPlayers.syncFromAuthUser(data.user);
-        }
         if (window.sitePlayerDomain?.syncMyAccountDomain) {
           await window.sitePlayerDomain.syncMyAccountDomain(supabaseClient);
         }
@@ -1735,9 +1731,6 @@
           throw error;
         }
 
-        if (window.siteRegisteredPlayers?.syncFromAuthUser) {
-          window.siteRegisteredPlayers.syncFromAuthUser(data.user);
-        }
         if (data.session && window.sitePlayerDomain?.syncMyAccountDomain) {
           await window.sitePlayerDomain.syncMyAccountDomain(supabaseClient);
         }

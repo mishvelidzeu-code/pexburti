@@ -41,19 +41,17 @@
       return entry.club_route;
     }
 
+    const slug = String(entry?.club_slug || '').trim().toLowerCase();
+    if (slug) {
+      if (slug === 'dinamo-tbilisi') {
+        return 'team-dinamo-tbilisi.html';
+      }
+      return 'team-dinamo-tbilisi.html?club=' + encodeURIComponent(slug);
+    }
+
     const teamsApi = window.siteTeams;
     if (!teamsApi?.teams) {
       return '';
-    }
-
-    const slug = String(entry?.club_slug || '').trim().toLowerCase();
-    if (slug) {
-      const bySlug = teamsApi.teams.find(function (team) {
-        return String(team.slug || '').trim().toLowerCase() === slug;
-      });
-      if (bySlug?.route) {
-        return bySlug.route;
-      }
     }
 
     const name = normalizeText(entry?.club_name);
