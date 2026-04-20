@@ -324,6 +324,9 @@
       margin-top: 30px;
     }
     .hero-point {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       padding: 8px 14px;
       border-radius: 999px;
       background: rgba(255,255,255,0.8);
@@ -333,6 +336,24 @@
       font-size: 12px;
       font-weight: 600;
       box-shadow: var(--shadow-sm);
+      text-decoration: none;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+      cursor: pointer;
+    }
+    .hero-point:hover,
+    .hero-point:focus-visible {
+      transform: translateY(-4px);
+      box-shadow: 0 18px 32px rgba(15,23,42,0.14);
+      border-color: rgba(185, 28, 28, 0.18);
+      background: rgba(255,255,255,0.94);
+    }
+    .hero-point:active {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 18px rgba(15,23,42,0.12);
+    }
+    .hero-point:focus-visible {
+      outline: 2px solid rgba(185, 28, 28, 0.32);
+      outline-offset: 2px;
     }
 
     .hero-side {
@@ -1102,10 +1123,10 @@
         </div>
 
         <div class="hero-points">
-          <div class="hero-point">150+ ვარჯიში</div>
-          <div class="hero-point">ტაქტიკური ვიდეოები</div>
-          <div class="hero-point">ელიტური მენტორობა</div>
-          <div class="hero-point">ფეხბურთის ბანაკები</div>
+          <a class="hero-point" href="#app-download">150+ ვარჯიში</a>
+          <a class="hero-point" href="#app-download">ტაქტიკური ვიდეოები</a>
+          <a class="hero-point" href="#app-download">ელიტური მენტორობა</a>
+          <a class="hero-point" href="banakebi.html">ფეხბურთის ბანაკები</a>
         </div>
 
         <div class="stats-bar">
@@ -1356,7 +1377,7 @@
     </div>
   </section>
 
-  <section class="section-sm bg-alt">
+  <section id="app-download" class="section-sm bg-alt">
     <div class="container progress-showcase">
       <div class="progress-top">
         <div class="progress-side-image">
