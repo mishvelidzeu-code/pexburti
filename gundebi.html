@@ -442,11 +442,21 @@
       min-width:74px;
       height:86px;
       filter:drop-shadow(0 12px 24px rgba(15,23,42,.10));
+      overflow:hidden;
     }
     .team-emblem svg{
       display:block;
       width:100%;
       height:100%;
+    }
+    .team-emblem img{
+      display:block;
+      width:100%;
+      height:100%;
+      object-fit:contain;
+      background:#fff;
+      border-radius:20px;
+      box-shadow:0 16px 28px rgba(15,23,42,.16);
     }
     .team-head{
       flex:1 1 auto;
@@ -889,6 +899,9 @@
       }
 
       function createDynamicEmblem(club) {
+        if (club.logoPath) {
+          return `<img src="${escapeHtml(club.logoPath)}" alt="${escapeHtml(club.name)} ლოგო" loading="lazy">`;
+        }
         return `
           <div style="width:74px;height:86px;border-radius:22px;background:linear-gradient(135deg,#b91c1c,#0f172a);display:grid;place-items:center;color:#fff;font-size:1.05rem;font-weight:900;letter-spacing:-.04em;box-shadow:0 16px 28px rgba(15,23,42,.16);">
             ${escapeHtml(club.shortCode || 'FG')}

@@ -427,7 +427,9 @@
           : 'შესვლა და ხმა';
 
       const rankMarkup = settings.rank ? `<span class="poll-rank-chip">#${settings.rank}</span>` : '';
-      const profileHref = `player.html?id=${escapeHtml(candidate.playerId)}`;
+      const profileHref = candidate.playerId && window.siteData?.buildPlayerHref
+        ? window.siteData.buildPlayerHref(candidate.playerId, 'gamokitkhvebi.html')
+        : '#';
 
       return `
         <article class="poll-card">

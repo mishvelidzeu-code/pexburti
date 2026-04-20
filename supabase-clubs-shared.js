@@ -46,6 +46,7 @@
       route: buildTeamRoute(slug),
       shortCode: shortCode(row.name, row.short_code),
       mark: shortCode(row.name, row.short_code),
+      logoPath: String(row.logo_path || '').trim(),
       age: String(row.age_band || 'pro').trim().toLowerCase(),
       ageLabel: String(row.age_band || 'PRO').trim().toUpperCase()
     };
@@ -61,7 +62,7 @@
     if (!loadPromise) {
       loadPromise = client
         .from('clubs')
-        .select('id, slug, short_code, name, city, country, age_band, is_public, is_active')
+        .select('id, slug, short_code, name, city, country, age_band, logo_path, is_public, is_active')
         .eq('is_public', true)
         .eq('is_active', true)
         .order('name', { ascending: true })

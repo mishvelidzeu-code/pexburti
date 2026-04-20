@@ -135,6 +135,39 @@
     return 'https://i.pravatar.cc/400?img=' + imageIndex;
   }
 
+  function resolveClubLogo(existingLogo, shortCode) {
+    const cleanLogo = String(existingLogo || '').trim();
+    if (cleanLogo) {
+      return cleanLogo;
+    }
+
+    const code = String(shortCode || 'FG').trim().slice(0, 3).toUpperCase() || 'FG';
+    const paletteIndex = hashString(code) % 6;
+    const palettes = [
+      ['#b91c1c', '#7f1d1d', '#fca5a5'],
+      ['#1d4ed8', '#1e3a8a', '#93c5fd'],
+      ['#0f766e', '#134e4a', '#99f6e4'],
+      ['#7c3aed', '#4c1d95', '#c4b5fd'],
+      ['#ea580c', '#9a3412', '#fdba74'],
+      ['#1f2937', '#0f172a', '#cbd5e1']
+    ];
+    const palette = palettes[paletteIndex];
+    const svg = [
+      "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 112'>",
+      "<defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'>",
+      "<stop offset='0' stop-color='" + palette[0] + "'/>",
+      "<stop offset='1' stop-color='" + palette[1] + "'/>",
+      "</linearGradient></defs>",
+      "<path d='M48 4L84 16V48C84 69 69 88 48 104C27 88 12 69 12 48V16L48 4Z' fill='url(#g)'/>",
+      "<path d='M48 14L74 23V48C74 63 64 77 48 89C32 77 22 63 22 48V23L48 14Z' fill='none' stroke='white' stroke-opacity='.68' stroke-width='2'/>",
+      "<circle cx='48' cy='40' r='14' fill='" + palette[2] + "' fill-opacity='.96'/>",
+      "<text x='48' y='45' text-anchor='middle' font-family='Segoe UI, Arial, sans-serif' font-size='17' font-weight='900' fill='white'>" + code + "</text>",
+      "<text x='48' y='74' text-anchor='middle' font-family='Segoe UI, Arial, sans-serif' font-size='9' font-weight='800' letter-spacing='.18em' fill='white'>CLUB</text>",
+      "</svg>"
+    ].join('');
+    return 'data:image/svg+xml;base64,' + window.btoa(svg);
+  }
+
   function buildRating(player) {
     const votes = Number(player.votesCount || 0) || 0;
     const age = Number(player.age || 0) || 0;
@@ -180,13 +213,14 @@
 
   function enrichClub(row, playerCounts, playerVotes) {
     const slug = String(row.slug || '').trim().toLowerCase();
+    const shortCode = String(row.short_code || '').trim() || titleCaseSlug(slug).slice(0, 2).toUpperCase();
     const playerCount = playerCounts.get(slug) || Number(row.players_count || 0) || 0;
     const votesCount = playerVotes.get(slug) || 0;
     const band = String(row.age_band || 'PRO').trim();
     return {
       id: String(row.id || '').trim(),
       slug: slug,
-      shortCode: String(row.short_code || '').trim() || titleCaseSlug(slug).slice(0, 2).toUpperCase(),
+      shortCode: shortCode,
       name: String(row.name || titleCaseSlug(slug)).trim(),
       city: String(row.city || '').trim(),
       country: String(row.country || 'Georgia').trim(),
@@ -196,6 +230,7 @@
       coach: String(row.coach_name || '\u10d0\u10e0 \u10d0\u10e0\u10d8\u10e1 \u10db\u10d8\u10d7\u10d8\u10d7\u10d4\u10d1\u10e3\u10da\u10d8').trim(),
       playersCount: playerCount,
       votesCount: votesCount,
+      logoPath: resolveClubLogo(row.logo_path, shortCode),
       route: buildTeamHref(slug),
       summary: String(row.summary || '').trim()
     };
@@ -260,7 +295,7 @@
       const [clubResponse, players] = await Promise.all([
         client
           .from('clubs')
-          .select('id, slug, short_code, name, city, country, age_band, coach_name, players_count, summary, is_public, is_active')
+          .select('id, slug, short_code, name, city, country, age_band, coach_name, players_count, logo_path, summary, is_public, is_active')
           .eq('is_public', true)
           .eq('is_active', true)
           .order('name', { ascending: true }),
