@@ -74,7 +74,7 @@
       border-radius: 24px;
       box-shadow: 0 20px 40px rgba(15,23,42,0.15);
       padding: 24px;
-      max-height: 500px;
+      max-height: 550px;
       overflow-y: auto;
     }
     
@@ -121,12 +121,14 @@
       margin-bottom:18px;
     }
     
-    /* Grid-ები და ბარათები */
-    .poll-results-grid {
+    /* მოგვარებული Grid - აღარ გაწელავს 1-2 სურათს უზარმაზარ ზომაზე */
+    .poll-results-grid,
+    .poll-top-list {
       display:grid;
-      grid-template-columns:repeat(2,minmax(0,1fr));
+      grid-template-columns:repeat(auto-fill, minmax(180px, 1fr));
       gap:16px;
     }
+    
     .poll-empty {
       padding:22px;
       border-radius:20px;
@@ -136,10 +138,10 @@
       text-align:center;
       line-height:1.75;
     }
+    
     .poll-card {
       display:flex;
       flex-direction:column;
-      gap:14px;
       padding:14px;
       border-radius:22px;
       background:var(--bg-alt);
@@ -152,15 +154,23 @@
       border-color:rgba(185,28,28,.24);
       box-shadow:var(--shadow-hover);
     }
-    .poll-card-head {
-      display:grid;
-      gap:12px;
+    
+    /* ბმული რომელიც სურათსა და სახელს აერთიანებს */
+    .poll-profile-link {
+      text-decoration: none;
+      color: inherit;
+      display: grid;
+      gap: 12px;
     }
+    .poll-profile-link:hover h3 {
+      color: var(--red);
+    }
+    
     .poll-card-media {
       position:relative;
       overflow:hidden;
       border-radius:18px;
-      aspect-ratio:4/5;
+      aspect-ratio: 1 / 1; /* კვადრატული პროპორცია უკეთესია ბარათისთვის */
       background:linear-gradient(180deg,#e2e8f0 0%,#cbd5e1 100%);
     }
     .poll-rank-chip {
@@ -186,7 +196,6 @@
       height:100%;
       border-radius:0;
       object-fit:cover;
-      overflow:hidden;
       display:block;
       background:#e2e8f0;
     }
@@ -195,98 +204,75 @@
       place-items:center;
       color:#0f172a;
       font-weight:900;
-      font-size:2rem;
+      font-size:2.5rem;
     }
+    
     .poll-card-copy h3 {
       font-size:.98rem;
       margin-bottom:8px;
       line-height:1.3;
+      transition: color 0.2s;
     }
     .poll-meta {
       display:flex;
       flex-wrap:wrap;
-      gap:8px;
+      gap:6px;
+      margin-bottom: 12px;
     }
     .poll-badge {
       display:inline-flex;
       align-items:center;
-      padding:6px 10px;
-      border-radius:999px;
+      padding:4px 8px;
+      border-radius:6px;
       background:#fff;
       border:1px solid var(--line);
       color:var(--muted-2);
-      font-size:.76rem;
+      font-size:.72rem;
       font-weight:700;
     }
-    .poll-vote-row {
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:14px;
-      flex-wrap:wrap;
-      margin-top:auto;
+    
+    .poll-vote-info {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: auto;
+      padding-top: 10px;
+      border-top: 1px solid var(--line);
     }
     .poll-count {
-      display:inline-flex;
-      align-items:center;
-      padding:8px 12px;
-      border-radius:999px;
-      background:#fff;
-      border:1px solid rgba(185,28,28,.16);
-      color:var(--red-2);
-      font-size:.8rem;
-      font-weight:800;
-    }
-    .poll-actions-group {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-    }
-    .profile-link-btn {
-      display: inline-flex;
-      align-items: center;
-      padding: 8px 14px;
-      border-radius: 999px;
-      background: #f1f5f9;
-      color: #0f172a;
-      font-size: .8rem;
-      font-weight: 700;
-      text-decoration: none;
-      transition: .2s;
-    }
-    .profile-link-btn:hover {
-      background: #e2e8f0;
-    }
-    .poll-vote-button {
-      min-width:130px;
-    }
-    .poll-vote-button.is-voted,
-    .poll-vote-button[disabled] {
-      background:#dcfce7;
-      color:#166534;
-      border-color:#bbf7d0;
-      box-shadow:none;
-      cursor:default;
-    }
-    .poll-top-list {
-      display:grid;
-      grid-template-columns:repeat(5,minmax(0,1fr));
-      gap:16px;
+      color: var(--red-2);
+      font-size: .85rem;
+      font-weight: 800;
     }
     
-    @media (max-width:1080px) {
-      .poll-top-list {
-        grid-template-columns:repeat(3,minmax(0,1fr));
-      }
+    /* ხმის მიცემის ღილაკი ქვემოთ, სრულ სიგანეზე */
+    .poll-vote-button {
+      width: 100%;
+      margin-top: 12px;
+      padding: 10px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: .85rem;
     }
+    
+    /* გამწვანებული, მიცემული ხმის სტილი */
+    .poll-vote-button.is-voted,
+    .poll-vote-button[disabled].is-voted {
+      background: #16a34a !important; /* მკვეთრი მწვანე */
+      color: #ffffff !important;
+      border-color: #15803d !important;
+      box-shadow: 0 4px 12px rgba(22, 163, 74, 0.2);
+      cursor: default;
+    }
+    
     @media (max-width:760px) {
       .poll-search-panel,
       .poll-top-panel {
         padding:22px 18px;
       }
-      .poll-top-list,
-      .poll-results-grid {
-        grid-template-columns:repeat(1,minmax(0,1fr));
+      .poll-results-grid,
+      .poll-top-list {
+        grid-template-columns:repeat(2, minmax(130px, 1fr)); /* მობილურზე 2 სვეტი */
       }
     }
   </style>
@@ -318,40 +304,7 @@
 
   <section class="page-hero" hidden>
     <div class="container grid-2 poll-hero-grid">
-      <div class="hero-copy">
-        <div class="eyebrow">საზოგადოებრივი ხმის მიცემა</div>
-        <h1>გამოკითხვები, სადაც შეგიძლია მოძებნო ფეხბურთელი და მისცე ხმა</h1>
-        <p class="lead">
-          აქ ჩანს მხოლოდ რეგისტრირებული ფეხბურთელები. ჩაწერე სახელი და გვარი, მოძებნე კანდიდატი,
-          ნახე რამდენი ხმა აქვს და დაუჭირე მხარი. ხმის მიცემა შეუძლია მხოლოდ რეგისტრირებულ მომხმარებელს,
-          როლის მიუხედავად.
-        </p>
-        <div class="poll-gate">ერთ მომხმარებელს თითო კანდიდატზე მხოლოდ ერთი ხმა შეუძლია</div>
       </div>
-
-      <div class="card red poll-side-card">
-        <div class="eyebrow">გამოკითხვის სტატუსი</div>
-        <h3 style="font-size:1.55rem;">ძებნით იპოვე კანდიდატი და ნახე ტოპ 10 ყველაზე მეტი ხმით</h3>
-        <p class="lead" style="margin-top:14px; max-width:none;">
-          სია თავიდან დამალულია, რომ გვერდი სუფთა დარჩეს. შედეგები გამოჩნდება მხოლოდ მაშინ,
-          როცა საძიებოში სახელს ან გვარს ჩაწერ.
-        </p>
-        <div class="poll-stat-grid">
-          <div class="poll-stat">
-            <strong id="pollCandidatesCount">0</strong>
-            <span class="small">რეგისტრირებული კანდიდატი</span>
-          </div>
-          <div class="poll-stat">
-            <strong id="pollVotesCount">0</strong>
-            <span class="small">ჯამური ხმები</span>
-          </div>
-          <div class="poll-stat">
-            <strong>Top 10</strong>
-            <span class="small">ყველაზე მეტი მხარდაჭერა</span>
-          </div>
-        </div>
-      </div>
-    </div>
   </section>
 
   <section class="section-sm bg-alt">
@@ -398,38 +351,7 @@
 
   <footer class="section-sm bg-alt">
     <div class="container">
-      <div class="grid-3">
-        <div>
-          <a href="index.html" class="brand">
-            <span class="logo">DM</span>
-            <span>Football Georgia</span>
-          </a>
-          <p class="small" style="margin-top:16px; line-height:1.8;">
-            ფეხბურთელების პლატფორმა, სადაც პროგრესი, ხმის მიცემა და აღმოჩენა ერთ სივრცეში იყრის თავს.
-          </p>
-        </div>
-
-        <div>
-          <h3 style="margin-bottom:14px;">გვერდები</h3>
-          <div style="display:grid; gap:10px;" class="small">
-            <a href="pexburtelebi.html">ფეხბურთელები</a>
-            <a href="gundebi.html">გუნდები</a>
-            <a href="coaching.html">ქოუჩინგი</a>
-            <a href="gamokitkhvebi.html">გამოკითხვები</a>
-          </div>
-        </div>
-
-        <div>
-          <h3 style="margin-bottom:14px;">წვდომა</h3>
-          <div style="display:grid; gap:10px;" class="small">
-            <a href="login.html?redirect=gamokitkhvebi.html%23login#login">შესვლა</a>
-            <a href="login.html?redirect=gamokitkhvebi.html%23register#register">რეგისტრაცია</a>
-            <a href="user-profile.html?from=gamokitkhvebi.html">პროფილი</a>
-            <a href="cxrilebi.html">ცხრილები</a>
-          </div>
-        </div>
       </div>
-    </div>
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -445,8 +367,6 @@
     const resultsState = document.getElementById('pollResultsState');
     const topList = document.getElementById('pollTopList');
     const searchWrapper = document.getElementById('searchWrapper');
-    const candidatesCount = document.getElementById('pollCandidatesCount');
-    const votesCount = document.getElementById('pollVotesCount');
 
     let currentUser = null;
     let registeredCandidates = [];
@@ -501,21 +421,17 @@
       const voted = hasCurrentUserVoted(candidate);
       const votable = Boolean(candidate.playerId);
       const buttonLabel = !votable
-        ? 'ხმა ჯერ ვერ მოიცემა'
+        ? 'ხმა ვერ მოიცემა'
         : currentUser
-          ? (voted ? 'ხმა მიცემულია' : 'ხმის მიცემა')
+          ? (voted ? '✓ ხმა მიცემულია' : 'ხმის მიცემა')
           : 'შესვლა და ხმა';
 
       const rankMarkup = settings.rank ? `<span class="poll-rank-chip">#${settings.rank}</span>` : '';
-      
       const profileHref = `player.html?id=${escapeHtml(candidate.playerId)}`;
-      const profileButton = votable 
-        ? `<a href="${profileHref}" class="profile-link-btn">პროფილი ⇾</a>` 
-        : '';
 
       return `
         <article class="poll-card">
-          <div class="poll-card-head">
+          <a href="${profileHref}" class="poll-profile-link">
             <div class="poll-card-media">
               ${rankMarkup}
               ${createAvatarMarkup(candidate)}
@@ -526,19 +442,18 @@
                 ${meta.map(item => `<span class="poll-badge">${escapeHtml(item)}</span>`).join('')}
               </div>
             </div>
-          </div>
-          <div class="poll-vote-row">
+          </a>
+          
+          <div class="poll-vote-info">
             <span class="poll-count">${voteCount} ხმა</span>
-            <div class="poll-actions-group">
-              ${profileButton}
-              <button
-                type="button"
-                class="btn btn-secondary poll-vote-button${voted ? ' is-voted' : ''}"
-                data-candidate-key="${escapeHtml(candidate.key)}"
-                ${(votable && !voted) ? '' : 'disabled'}
-              >${buttonLabel}</button>
-            </div>
           </div>
+
+          <button
+            type="button"
+            class="btn btn-secondary poll-vote-button ${voted ? 'is-voted' : ''}"
+            data-candidate-key="${escapeHtml(candidate.key)}"
+            ${(votable && !voted) ? '' : 'disabled'}
+          >${buttonLabel}</button>
         </article>
       `;
     }
@@ -574,11 +489,6 @@
       resultsGrid.innerHTML = matches.map(createCandidateCard).join('');
     }
 
-    function updateCounters() {
-      if(candidatesCount) candidatesCount.textContent = String(registeredCandidates.length);
-      if(votesCount) votesCount.textContent = String(registeredCandidates.reduce((sum, candidate) => sum + getVoteCountForCandidate(candidate), 0));
-    }
-
     function renderTopTenCards() {
       const ranked = registeredCandidates
         .map(candidate => ({ ...candidate, votes: getVoteCountForCandidate(candidate) }))
@@ -602,10 +512,6 @@
 
       const { data } = await client.auth.getSession();
       currentUser = data?.session?.user || null;
-
-      if (currentUser && window.sitePlayerDomain?.syncMyAccountDomain) {
-        await window.sitePlayerDomain.syncMyAccountDomain(client);
-      }
 
       if (currentUser && window.sitePlayerDomain?.fetchCurrentUserVotes) {
         currentUserVotes = new Set(await window.sitePlayerDomain.fetchCurrentUserVotes(client, currentUser.id));
@@ -666,8 +572,6 @@
 
       if (hasCurrentUserVoted(candidate)) {
         setPollHelper('ამ ფეხბურთელზე ხმა უკვე მიცემული გაქვს.');
-        renderSearchResults();
-        renderTopTenCards();
         return;
       }
 
@@ -681,25 +585,14 @@
         return;
       }
 
-      if (voteResult.reason === 'duplicate') {
-        currentUserVotes.add(String(candidate.playerId));
-        setPollHelper('ამ ფეხბურთელზე ხმა უკვე მიცემული გაქვს.');
-        await loadCandidates();
-        updateCounters();
-        renderSearchResults();
-        renderTopTenCards();
-        return;
-      }
-
       currentUserVotes.add(String(candidate.playerId));
       await loadCandidates();
       setPollHelper('ხმა წარმატებით დაფიქსირდა.');
-      updateCounters();
       renderSearchResults();
       renderTopTenCards();
     }
 
-    // ხმის მიცემის Click Event-ები
+    // მოქმედებები დაკლიკებაზე
     resultsGrid.addEventListener('click', event => {
       const button = event.target.closest('.poll-vote-button');
       if (button) handleVote(button.getAttribute('data-candidate-key'));
@@ -712,7 +605,6 @@
 
     searchInput.addEventListener('input', renderSearchResults);
 
-    // ფანჯრის გარეთ დაკლიკებისას Dropdown-ის დამალვა
     document.addEventListener('click', (event) => {
       if (!searchWrapper.contains(event.target)) {
         dropdown.hidden = true;
@@ -735,7 +627,6 @@
       await loadCurrentUser();
       await loadCandidates();
       setPollHelper('');
-      updateCounters();
       renderSearchResults();
       renderTopTenCards();
     }
