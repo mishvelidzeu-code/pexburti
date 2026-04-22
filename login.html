@@ -316,9 +316,88 @@
     }
     .forgot-password:hover{color:var(--red)}
 
+    .role-picker{
+      display:grid;
+      grid-template-columns:repeat(2, minmax(0, 1fr));
+      gap:12px;
+      margin:0 0 14px;
+    }
+    .role-option{
+      width:100%;
+      display:grid;
+      gap:6px;
+      text-align:left;
+      padding:16px 16px 15px;
+      border-radius:20px;
+      border:1px solid var(--line);
+      background:#fff;
+      color:var(--text);
+      cursor:pointer;
+      transition:.22s ease;
+      box-shadow:0 10px 24px rgba(15,23,42,.06);
+    }
+    .role-option:hover{
+      transform:translateY(-2px);
+      box-shadow:0 18px 36px rgba(15,23,42,.10);
+    }
+    .role-option.active{
+      transform:translateY(-2px);
+      box-shadow:0 20px 42px rgba(15,23,42,.12);
+      outline:3px solid rgba(185,28,28,.12);
+    }
+    .role-option strong{
+      display:block;
+      font-size:.95rem;
+      font-weight:900;
+      letter-spacing:-.02em;
+      line-height:1.2;
+    }
+    .role-option span{
+      display:block;
+      font-size:.78rem;
+      line-height:1.45;
+      opacity:.9;
+    }
+    .role-option.theme-white{
+      background:#fff;
+      color:var(--text);
+      border-color:rgba(16,24,40,.14);
+    }
+    .role-option.theme-red{
+      background:linear-gradient(180deg,#c81e1e 0%,#991b1b 100%);
+      color:#fff;
+      border-color:rgba(185,28,28,.2);
+    }
+    .role-option.theme-black{
+      background:#020617;
+      color:#fff;
+      border-color:#020617;
+    }
+    .role-option.theme-green{
+      background:linear-gradient(180deg,#15803d 0%,#166534 100%);
+      color:#fff;
+      border-color:rgba(21,128,61,.2);
+    }
+    .role-option-link{
+      text-decoration:none;
+    }
+    .role-option-badge{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      width:max-content;
+      min-height:28px;
+      padding:0 10px;
+      border-radius:999px;
+      background:rgba(255,255,255,.16);
+      border:1px solid rgba(255,255,255,.2);
+      font-size:.7rem;
+      font-weight:900;
+      letter-spacing:.01em;
+    }
     .role-note{
-      margin:-4px 0 18px;
-      padding:14px 16px;
+      margin:-2px 0 18px;
+      padding:13px 15px;
       border-radius:18px;
       border:1px solid var(--line);
       background:var(--panel-2);
@@ -338,32 +417,40 @@
     .role-fields{
       margin-bottom:18px;
     }
-    .role-empty{
-      padding:14px 16px;
-      border-radius:18px;
-      border:1px dashed var(--line-2);
-      background:var(--panel-2);
-      color:var(--muted);
-      font-size:.88rem;
+    .date-input-wrap{
+      position:relative;
     }
-    .role-card{
-      padding:14px 16px;
-      border-radius:18px;
-      border:1px solid rgba(185,28,28,.16);
-      background:#fff7f7;
-      margin-bottom:14px;
+    .date-input-wrap .form-input{
+      padding-right:52px;
+      background:#fff;
     }
-    .role-card strong{
-      display:block;
-      margin-bottom:4px;
-      font-size:.86rem;
-      font-weight:900;
-      color:var(--red-2);
+    .date-trigger{
+      position:absolute;
+      top:50%;
+      right:10px;
+      transform:translateY(-50%);
+      width:36px;
+      height:36px;
+      border:none;
+      border-radius:12px;
+      background:#f1f5f9;
+      color:var(--muted-2);
+      display:grid;
+      place-items:center;
+      cursor:pointer;
+      transition:.2s ease;
     }
-    .role-card span{
-      display:block;
-      color:var(--muted);
-      font-size:.84rem;
+    .date-trigger:hover{
+      background:#e2e8f0;
+      transform:translateY(calc(-50% - 1px));
+    }
+    .date-input-wrap input[type="date"]::-webkit-calendar-picker-indicator{
+      opacity:0;
+      position:absolute;
+      right:8px;
+      width:36px;
+      height:36px;
+      cursor:pointer;
     }
     .form-hint{
       margin-top:6px;
@@ -529,6 +616,9 @@
       .form-row{
         grid-template-columns:1fr;
       }
+      .role-picker{
+        grid-template-columns:1fr;
+      }
       .nav-links{
         display:none;
       }
@@ -616,15 +706,15 @@
       </div>
 
       <div class="auth-float float-agent">
-        <span class="mini-pill">აგენტი</span>
-        <strong>აკავშირებს ტალანტს და შესაძლებლობას</strong>
-        <p>მართავს კონტაქტებს, ხედავს მოთამაშეებს და ქმნის უფრო სუფთა საკომუნიკაციო არხს კლუბებთან.</p>
+        <span class="mini-pill">გუნდი</span>
+        <strong>დაამატე შენი გუნდი სწორად</strong>
+        <p>გუნდის მოთხოვნა მიდის ადმინთან, დადასტურების შემდეგ კი გუნდი ემატება ბაზას და ხდება არჩევადი მთელ პლატფორმაზე.</p>
       </div>
 
       <div class="auth-float float-exposure">
-        <span class="mini-pill">Exposure</span>
-        <strong>სწორად გამოჩენა ზრდის შანსს</strong>
-        <p>პროფილი, გუნდი, სტატისტიკა და ვიდეო ერთად უფრო დამაჯერებელ პირველ შთაბეჭდილებას ქმნის.</p>
+        <span class="mini-pill">განვითარდი</span>
+        <strong>შექმენი სუფთა და ძლიერი საფეხბურთო გზა</strong>
+        <p>პროფილი, გუნდი, სტატისტიკა და სწორი ფორმით შევსებული ინფორმაცია შენს პროგრესს ბევრად უკეთ აჩენს.</p>
       </div>
 
       <div class="auth-box">
@@ -662,6 +752,40 @@
         </div>
 
         <form id="registerForm">
+          <div class="form-group">
+            <label class="form-label">აირჩიე როლი</label>
+            <input id="roleSelect" type="hidden" value="">
+            <div class="role-picker" id="rolePicker">
+              <button type="button" class="role-option theme-white" data-role-option="player" aria-pressed="false">
+                <span class="role-option-badge">მოთამაშე</span>
+                <strong>შექმენი შენი პროფილი</strong>
+                <span>მოათავსე დაბადების თარიღი, პოზიცია, გუნდი და დაიწყე საკუთარი გზის მართვა.</span>
+              </button>
+              <button type="button" class="role-option theme-black" data-role-option="parent" aria-pressed="false">
+                <span class="role-option-badge">მშობელი</span>
+                <strong>მართე ბავშვის გვერდი</strong>
+                <span>დაამატე არასრულწლოვანი მოთამაშე, შეურჩიე გუნდი და აკონტროლე მისი პროგრესი.</span>
+              </button>
+              <button type="button" class="role-option theme-red" data-role-option="agent" aria-pressed="false">
+                <span class="role-option-badge">აგენტი</span>
+                <strong>მართე კავშირები სწორად</strong>
+                <span>შეიყვანე სააგენტოს მონაცემები და იმუშავე მოთამაშეების კარიერულ მიმართულებაზე.</span>
+              </button>
+              <a href="gundebi.html" class="role-option role-option-link theme-green">
+                <span class="role-option-badge">გუნდი</span>
+                <strong>გუნდის დამატება</strong>
+                <span>თუ გუნდის შეტანა გინდა, გამოიყენე ცალკე მოთხოვნის ფორმა გუნდების გვერდზე.</span>
+              </a>
+            </div>
+          </div>
+
+          <div id="roleNote" class="role-note">
+            <strong>აირჩიე ერთ-ერთი როლი</strong>
+            <span>მოთამაშე, მშობელი ან აგენტი. თუ გუნდის დამატება გჭირდება, გამოიყენე მწვანე ბარათი.</span>
+          </div>
+
+          <div id="roleFields" class="role-fields"></div>
+
           <div class="form-row">
             <div class="form-group">
               <label class="form-label" for="firstName">სახელი</label>
@@ -682,25 +806,6 @@
               <label class="form-label" for="phoneNumber">ტელეფონის ნომერი</label>
               <input id="phoneNumber" type="tel" class="form-input" placeholder="599123456" inputmode="numeric" pattern="[0-9]{9,12}" minlength="9" maxlength="12" data-digits-only="12" autocomplete="tel" required>
             </div>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label" for="roleSelect">როლი სისტემაში</label>
-            <select id="roleSelect" class="form-input" required>
-              <option value="" selected disabled>აირჩიეთ როლი...</option>
-              <option value="player">მოთამაშე</option>
-              <option value="parent">მშობელი</option>
-              <option value="agent">აგენტი</option>
-            </select>
-          </div>
-
-          <div id="roleNote" class="role-note">
-            <strong>აირჩიეთ როლი</strong>
-            <span>არჩეული როლის მიხედვით ფორმა ავტომატურად გაჩვენებს შესაბამის ველებს.</span>
-          </div>
-
-          <div id="roleFields" class="role-fields">
-            <div class="role-empty">როლის არჩევის შემდეგ აქ გამოჩნდება შესაბამისი კითხვები.</div>
           </div>
 
           <div class="form-group">
@@ -744,6 +849,7 @@
   <script src="auth-shared.js"></script>
   <script>
     const roleSelect = document.getElementById('roleSelect');
+    const roleOptions = document.querySelectorAll('[data-role-option]');
     const roleNote = document.getElementById('roleNote');
     const roleFields = document.getElementById('roleFields');
     const loginSection = document.getElementById('loginSection');
@@ -762,8 +868,8 @@
       : null;
 
     const defaultRoleNote = {
-      title: 'აირჩიეთ როლი',
-      description: 'არჩეული როლის მიხედვით ფორმა ავტომატურად გაჩვენებს შესაბამის სავალდებულო ველებს.'
+      title: 'აირჩიე ერთ-ერთი როლი',
+      description: 'მოთამაშე, მშობელი ან აგენტი. თუ გუნდის დამატება გჭირდება, გამოიყენე მწვანე ბარათი.'
     };
 
     const roleConfigurations = {
@@ -1010,7 +1116,17 @@
         return `
           <div class="form-group">
             <label class="form-label" for="${field.id}">${field.label}</label>
-            <input id="${field.id}" name="${field.id}" type="date" class="form-input" min="1900-01-01" max="${currentDateIso}" data-birthdate="true"${ageTarget} autocomplete="bday" required>
+            <div class="date-input-wrap">
+              <input id="${field.id}" name="${field.id}" type="date" class="form-input" min="1900-01-01" max="${currentDateIso}" data-birthdate="true"${ageTarget} autocomplete="bday" required>
+              <button type="button" class="date-trigger" data-open-picker-for="${field.id}" aria-label="კალენდრის გახსნა">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M8 2V5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                  <path d="M16 2V5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                  <rect x="3" y="4.5" width="18" height="16.5" rx="3" stroke="currentColor" stroke-width="2"/>
+                  <path d="M3 9H21" stroke="currentColor" stroke-width="2"/>
+                </svg>
+              </button>
+            </div>
             ${helper}
           </div>
         `;
@@ -1061,11 +1177,28 @@
     }
 
     function resetRoleState() {
+      roleSelect.value = '';
+      updateRolePicker('');
       roleNote.innerHTML = `
         <strong>${defaultRoleNote.title}</strong>
         <span>${defaultRoleNote.description}</span>
       `;
-      roleFields.innerHTML = '<div class="role-empty">როლის არჩევის შემდეგ აქ გამოჩნდება შესაბამისი კითხვები.</div>';
+      roleFields.innerHTML = '';
+    }
+
+    function updateRolePicker(role) {
+      roleOptions.forEach((option) => {
+        const isActive = option.dataset.roleOption === role;
+        option.classList.toggle('active', isActive);
+        option.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+      });
+    }
+
+    function setRoleSelection(role) {
+      roleSelect.value = role || '';
+      updateRolePicker(roleSelect.value);
+      renderRoleFields(roleSelect.value);
+      setStatus(registerStatus);
     }
 
     function syncComputedAge(source) {
@@ -1090,6 +1223,7 @@
         return;
       }
 
+      updateRolePicker(role);
       roleNote.innerHTML = `
         <strong>${config.title}</strong>
         <span>${config.description}</span>
@@ -1101,15 +1235,24 @@
         rows.push(`<div class="form-row">${currentFields}</div>`);
       }
 
-      roleFields.innerHTML = `
-        <div class="role-card">
-          <strong>${config.title}</strong>
-          <span>${config.description}</span>
-        </div>
-        ${rows.join('')}
-      `;
+      roleFields.innerHTML = rows.join('');
 
       roleFields.querySelectorAll('[data-age-target]').forEach(syncComputedAge);
+      roleFields.querySelectorAll('[data-open-picker-for]').forEach((button) => {
+        button.addEventListener('click', () => {
+          const input = document.getElementById(button.dataset.openPickerFor || '');
+          if (!input) {
+            return;
+          }
+
+          if (typeof input.showPicker === 'function') {
+            input.showPicker();
+          } else {
+            input.focus();
+            input.click();
+          }
+        });
+      });
 
       if (role === 'player') {
         initializeTeamAutocomplete(document.getElementById('playerTeam'));
@@ -1596,9 +1739,10 @@
       toggleForm(mode === 'register' ? 'register' : 'login', false);
     }
 
-    roleSelect.addEventListener('change', (event) => {
-      renderRoleFields(event.target.value);
-      setStatus(registerStatus);
+    roleOptions.forEach((option) => {
+      option.addEventListener('click', () => {
+        setRoleSelection(option.dataset.roleOption || '');
+      });
     });
 
     registerForm.addEventListener('input', (event) => {
@@ -1683,7 +1827,8 @@
     registerForm.addEventListener('submit', async (event) => {
       event.preventDefault();
       if (!roleSelect.value) {
-        roleSelect.reportValidity();
+        setStatus(registerStatus, 'აირჩიე როლი ზედა ბარათებიდან.', 'error');
+        roleOptions[0]?.focus();
         return;
       }
       setStatus(registerStatus);
@@ -1783,7 +1928,7 @@
     window.addEventListener('hashchange', syncFormFromLocation);
     window.addEventListener('DOMContentLoaded', () => {
       syncFormFromLocation();
-      renderRoleFields(roleSelect.value);
+      resetRoleState();
       sanitizeDigitsField(document.getElementById('personalNumber'));
       sanitizeDigitsField(document.getElementById('phoneNumber'));
       if (window.siteAuth?.renderAuthNav) {
