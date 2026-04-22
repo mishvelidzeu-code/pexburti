@@ -83,6 +83,7 @@
     player: 'მოთამაშე',
     parent: 'მშობელი',
     agent: 'აგენტი',
+    academy: 'გუნდის მენეჯერი',
     admin: 'ადმინისტრატორი'
   })[role] || 'მომხმარებელი';
 
@@ -1340,6 +1341,10 @@
     const role = auth.getUserRole ? auth.getUserRole(user) : 'player';
     if (role === 'admin') {
       location.href = 'admin-deshboard.html';
+      return;
+    }
+    if (role === 'academy') {
+      location.href = 'team-manager-dashboard.html';
       return;
     }
 

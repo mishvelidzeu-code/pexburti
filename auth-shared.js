@@ -3,6 +3,7 @@
   const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_EGyaVD9bOtD5PHJbT5qPpw_9P4MHhwE';
   const DEFAULT_PROFILE_ROUTE = 'user-profile.html';
   const DEFAULT_ADMIN_ROUTE = 'admin-deshboard.html';
+  const DEFAULT_MANAGER_ROUTE = 'team-manager-dashboard.html';
 
   function getClient() {
     if (window.__mfgSupabaseClient) {
@@ -42,9 +43,14 @@
   }
 
   function getProfileRouteForRole(role) {
-    return normalizeRole(role) === 'admin'
-      ? DEFAULT_ADMIN_ROUTE
-      : DEFAULT_PROFILE_ROUTE;
+    const normalizedRole = normalizeRole(role);
+    if (normalizedRole === 'admin') {
+      return DEFAULT_ADMIN_ROUTE;
+    }
+    if (normalizedRole === 'academy') {
+      return DEFAULT_MANAGER_ROUTE;
+    }
+    return DEFAULT_PROFILE_ROUTE;
   }
 
   function getProfileRouteForUser(user) {
@@ -208,7 +214,7 @@
     const base = parts[0] || '';
     const search = parts[1] || '';
 
-    if ((base === DEFAULT_PROFILE_ROUTE || base === DEFAULT_ADMIN_ROUTE) && search) {
+    if ((base === DEFAULT_PROFILE_ROUTE || base === DEFAULT_ADMIN_ROUTE || base === DEFAULT_MANAGER_ROUTE) && search) {
       const params = new URLSearchParams(search);
       return sanitizeInternalPath(params.get('from'), 'index.html');
     }
@@ -231,6 +237,26 @@
           href: buildProfileHref(`${DEFAULT_PROFILE_ROUTE}?view=data`, fromPath),
           title: 'მონაცემები',
           copy: 'საკუთარი მონაცემების და ანგარიშის პარამეტრების ნახვა.'
+        }
+      ];
+    }
+
+    if (role === 'academy') {
+      return [
+        {
+          href: buildProfileHref(`${DEFAULT_MANAGER_ROUTE}#overview`, fromPath),
+          title: 'მენეჯერის დაფა',
+          copy: 'გუნდის მართვა, მოთხოვნები და ძირითადი სამუშაო სივრცე.'
+        },
+        {
+          href: buildProfileHref(`${DEFAULT_MANAGER_ROUTE}#team`, fromPath),
+          title: 'გუნდის ინფორმაცია',
+          copy: 'კლუბის ძირითადი მონაცემები, სტატუსი და გუნდის კონტექსტი.'
+        },
+        {
+          href: buildProfileHref(`${DEFAULT_MANAGER_ROUTE}#requests`, fromPath),
+          title: 'მოთხოვნები',
+          copy: 'გუნდის მოთხოვნები, დამტკიცების სტატუსი და კომუნიკაცია.'
         }
       ];
     }

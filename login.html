@@ -251,10 +251,12 @@
     .auth-float.featured p{
       color:#fff;
     }
-    .float-player{top:66px;left:24px}
-    .float-parent{top:108px;right:28px}
-    .float-agent{bottom:98px;left:48px}
-    .float-exposure{bottom:72px;right:36px}
+    .float-player{top:54px;left:22px}
+    .float-parent{top:90px;right:28px}
+    .float-agent{bottom:112px;left:26px}
+    .float-exposure{bottom:84px;right:26px}
+    .float-mentor{top:286px;left:-8px}
+    .float-scout{top:318px;right:-4px}
     .auth-header{
       text-align:center;
       margin-bottom:22px;
@@ -323,6 +325,8 @@
       margin:0 0 14px;
     }
     .role-option{
+      position:relative;
+      overflow:hidden;
       width:100%;
       display:grid;
       gap:6px;
@@ -336,14 +340,37 @@
       transition:.22s ease;
       box-shadow:0 10px 24px rgba(15,23,42,.06);
     }
+    .role-option::after{
+      content:'';
+      position:absolute;
+      top:12px;
+      right:12px;
+      width:28px;
+      height:28px;
+      border-radius:999px;
+      border:1px solid rgba(15,23,42,.12);
+      background:rgba(255,255,255,.78);
+      box-shadow:0 8px 18px rgba(15,23,42,.08);
+      opacity:.7;
+      transition:.22s ease;
+    }
     .role-option:hover{
       transform:translateY(-2px);
       box-shadow:0 18px 36px rgba(15,23,42,.10);
     }
     .role-option.active{
-      transform:translateY(-2px);
-      box-shadow:0 20px 42px rgba(15,23,42,.12);
-      outline:3px solid rgba(185,28,28,.12);
+      transform:translateY(-3px) scale(1.01);
+      box-shadow:0 22px 44px rgba(15,23,42,.14);
+      outline:none;
+    }
+    .role-option.active::after{
+      content:'✓';
+      display:grid;
+      place-items:center;
+      font-size:.92rem;
+      font-weight:900;
+      opacity:1;
+      transform:scale(1.04);
     }
     .role-option strong{
       display:block;
@@ -363,20 +390,56 @@
       color:var(--text);
       border-color:rgba(16,24,40,.14);
     }
+    .role-option.theme-white.active{
+      border-color:rgba(185,28,28,.34);
+      box-shadow:0 0 0 3px rgba(185,28,28,.12), 0 24px 44px rgba(15,23,42,.12);
+    }
+    .role-option.theme-white.active::after{
+      background:#b91c1c;
+      border-color:#b91c1c;
+      color:#fff;
+    }
     .role-option.theme-red{
       background:linear-gradient(180deg,#c81e1e 0%,#991b1b 100%);
       color:#fff;
       border-color:rgba(185,28,28,.2);
+    }
+    .role-option.theme-red.active{
+      border-color:rgba(255,255,255,.52);
+      box-shadow:0 0 0 3px rgba(185,28,28,.14), inset 0 0 0 2px rgba(255,255,255,.24), 0 24px 44px rgba(127,29,29,.28);
+    }
+    .role-option.theme-red.active::after{
+      background:#fff;
+      border-color:#fff;
+      color:#991b1b;
     }
     .role-option.theme-black{
       background:#020617;
       color:#fff;
       border-color:#020617;
     }
+    .role-option.theme-black.active{
+      border-color:rgba(248,250,252,.7);
+      box-shadow:0 0 0 3px rgba(15,23,42,.16), inset 0 0 0 2px rgba(255,255,255,.2), 0 24px 44px rgba(2,6,23,.28);
+    }
+    .role-option.theme-black.active::after{
+      background:#fff;
+      border-color:#fff;
+      color:#020617;
+    }
     .role-option.theme-green{
       background:linear-gradient(180deg,#15803d 0%,#166534 100%);
       color:#fff;
       border-color:rgba(21,128,61,.2);
+    }
+    .role-option.theme-green.active{
+      border-color:rgba(220,252,231,.72);
+      box-shadow:0 0 0 3px rgba(21,128,61,.16), inset 0 0 0 2px rgba(255,255,255,.24), 0 24px 44px rgba(22,101,52,.24);
+    }
+    .role-option.theme-green.active::after{
+      background:#fff;
+      border-color:#fff;
+      color:#166534;
     }
     .role-option-link{
       text-decoration:none;
@@ -638,9 +701,11 @@
         width:250px;
       }
       .float-player{top:28px;left:0}
-      .float-parent{top:74px;right:0}
-      .float-agent{bottom:46px;left:0}
-      .float-exposure{bottom:22px;right:0}
+      .float-parent{top:72px;right:0}
+      .float-agent{bottom:84px;left:0}
+      .float-exposure{bottom:18px;right:0}
+      .float-mentor{top:252px;left:0}
+      .float-scout{top:302px;right:0}
     }
     @media (max-width:820px){
       .auth-scene{
@@ -665,6 +730,8 @@
       .float-parent{order:3}
       .float-agent{order:4}
       .float-exposure{order:5}
+      .float-mentor{order:6}
+      .float-scout{order:7}
     }
   </style>
 </head>
@@ -706,15 +773,27 @@
       </div>
 
       <div class="auth-float float-agent">
-        <span class="mini-pill">გუნდი</span>
-        <strong>დაამატე შენი გუნდი სწორად</strong>
-        <p>გუნდის მოთხოვნა მიდის ადმინთან, დადასტურების შემდეგ კი გუნდი ემატება ბაზას და ხდება არჩევადი მთელ პლატფორმაზე.</p>
+        <span class="mini-pill">გუნდის მენეჯერი</span>
+        <strong>მართე გუნდი ერთ სივრცეში</strong>
+        <p>აკონტროლე გუნდის ინფორმაცია, ძირითადი კომუნიკაცია და მოთამაშეების ნაკადი ერთი სამუშაო დაფიდან.</p>
       </div>
 
       <div class="auth-float float-exposure">
         <span class="mini-pill">განვითარდი</span>
         <strong>შექმენი სუფთა და ძლიერი საფეხბურთო გზა</strong>
         <p>პროფილი, გუნდი, სტატისტიკა და სწორი ფორმით შევსებული ინფორმაცია შენს პროგრესს ბევრად უკეთ აჩენს.</p>
+      </div>
+
+      <div class="auth-float float-mentor">
+        <span class="mini-pill">მენტორობა</span>
+        <strong>მიიღე უკუკავშირი და სწორი მიმართულება</strong>
+        <p>როდესაც სისტემა სწორად ივსება, უფრო ადვილია ყველაფერი ერთ რითმში იყოს: კომუნიკაცია, შეფასება და შემდეგი ნაბიჯი.</p>
+      </div>
+
+      <div class="auth-float float-scout">
+        <span class="mini-pill">სკაუტინგი</span>
+        <strong>გახდი უფრო ხილული სწორ აუდიტორიასთან</strong>
+        <p>შევსებული პროფილი უფრო სუფთად აჩვენებს მოთამაშეს, ბავშვს ან გუნდს იმ ადამიანებისთვის, ვინც რეალურ შესაძლებლობებს ეძებს.</p>
       </div>
 
       <div class="auth-box">
@@ -771,17 +850,17 @@
                 <strong>მართე კავშირები სწორად</strong>
                 <span>შეიყვანე სააგენტოს მონაცემები და იმუშავე მოთამაშეების კარიერულ მიმართულებაზე.</span>
               </button>
-              <a href="gundebi.html" class="role-option role-option-link theme-green">
-                <span class="role-option-badge">გუნდი</span>
-                <strong>გუნდის დამატება</strong>
-                <span>თუ გუნდის შეტანა გინდა, გამოიყენე ცალკე მოთხოვნის ფორმა გუნდების გვერდზე.</span>
-              </a>
+              <button type="button" class="role-option theme-green" data-role-option="academy" aria-pressed="false">
+                <span class="role-option-badge">გუნდის მენეჯერი</span>
+                <strong>მართე გუნდი სისტემიდან</strong>
+                <span>მიიღე ცალკე dashboard გუნდის სამართავად, საკონტაქტო არხებისთვის და ძირითად საოპერაციო პროცესებისთვის.</span>
+              </button>
             </div>
           </div>
 
           <div id="roleNote" class="role-note">
             <strong>აირჩიე ერთ-ერთი როლი</strong>
-            <span>მოთამაშე, მშობელი ან აგენტი. თუ გუნდის დამატება გჭირდება, გამოიყენე მწვანე ბარათი.</span>
+            <span>მოთამაშე, მშობელი, აგენტი ან გუნდის მენეჯერი.</span>
           </div>
 
           <div id="roleFields" class="role-fields"></div>
@@ -869,7 +948,7 @@
 
     const defaultRoleNote = {
       title: 'აირჩიე ერთ-ერთი როლი',
-      description: 'მოთამაშე, მშობელი ან აგენტი. თუ გუნდის დამატება გჭირდება, გამოიყენე მწვანე ბარათი.'
+      description: 'მოთამაშე, მშობელი, აგენტი ან გუნდის მენეჯერი.'
     };
 
     const roleConfigurations = {
@@ -927,6 +1006,16 @@
           { id: 'playersManaged', label: 'რამდენ მოთამაშეს წარმოადგენ', type: 'number', placeholder: 'მაგ: 8', min: '1', max: '200' },
           { id: 'agencyRegion', label: 'რეგიონი / ბაზარი', type: 'text', placeholder: 'მაგ: თბილისი / საქართველო' },
           { id: 'agentFocus', label: 'ძირითადი მიმართულება', type: 'select', options: ['ახალგაზრდა მოთამაშეები', 'პროფესიონალები', 'საერთაშორისო ტრანსფერები', 'სკაუტინგი და კარიერის მართვა'] }
+        ]
+      },
+      academy: {
+        title: 'გუნდის მენეჯერის რეგისტრაცია',
+        description: 'მიუთითე გუნდის მართვასთან დაკავშირებული ძირითადი ინფორმაცია. შესვლის შემდეგ გაიხსნება ცალკე სამუშაო დაფა.',
+        fields: [
+          { id: 'managerClubName', label: 'გუნდის სახელი', type: 'text', placeholder: 'მაგ: დინამო ავჭალა' },
+          { id: 'managerCity', label: 'მდებარეობა', type: 'text', placeholder: 'მაგ: თბილისი' },
+          { id: 'managerPosition', label: 'შენი როლი გუნდში', type: 'select', options: ['გენერალური მენეჯერი', 'აკადემიის მენეჯერი', 'კოორდინატორი', 'ოპერაციული მენეჯერი'] },
+          { id: 'managerFocus', label: 'ძირითადი ფოკუსი', type: 'select', options: ['მოთამაშეების მართვა', 'რეგისტრაცია და კომუნიკაცია', 'სკაუტინგი და ტრაიალები', 'სრული საოპერაციო მართვა'] }
         ]
       }
     };
