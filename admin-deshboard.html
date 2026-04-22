@@ -377,6 +377,99 @@
       font-size: .85rem;
       color: var(--muted);
     }
+    .requests-card {
+      margin-bottom: 24px;
+    }
+    .requests-body {
+      padding: 24px;
+      display: grid;
+      gap: 14px;
+    }
+    .requests-state {
+      border-radius: 20px;
+      border: 1px dashed rgba(16,24,40,.16);
+      background: #f8fafc;
+      color: var(--muted);
+      padding: 18px 20px;
+      font-size: .92rem;
+      font-weight: 700;
+    }
+    .requests-state.error {
+      background: #fff1f2;
+      border-color: rgba(185,28,28,.18);
+      color: #991b1b;
+    }
+    .requests-state.success {
+      background: #f0fdf4;
+      border-color: rgba(34,197,94,.18);
+      color: #166534;
+    }
+    .request-list {
+      display: grid;
+      gap: 14px;
+    }
+    .request-item {
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      padding: 18px;
+      background: #fff;
+      display: grid;
+      gap: 14px;
+    }
+    .request-main {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .request-main h4 {
+      margin: 0 0 6px;
+      font-size: 1rem;
+      font-weight: 900;
+      letter-spacing: -.02em;
+    }
+    .request-main p {
+      margin: 0;
+      color: var(--muted);
+      font-size: .88rem;
+    }
+    .request-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .request-meta .chip {
+      background: #fff;
+    }
+    .request-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .request-actions .btn {
+      min-height: 42px;
+      padding: 0 16px;
+      font-size: 13px;
+    }
+    .request-inline-status {
+      border-radius: 16px;
+      padding: 10px 12px;
+      background: #f8fafc;
+      color: var(--muted-2);
+      border: 1px solid rgba(16,24,40,.08);
+      font-size: .82rem;
+      font-weight: 700;
+    }
+    .request-inline-status.error {
+      background: #fff1f2;
+      border-color: rgba(185,28,28,.18);
+      color: #991b1b;
+    }
+    .request-inline-status.success {
+      background: #f0fdf4;
+      border-color: rgba(34,197,94,.18);
+      color: #166534;
+    }
 
     @media (max-width: 1024px) {
       .dashboard-grid { grid-template-columns: 1fr; }
@@ -478,6 +571,17 @@
         </div>
       </div>
 
+      <section class="dash-card requests-card">
+        <div class="dash-card-header">
+          <h3>გუნდის დამატების მოთხოვნები</h3>
+          <span class="chip" id="clubRequestCountChip">იტვირთება...</span>
+        </div>
+        <div class="requests-body">
+          <div class="requests-state" id="clubRequestState">ახლავე ვტვირთავ მომხმარებლების მიერ გამოგზავნილ გუნდების მოთხოვნებს.</div>
+          <div class="request-list" id="clubRequestList" hidden></div>
+        </div>
+      </section>
+
       <div class="dashboard-grid">
         
         <div class="dash-card">
@@ -578,5 +682,187 @@
     </div>
   </main>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="auth-shared.js"></script>
+  <script>
+    (async function () {
+      const stateNode = document.getElementById('clubRequestState');
+      const listNode = document.getElementById('clubRequestList');
+      const chipNode = document.getElementById('clubRequestCountChip');
+
+      function setState(message, type) {
+        if (!stateNode) {
+          return;
+        }
+
+        stateNode.hidden = false;
+        stateNode.textContent = message;
+        stateNode.className = 'requests-state' + (type ? ' ' + type : '');
+      }
+
+      function escapeHtml(value) {
+        return String(value || '')
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;');
+      }
+
+      function formatStatus(status) {
+        if (status === 'approved') return 'დადასტურებული';
+        if (status === 'rejected') return 'უარყოფილი';
+        return 'მოლოდინში';
+      }
+
+      function formatDate(value) {
+        if (!value) {
+          return 'ახლახან';
+        }
+
+        try {
+          return new Intl.DateTimeFormat('ka-GE', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+          }).format(new Date(value));
+        } catch (error) {
+          return value;
+        }
+      }
+
+      if (!window.siteAuth?.requireAuth) {
+        setState('ავტორიზაციის მოდული ვერ ჩაიტვირთა.');
+        return;
+      }
+
+      const authState = await window.siteAuth.requireAuth('admin-deshboard.html');
+      const client = authState?.client || null;
+      const user = authState?.user || null;
+
+      if (!client || !user) {
+        return;
+      }
+
+      if ((window.siteAuth?.getUserRole ? window.siteAuth.getUserRole(user) : '') !== 'admin') {
+        setState('ამ მოთხოვნების მართვა მხოლოდ ადმინისთვის არის ხელმისაწვდომი.');
+        if (chipNode) chipNode.textContent = 'ადმინი';
+        return;
+      }
+
+      async function updateRequestStatus(requestId, status, button) {
+        if (!client?.from) {
+          return;
+        }
+
+        const originalText = button.textContent;
+        button.disabled = true;
+        button.textContent = 'იგზავნება...';
+
+        const { error } = await client
+          .from('club_submission_requests')
+          .update({ status: status })
+          .eq('id', requestId);
+
+        button.disabled = false;
+        button.textContent = originalText;
+
+        if (error) {
+          setState('სტატუსის შეცვლა ვერ შესრულდა. გადაამოწმე `supabase_club_request_flow.sql`.', 'error');
+          return;
+        }
+
+        await loadRequests();
+      }
+
+      async function loadRequests() {
+        setState('მოთხოვნები იტვირთება...');
+        listNode.hidden = true;
+        listNode.innerHTML = '';
+
+        const { data, error } = await client
+          .from('club_submission_requests')
+          .select('id, club_name, city, status, requester_email, created_at, admin_note')
+          .order('created_at', { ascending: false })
+          .limit(20);
+
+        if (error) {
+          setState('გუნდის მოთხოვნები ვერ მოიძებნა. ჯერ გაუშვი `supabase_club_request_flow.sql`.', 'error');
+          if (chipNode) chipNode.textContent = 'SQL საჭიროა';
+          return;
+        }
+
+        const rows = Array.isArray(data) ? data.slice().sort(function (a, b) {
+          const priorityA = a.status === 'pending' ? 0 : 1;
+          const priorityB = b.status === 'pending' ? 0 : 1;
+          if (priorityA !== priorityB) {
+            return priorityA - priorityB;
+          }
+          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+        }) : [];
+
+        const pendingCount = rows.filter(function (row) {
+          return row.status === 'pending';
+        }).length;
+
+        if (chipNode) {
+          chipNode.textContent = pendingCount ? `${pendingCount} მოლოდინში` : 'ცარიელია';
+        }
+
+        if (!rows.length) {
+          setState('ჯერ არცერთი ახალი გუნდის მოთხოვნა არ არის.');
+          return;
+        }
+
+        stateNode.hidden = true;
+        listNode.hidden = false;
+        listNode.innerHTML = rows.map(function (row) {
+          const infoBits = [
+            row.requester_email ? `მომხმარებელი: ${escapeHtml(row.requester_email)}` : 'მომხმარებელი: უცნობია',
+            `გამოგზავნილია: ${escapeHtml(formatDate(row.created_at))}`
+          ];
+
+          return `
+            <article class="request-item" data-request-id="${escapeHtml(row.id)}">
+              <div class="request-main">
+                <div>
+                  <h4>${escapeHtml(row.club_name)}</h4>
+                  <p>${escapeHtml(row.city)}</p>
+                </div>
+                <div class="request-meta">
+                  <span class="chip">${escapeHtml(formatStatus(row.status))}</span>
+                </div>
+              </div>
+              <div class="request-meta">
+                ${infoBits.map(function (text) {
+                  return `<span class="chip">${text}</span>`;
+                }).join('')}
+              </div>
+              <div class="request-actions">
+                <button type="button" class="btn btn-red" data-request-action="approved" ${row.status === 'approved' ? 'disabled' : ''}>დადასტურება</button>
+                <button type="button" class="btn btn-white" data-request-action="rejected" ${row.status === 'rejected' ? 'disabled' : ''}>უარყოფა</button>
+              </div>
+            </article>
+          `;
+        }).join('');
+
+        listNode.querySelectorAll('[data-request-action]').forEach(function (button) {
+          button.addEventListener('click', function () {
+            const card = button.closest('[data-request-id]');
+            const requestId = card?.dataset?.requestId;
+            const nextStatus = button.dataset.requestAction;
+            if (!requestId || !nextStatus) {
+              return;
+            }
+            updateRequestStatus(requestId, nextStatus, button);
+          });
+        });
+      }
+
+      await loadRequests();
+    })();
+  </script>
 </body>
 </html>
