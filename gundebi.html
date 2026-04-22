@@ -782,9 +782,13 @@
           <label for="clubRequestCity">სად მდებარეობს გუნდი</label>
           <input id="clubRequestCity" name="club_city" type="text" maxlength="120" required placeholder="მაგ: თბილისი, ავჭალა">
         </div>
+        <div class="field">
+          <label for="clubRequestPhone">თქვენი ტელეფონის ნომერი</label>
+          <input id="clubRequestPhone" name="phone" type="tel" maxlength="40" inputmode="tel" required placeholder="მაგ: 599 12 34 56">
+        </div>
 
         <div class="request-note">
-          მოთხოვნა გამოჩნდება ადმინის მხარეს დასადასტურებლად. დამტკიცების შემდეგ გუნდი ავტომატურად გამოჩნდება გუნდების სიაში და რეგისტრაციაშიც.
+          ყველა ველი სავალდებულოა. მოთხოვნა გამოჩნდება ადმინის მხარეს დასადასტურებლად. დამტკიცების შემდეგ გუნდი ავტომატურად გამოჩნდება გუნდების სიაში და რეგისტრაციაშიც.
         </div>
 
         <div class="request-status" id="clubRequestStatus" hidden></div>
@@ -1003,9 +1007,10 @@
           const formData = new FormData(requestForm);
           const clubName = String(formData.get('club_name') || '').trim();
           const clubCity = String(formData.get('club_city') || '').trim();
+          const phone = String(formData.get('phone') || '').trim();
 
-          if (!clubName || !clubCity) {
-            setRequestStatus('შეავსე გუნდის სახელი და მდებარეობა.', 'error');
+          if (!clubName || !clubCity || !phone) {
+            setRequestStatus('შეავსე გუნდის სახელი, მდებარეობა და ტელეფონის ნომერი.', 'error');
             return;
           }
 
@@ -1024,7 +1029,8 @@
               requested_by: user?.id || null,
               requester_email: user?.email || null,
               club_name: clubName,
-              city: clubCity
+              city: clubCity,
+              phone: phone
             });
 
           submitRequestButton.disabled = false;

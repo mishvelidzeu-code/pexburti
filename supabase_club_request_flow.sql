@@ -6,6 +6,7 @@ create table if not exists public.club_submission_requests (
   requester_email text,
   club_name text not null check (char_length(btrim(club_name)) > 1),
   city text not null check (char_length(btrim(city)) > 1),
+  phone text,
   status text not null default 'pending' check (status in ('pending', 'approved', 'rejected')),
   admin_note text,
   approved_club_id uuid references public.clubs (id) on delete set null,
@@ -17,6 +18,9 @@ create table if not exists public.club_submission_requests (
 
 alter table public.club_submission_requests
   alter column requested_by drop not null;
+
+alter table public.club_submission_requests
+  add column if not exists phone text;
 
 create index if not exists idx_club_submission_requests_status
   on public.club_submission_requests (status, created_at desc);
@@ -181,6 +185,9 @@ for insert
 to public
 with check (
   status = 'pending'
+  and nullif(btrim(club_name), '') is not null
+  and nullif(btrim(city), '') is not null
+  and nullif(btrim(phone), '') is not null
   and (
     (auth.uid() is null and requested_by is null)
     or requested_by = auth.uid()

@@ -784,7 +784,7 @@
 
         const { data, error } = await client
           .from('club_submission_requests')
-          .select('id, club_name, city, status, requester_email, created_at, admin_note')
+          .select('id, club_name, city, phone, status, requester_email, created_at, admin_note')
           .order('created_at', { ascending: false })
           .limit(20);
 
@@ -821,6 +821,7 @@
         listNode.innerHTML = rows.map(function (row) {
           const infoBits = [
             row.requester_email ? `მომხმარებელი: ${escapeHtml(row.requester_email)}` : 'მომხმარებელი: უცნობია',
+            row.phone ? `ტელეფონი: ${escapeHtml(row.phone)}` : 'ტელეფონი: არ არის მითითებული',
             `გამოგზავნილია: ${escapeHtml(formatDate(row.created_at))}`
           ];
 
