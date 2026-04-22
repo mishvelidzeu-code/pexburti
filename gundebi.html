@@ -768,7 +768,7 @@
         <div>
           <span class="chip">გუნდის მოთხოვნა</span>
           <h2 id="clubRequestTitle">დაამატე ახალი გუნდი</h2>
-          <p>შენ ავსებ მხოლოდ გუნდის სახელს და მდებარეობას. მოთხოვნა პირდაპირ წავა ადმინთან და დადასტურების შემდეგ გუნდი ავტომატურად დაემატება ბაზას.</p>
+          <p>ავტორიზაცია საჭირო არ არის. შენ ავსებ მხოლოდ გუნდის სახელს და მდებარეობას, მოთხოვნა კი პირდაპირ წავა ადმინთან და დადასტურების შემდეგ გუნდი ავტომატურად დაემატება ბაზას.</p>
         </div>
         <button type="button" class="modal-close" id="closeClubRequest" aria-label="დახურვა">×</button>
       </div>
@@ -863,22 +863,8 @@
         return data?.session?.user || null;
       }
 
-      async function ensureRequestUser() {
-        const user = await getSessionUser();
-        if (user) {
-          return user;
-        }
-
-        const loginHref = window.siteAuth?.buildLoginHref
-          ? window.siteAuth.buildLoginHref('gundebi.html')
-          : 'login.html?redirect=gundebi.html#login';
-        window.location.href = loginHref;
-        return null;
-      }
-
-      async function openRequestModal() {
-        const user = await ensureRequestUser();
-        if (!user || !requestModal) {
+      function openRequestModal() {
+        if (!requestModal) {
           return;
         }
 
@@ -1012,10 +998,7 @@
         requestForm.addEventListener('submit', async function (event) {
           event.preventDefault();
 
-          const user = await ensureRequestUser();
-          if (!user) {
-            return;
-          }
+          const user = await getSessionUser();
 
           const formData = new FormData(requestForm);
           const clubName = String(formData.get('club_name') || '').trim();
@@ -1038,8 +1021,8 @@
           const { error } = await client
             .from('club_submission_requests')
             .insert({
-              requested_by: user.id,
-              requester_email: user.email || null,
+              requested_by: user?.id || null,
+              requester_email: user?.email || null,
               club_name: clubName,
               city: clubCity
             });
@@ -1049,8 +1032,8 @@
 
           if (error) {
             const message = String(error.message || '');
-            if (message.includes('club_submission_requests')) {
-              setRequestStatus('ჯერ საჭიროა გუნდის მოთხოვნების SQL-ის გაშვება Supabase-ში.', 'error');
+            if (message.includes('club_submission_requests') || message.includes('row-level security') || message.includes('violates not-null constraint')) {
+              setRequestStatus('ახლა საჭიროა განახლებული გუნდის მოთხოვნების SQL-ის ხელახლა გაშვება Supabase-ში.', 'error');
             } else {
               setRequestStatus('მოთხოვნა ვერ გაიგზავნა. სცადე თავიდან.', 'error');
             }

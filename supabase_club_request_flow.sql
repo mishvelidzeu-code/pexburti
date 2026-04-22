@@ -2,7 +2,7 @@ create extension if not exists pgcrypto;
 
 create table if not exists public.club_submission_requests (
   id uuid primary key default gen_random_uuid(),
-  requested_by uuid not null references public.profiles (id) on delete cascade,
+  requested_by uuid references public.profiles (id) on delete set null,
   requester_email text,
   club_name text not null check (char_length(btrim(club_name)) > 1),
   city text not null check (char_length(btrim(city)) > 1),
@@ -14,6 +14,9 @@ create table if not exists public.club_submission_requests (
   created_at timestamptz not null default timezone('utc', now()),
   updated_at timestamptz not null default timezone('utc', now())
 );
+
+alter table public.club_submission_requests
+  alter column requested_by drop not null;
 
 create index if not exists idx_club_submission_requests_status
   on public.club_submission_requests (status, created_at desc);
@@ -161,7 +164,8 @@ execute function private.process_club_submission_request();
 
 alter table public.club_submission_requests enable row level security;
 
-grant select, insert, update on public.club_submission_requests to authenticated;
+grant insert on public.club_submission_requests to anon, authenticated;
+grant select, update on public.club_submission_requests to authenticated;
 
 drop policy if exists club_requests_select_own_or_admin on public.club_submission_requests;
 create policy club_requests_select_own_or_admin
@@ -170,14 +174,17 @@ for select
 to authenticated
 using (requested_by = auth.uid() or private.is_admin());
 
-drop policy if exists club_requests_insert_self on public.club_submission_requests;
-create policy club_requests_insert_self
+drop policy if exists club_requests_insert_public on public.club_submission_requests;
+create policy club_requests_insert_public
 on public.club_submission_requests
 for insert
-to authenticated
+to public
 with check (
-  requested_by = auth.uid()
-  and status = 'pending'
+  status = 'pending'
+  and (
+    (auth.uid() is null and requested_by is null)
+    or requested_by = auth.uid()
+  )
 );
 
 drop policy if exists club_requests_update_admin on public.club_submission_requests;
