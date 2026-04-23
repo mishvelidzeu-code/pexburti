@@ -23,7 +23,9 @@
     user: null,
     profile: {},
     back: 'index.html',
-    client: null
+    client: null,
+    editing: false,
+    displayItems: []
   };
   const videoEditorState = {
     role: '',
@@ -1306,18 +1308,35 @@
   }
 
   function toggleDataEditor(show) {
-    const panel = document.getElementById('dataEditPanel');
-    if (!panel) {
-      return;
+    const actions = document.getElementById('dataInlineActions');
+    const editButton = document.getElementById('editDataBtn');
+    dataEditorState.editing = !!show;
+    if (actions) {
+      actions.hidden = !show;
     }
-    panel.hidden = !show;
+    if (editButton) {
+      editButton.textContent = show ? 'რედაქტირება მიმდინარეობს' : 'რედაქტირება მონაცემების';
+      editButton.disabled = !!show;
+    }
     if (!show) {
       setDataEditorStatus('');
-      const photoInput = document.getElementById('photoInput');
-      if (photoInput) {
-        photoInput.value = '';
-      }
     }
+  }
+
+  function splitFullName(value) {
+    const parts = String(value || '').trim().split(/\s+/).filter(Boolean);
+    return {
+      first: parts[0] || '',
+      last: parts.slice(1).join(' ')
+    };
+  }
+
+  function renderDataDisplay() {
+    const grid = document.getElementById('dataGrid');
+    if (!grid) {
+      return;
+    }
+    grid.innerHTML = renderItems(dataEditorState.displayItems || []);
   }
 
   function getDataEditorFields(role, user, profile) {
@@ -1337,8 +1356,10 @@
     }
 
     if (role === 'parent') {
+      const childName = splitFullName(profile.childName);
       return common.concat([
-        { key: 'childName', label: 'ბავშვის სახელი და გვარი', type: 'text', value: profile.childName || '' },
+        { key: 'childFirstName', label: 'ბავშვის სახელი', type: 'text', value: profile.childFirstName || childName.first || '' },
+        { key: 'childLastName', label: 'ბავშვის გვარი', type: 'text', value: profile.childLastName || childName.last || '' },
         { key: 'childBirthDate', label: 'ბავშვის დაბადების თარიღი', type: 'date', value: inputDateValue(profile.childBirthDate) },
         { key: 'childPosition', label: 'ბავშვის პოზიცია', type: 'text', value: profile.childPosition || '' },
         { key: 'childFoot', label: 'ბავშვის ფეხი', type: 'text', value: profile.childFoot || '' },
@@ -1355,7 +1376,7 @@
   }
 
   function renderDataEditor(role, user, profile) {
-    const fieldsBox = document.getElementById('dataEditFields');
+    const fieldsBox = document.getElementById('dataGrid');
     if (!fieldsBox) {
       return;
     }
@@ -1366,7 +1387,7 @@
 
     const fields = getDataEditorFields(role, user, profile);
     fieldsBox.innerHTML = fields.map((field) => (
-      `<div class="form-group">
+      `<div class="info">
         <label class="form-label" for="data-${esc(field.key)}">${esc(field.label)}</label>
         <input id="data-${esc(field.key)}" data-field="${esc(field.key)}" class="form-input" type="${esc(field.type)}" value="${esc(field.value)}">
       </div>`
@@ -1407,6 +1428,60 @@
     });
   }
 
+  function compressImageFile(file) {
+    return new Promise((resolve, reject) => {
+      if (!file) {
+        reject(new Error('სურათი ვერ მოიძებნა.'));
+        return;
+      }
+
+      const allowedTypes = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif']);
+      const fileType = String(file.type || '').toLowerCase();
+      const lowerName = String(file.name || '').toLowerCase();
+      const hasAllowedExtension = ['.jpg', '.jpeg', '.png', '.webp', '.gif'].some((ext) => lowerName.endsWith(ext));
+
+      if ((fileType && !allowedTypes.has(fileType)) || (!fileType && !hasAllowedExtension)) {
+        reject(new Error('ამ ეტაპზე მხარდაჭერილია მხოლოდ JPG, PNG, WEBP ან GIF სურათი.'));
+        return;
+      }
+
+      const objectUrl = URL.createObjectURL(file);
+      const image = new Image();
+
+      image.onload = () => {
+        try {
+          const canvas = document.createElement('canvas');
+          const maxSize = 720;
+          const ratio = Math.min(maxSize / image.width, maxSize / image.height, 1);
+          canvas.width = Math.max(1, Math.round(image.width * ratio));
+          canvas.height = Math.max(1, Math.round(image.height * ratio));
+          const context = canvas.getContext('2d');
+
+          if (!context) {
+            URL.revokeObjectURL(objectUrl);
+            reject(new Error('სურათის დამუშავება ვერ მოხერხდა.'));
+            return;
+          }
+
+          context.drawImage(image, 0, 0, canvas.width, canvas.height);
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.84);
+          URL.revokeObjectURL(objectUrl);
+          resolve(dataUrl);
+        } catch (error) {
+          URL.revokeObjectURL(objectUrl);
+          reject(new Error('სურათის დამუშავება ვერ მოხერხდა.'));
+        }
+      };
+
+      image.onerror = () => {
+        URL.revokeObjectURL(objectUrl);
+        reject(new Error('სურათის წაკითხვა ვერ მოხერხდა. სცადე JPG, PNG ან WEBP ფორმატი.'));
+      };
+
+      image.src = objectUrl;
+    });
+  }
+
   async function saveDataEditor() {
     const role = dataEditorState.role;
     const user = dataEditorState.user;
@@ -1431,7 +1506,9 @@
       nextProfile.playerPosition = readDataField('playerPosition');
       nextProfile.playerFoot = readDataField('playerFoot');
     } else if (role === 'parent') {
-      nextProfile.childName = readDataField('childName');
+      nextProfile.childFirstName = readDataField('childFirstName');
+      nextProfile.childLastName = readDataField('childLastName');
+      nextProfile.childName = `${nextProfile.childFirstName} ${nextProfile.childLastName}`.trim();
       nextProfile.childBirthDate = dateValueFromInput(readDataField('childBirthDate'));
       nextProfile.childPosition = readDataField('childPosition');
       nextProfile.childFoot = readDataField('childFoot');
@@ -1491,7 +1568,7 @@
     dataEditorState.role = role;
     dataEditorState.user = user;
     dataEditorState.profile = { ...(profile || {}) };
-    renderDataEditor(role, user, profile);
+    toggleDataEditor(false);
 
     const editButton = document.getElementById('editDataBtn');
     const cancelButton = document.getElementById('cancelDataBtn');
@@ -1508,6 +1585,7 @@
     if (cancelButton && cancelButton.dataset.ready !== 'true') {
       cancelButton.dataset.ready = 'true';
       cancelButton.addEventListener('click', () => {
+        renderDataDisplay();
         toggleDataEditor(false);
       });
     }
@@ -2369,6 +2447,7 @@
     dataEditorState.profile = currentProfile;
     dataEditorState.back = back;
     dataEditorState.client = client;
+    dataEditorState.displayItems = [];
     videoEditorState.role = role;
     videoEditorState.user = currentUser;
     videoEditorState.profile = currentProfile;
@@ -2391,7 +2470,10 @@
     if (quick) {
       quick.innerHTML = renderQuick(roleView.quick);
     }
-    document.getElementById('dataGrid').innerHTML = renderItems(roleView.pass);
+    dataEditorState.displayItems = roleView.pass;
+    if (!dataEditorState.editing) {
+      renderDataDisplay();
+    }
     document.getElementById('statsGrid').innerHTML = renderStats(roleView.stat);
     document.getElementById('videosTitle').textContent = roleView.videos.t;
     document.getElementById('videosCopy').textContent = roleView.videos.c;
