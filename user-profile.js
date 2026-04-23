@@ -1055,15 +1055,9 @@
           { l: 'ასაკობრივი', v: ageGroupLabel(state.effectiveKey), c: state.manual ? 'კატეგორია ახლა ხელით არის მითითებული.' : 'კატეგორია სეზონურად ავტომატურად ითვლება.' }
         ],
         videos: {
-          t: 'მოთამაშის ვიდეო ცენტრი',
-          c: 'აქ დაამატებ YouTube ვიდეოებს, გამორჩეულ ეპიზოდებს და შენს ვიდეო არქივს ერთ სივრცეში დაალაგებ.',
-          a: [
-            profile.playerTeamRoute
-              ? { h: profile.playerTeamRoute, l: 'ჩემი გუნდის გვერდი', c: 'btn-red' }
-              : { h: buildProfileViewHref('overview', back), l: 'პროფილი', c: 'btn-red' },
-            { h: 'pexburtelebi.html', l: 'ფეხბურთელების ბაზა', c: 'btn-white' },
-            { h: 'gundebi.html', l: 'გუნდების გვერდი', c: 'btn-white' }
-          ],
+          t: 'გადმოწერე ჩვენი აპი',
+          c: 'DM Football Georgia გაძლევს ვიდეოების არქივს, პროგრესის აღრიცხვას და განვითარებისთვის უფრო მარტივ კონტროლს ერთ სივრცეში.',
+          a: [],
           n: [
             { t: 'ვიდეო პროფილი', c: 'ლინკით დამატებული YouTube ვიდეოები აქვე გამოჩნდება და პროფილის ნაწილად დარჩება.' },
             { t: 'შენახვა', c: 'ვიდეო ფაილი ცალკე არ იტვირთება, ინახება მხოლოდ YouTube ბმული.' },
@@ -1116,15 +1110,9 @@
           { l: 'ასაკობრივი', v: ageGroupLabel(state.effectiveKey), c: state.manual ? 'ბავშვის კატეგორია ხელით არის მორგებული.' : 'ბავშვის კატეგორია სეზონურად ავტომატურად ითვლება.' }
         ],
         videos: {
-          t: 'ბავშვის ვიდეო ცენტრი',
-          c: 'აქედან მართავ ბავშვის YouTube ვიდეოებს, გამორჩეულ ეპიზოდებს და მთლიან ვიდეო პროფილს.',
-          a: [
-            profile.childTeamRoute
-              ? { h: profile.childTeamRoute, l: 'ბავშვის გუნდის გვერდი', c: 'btn-red' }
-              : { h: buildProfileViewHref('overview', back), l: 'პროფილი', c: 'btn-red' },
-            { h: 'gundebi.html', l: 'გუნდების ნახვა', c: 'btn-white' },
-            { h: 'pexburtelebi.html', l: 'ტალანტების ბაზა', c: 'btn-white' }
-          ],
+          t: 'გადმოწერე ჩვენი აპი',
+          c: 'DM Football Georgia-ში ბავშვის ვიდეოები, თარიღები და პროგრესი ბევრად უფრო დალაგებულად ინახება და იმართება.',
+          a: [],
           n: [
             { t: 'ბავშვის პროფილი', c: 'ვიდეოები ბავშვის პროფილზე შენს მიერ იმართება და ერთ სივრცეში გროვდება.' },
             { t: 'YouTube ბმული', c: 'საკმარისია სწორი YouTube ბმული, რომ ვიდეო პროფილში დაემატოს.' },
@@ -1164,13 +1152,9 @@
         { l: 'ვიდეოები', v: String(videoCount), c: 'დამატებული YouTube ვიდეოები აქ ითვლება.' }
       ],
       videos: {
-        t: 'ვიდეო და პრეზენტაციის სივრცე',
-        c: 'აქ შეგიძლია მოთამაშეების ვიდეო ბმულები შეაგროვო და სამუშაო პრეზენტაციისთვის ერთ ადგილას დაალაგო.',
-        a: [
-          { h: buildProfileViewHref('overview', back), l: 'პროფილი', c: 'btn-red' },
-          { h: 'pexburtelebi.html', l: 'ფეხბურთელების ბაზა', c: 'btn-white' },
-          { h: 'gundebi.html', l: 'გუნდების ბაზა', c: 'btn-white' }
-        ],
+        t: 'გადმოწერე ჩვენი აპი',
+        c: 'DM Football Georgia ვიდეოებს, კომენტარებს და სამუშაო არქივს აერთიანებს ერთ სწრაფ და კომპაქტურ სივრცეში.',
+        a: [],
         n: [
           { t: 'ვიდეოები', c: 'YouTube ბმულებით შეგიძლია შენი სამუშაო ვიდეოები ერთ სივრცეში დაალაგო.' },
           { t: 'ნავიგაცია', c: 'სხვა გვერდებზე გადასვლა ისევ ზედა მენიუდან შეგიძლია.' },
@@ -1694,9 +1678,9 @@
     }
 
     const comment = String(commentInput?.value || '').trim();
-    const date = String(dateInput?.value || '').trim();
-    if (!comment || !date) {
-      setVideoStatus('კომენტარი და თარიღი სავალდებულოა.', 'error');
+    const date = String(dateInput?.value || new Date().toISOString().slice(0, 10)).trim();
+    if (!comment) {
+      setVideoStatus('კომენტარი სავალდებულოა.', 'error');
       return;
     }
 
@@ -1737,6 +1721,11 @@
     const addButton = document.getElementById('addVideoBtn');
     const input = document.getElementById('videoUrlInput');
     const searchInput = document.getElementById('videoSearchInput');
+    const dateInput = document.getElementById('videoDateInput');
+
+    if (dateInput && !dateInput.value) {
+      dateInput.value = new Date().toISOString().slice(0, 10);
+    }
 
     if (addButton && addButton.dataset.ready !== 'true') {
       addButton.dataset.ready = 'true';
