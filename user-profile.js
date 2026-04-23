@@ -33,6 +33,15 @@
     profile: {},
     client: null
   };
+  const agentDashboardState = {
+    role: '',
+    user: null,
+    profile: {},
+    client: null,
+    players: [],
+    search: '',
+    ageGroup: 'all'
+  };
 
   const from = () => window.siteAuth?.sanitizeInternalPath(
     new URLSearchParams(location.search).get('from'),
@@ -246,6 +255,49 @@
   const renderActions = (list) => list.map((item) => (
     `<a href="${esc(item.h)}" class="btn ${esc(item.c)}">${esc(item.l)}</a>`
   )).join('');
+
+  function getAgentFavorites(profile) {
+    return Array.isArray(profile?.agentFavorites)
+      ? profile.agentFavorites.map((item) => String(item || '').trim()).filter(Boolean)
+      : [];
+  }
+
+  function getAgentWatchlist(profile) {
+    return Array.isArray(profile?.agentWatchlist)
+      ? profile.agentWatchlist.map((item) => String(item || '').trim()).filter(Boolean)
+      : [];
+  }
+
+  function getAgentNotes(profile) {
+    return Array.isArray(profile?.agentNotes)
+      ? profile.agentNotes
+        .filter((item) => item && typeof item === 'object')
+        .map((item) => ({
+          id: String(item.id || '').trim() || `note-${Date.now()}`,
+          text: String(item.text || '').trim(),
+          createdAt: String(item.createdAt || '').trim()
+        }))
+        .filter((item) => item.text)
+      : [];
+  }
+
+  function formatAgentDate(value) {
+    const raw = String(value || '').trim();
+    if (!raw) {
+      return 'ახლახან';
+    }
+    const date = new Date(raw);
+    if (Number.isNaN(date.getTime())) {
+      return raw;
+    }
+    return date.toLocaleString('ka-GE', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  }
 
   function getVideoProfileKey(role) {
     if (role === 'parent') {
@@ -1915,15 +1967,299 @@
     }
   }
 
+  function setAgentStatus(targetId, message, state) {
+    const status = document.getElementById(targetId);
+    if (!status) {
+      return;
+    }
+    if (!message) {
+      status.hidden = true;
+      status.textContent = '';
+      status.dataset.state = 'info';
+      return;
+    }
+    status.hidden = false;
+    status.dataset.state = state || 'info';
+    status.textContent = message;
+  }
+
+  async function saveAgentProfilePatch(patch, options) {
+    const client = agentDashboardState.client;
+    const user = agentDashboardState.user;
+    if (!client || !user) {
+      return false;
+    }
+
+    const nextProfile = {
+      ...(agentDashboardState.profile || {}),
+      ...(patch || {})
+    };
+
+    try {
+      const { data, error } = await client.auth.updateUser({
+        data: {
+          ...user.user_metadata,
+          profile: nextProfile
+        }
+      });
+      if (error) {
+        throw error;
+      }
+
+      const nextUser = data?.user || user;
+      agentDashboardState.user = nextUser;
+      agentDashboardState.profile = nextProfile;
+      dataEditorState.user = nextUser;
+      dataEditorState.profile = nextProfile;
+      videoEditorState.user = nextUser;
+      videoEditorState.profile = nextProfile;
+      teamManageState.user = nextUser;
+      teamManageState.profile = nextProfile;
+
+      if (options?.statusId) {
+        setAgentStatus(options.statusId, options.successMessage || 'ინფორმაცია წარმატებით განახლდა.', 'success');
+      }
+      return true;
+    } catch (error) {
+      if (options?.statusId) {
+        setAgentStatus(options.statusId, error?.message || 'განახლება ვერ შესრულდა.', 'error');
+      }
+      return false;
+    }
+  }
+
+  function getAgentFilteredPlayers() {
+    const search = String(agentDashboardState.search || '').trim().toLowerCase();
+    const ageGroup = String(agentDashboardState.ageGroup || 'all').trim().toLowerCase();
+    return (agentDashboardState.players || []).filter((player) => {
+      if (ageGroup !== 'all' && String(player.ageGroup || '').trim().toLowerCase() !== ageGroup) {
+        return false;
+      }
+      if (!search) {
+        return true;
+      }
+      const haystack = [
+        player.fullName,
+        player.team,
+        player.positionLabel,
+        player.ageLabel
+      ].join(' ').toLowerCase();
+      return haystack.includes(search);
+    });
+  }
+
+  function renderAgentPlayerCard(player, back) {
+    const favorites = new Set(getAgentFavorites(agentDashboardState.profile));
+    const watchlist = new Set(getAgentWatchlist(agentDashboardState.profile));
+    const isFavorite = favorites.has(player.id);
+    const isWatch = watchlist.has(player.id);
+    const profileHref = window.siteData?.buildPlayerHref
+      ? window.siteData.buildPlayerHref(player.id, back || 'user-profile.html')
+      : `player-profile.html?player=${encodeURIComponent(player.id)}&from=${encodeURIComponent(back || 'user-profile.html')}`;
+
+    return `
+      <article class="agent-player-card">
+        <div class="agent-player-top">
+          <a class="agent-player-avatar" href="${esc(profileHref)}">
+            <img src="${esc(player.photo)}" alt="${esc(player.fullName)}">
+          </a>
+          <div class="agent-player-meta">
+            <strong><a href="${esc(profileHref)}">${esc(player.fullName)}</a></strong>
+            <span>${esc(player.team || TEAM_FREE_AGENT)}</span>
+            <span>${esc(player.positionLabel)} • ${esc(player.ageLabel)}</span>
+          </div>
+        </div>
+        <div class="agent-tags">
+          <span>${esc(player.positionLabel)}</span>
+          <span>${esc(player.ageLabel)}</span>
+          <span>${esc(player.foot || 'ფეხი უცნობია')}</span>
+        </div>
+        <div class="agent-actions">
+          <button type="button" class="btn ${isFavorite ? 'btn-red' : 'btn-white'}" data-agent-action="favorite" data-player-id="${esc(player.id)}">${isFavorite ? 'რჩეულიდან ამოღება' : 'რჩეულებში'}</button>
+          <button type="button" class="btn ${isWatch ? 'btn-red' : 'btn-white'}" data-agent-action="watch" data-player-id="${esc(player.id)}">${isWatch ? 'დაკვირვებიდან ამოღება' : 'დასაკვირვებელი'}</button>
+        </div>
+      </article>
+    `;
+  }
+
+  function renderAgentBucket(targetId, playerIds, emptyText, back) {
+    const container = document.getElementById(targetId);
+    if (!container) {
+      return;
+    }
+    const idSet = new Set((playerIds || []).map((item) => String(item || '').trim()).filter(Boolean));
+    const players = (agentDashboardState.players || []).filter((player) => idSet.has(player.id));
+    if (!players.length) {
+      container.innerHTML = `<div class="agent-empty">${esc(emptyText)}</div>`;
+      return;
+    }
+    container.innerHTML = players.map((player) => renderAgentPlayerCard(player, back)).join('');
+  }
+
+  function renderAgentPlayers(back) {
+    const list = document.getElementById('agentPlayersList');
+    if (!list) {
+      return;
+    }
+    const players = getAgentFilteredPlayers();
+    setAgentStatus('agentPlayersStatus', '');
+    if (!players.length) {
+      list.innerHTML = '<div class="agent-empty">მონიშნული ფილტრებით ფეხბურთელი ვერ მოიძებნა. შეცვალე ასაკობრივი ან საძიებო სიტყვა.</div>';
+      return;
+    }
+    list.innerHTML = players.map((player) => renderAgentPlayerCard(player, back)).join('');
+  }
+
+  async function toggleAgentPlayerCollection(playerId, collectionKey, statusId, back) {
+    const current = collectionKey === 'agentFavorites'
+      ? getAgentFavorites(agentDashboardState.profile)
+      : getAgentWatchlist(agentDashboardState.profile);
+    const hasPlayer = current.includes(playerId);
+    const next = hasPlayer ? current.filter((item) => item !== playerId) : current.concat(playerId);
+    const success = await saveAgentProfilePatch({
+      [collectionKey]: next
+    }, {
+      statusId,
+      successMessage: hasPlayer ? 'სიიდან წარმატებით მოიხსნა.' : 'სია წარმატებით განახლდა.'
+    });
+    if (!success) {
+      return;
+    }
+    renderAgentPlayers(back);
+    renderAgentBucket('agentFavoritesList', getAgentFavorites(agentDashboardState.profile), 'რჩეულებში ჯერ არავინ არის დამატებული.', back);
+    renderAgentBucket('agentWatchlistList', getAgentWatchlist(agentDashboardState.profile), 'დასაკვირვებელ სიაში ჯერ არავინ არის დამატებული.', back);
+  }
+
+  async function saveAgentNote() {
+    const input = document.getElementById('agentNoteInput');
+    if (!input) {
+      return;
+    }
+    const text = String(input.value || '').trim();
+    if (!text) {
+      setAgentStatus('agentNotesStatus', 'ჩანაწერის ველი ცარიელი არ უნდა იყოს.', 'error');
+      return;
+    }
+    const nextNotes = [{
+      id: `note-${Date.now()}`,
+      text,
+      createdAt: new Date().toISOString()
+    }].concat(getAgentNotes(agentDashboardState.profile)).slice(0, 100);
+    const success = await saveAgentProfilePatch({
+      agentNotes: nextNotes
+    }, {
+      statusId: 'agentNotesStatus',
+      successMessage: 'ჩანაწერი წარმატებით შეინახა.'
+    });
+    if (!success) {
+      return;
+    }
+    input.value = '';
+    renderAgentNotes();
+  }
+
+  function renderAgentNotes() {
+    const container = document.getElementById('agentNotesList');
+    if (!container) {
+      return;
+    }
+    const notes = getAgentNotes(agentDashboardState.profile);
+    if (!notes.length) {
+      container.innerHTML = '<div class="agent-empty">ჩანაწერები ჯერ არ გაქვს დამატებული.</div>';
+      return;
+    }
+    container.innerHTML = notes.map((note) => `
+      <article class="agent-note-card">
+        <strong>${esc(formatAgentDate(note.createdAt))}</strong>
+        <p>${esc(note.text)}</p>
+      </article>
+    `).join('');
+  }
+
+  async function initializeAgentDashboard(role, user, profile, client, back) {
+    if (role !== 'agent') {
+      return;
+    }
+    agentDashboardState.role = role;
+    agentDashboardState.user = user;
+    agentDashboardState.profile = { ...(profile || {}) };
+    agentDashboardState.client = client;
+
+    try {
+      agentDashboardState.players = window.siteData?.fetchPublicPlayers
+        ? await window.siteData.fetchPublicPlayers(client)
+        : [];
+    } catch (error) {
+      agentDashboardState.players = [];
+      setAgentStatus('agentPlayersStatus', 'ფეხბურთელების საჯარო ბაზის ჩატვირთვა ვერ შესრულდა.', 'error');
+    }
+
+    const searchInput = document.getElementById('agentPlayerSearch');
+    const ageFilter = document.getElementById('agentAgeFilter');
+    const notesButton = document.getElementById('saveAgentNoteBtn');
+    const sectionsRoot = document.querySelector('.sections');
+
+    if (sectionsRoot && sectionsRoot.dataset.agentReady !== 'true') {
+      sectionsRoot.dataset.agentReady = 'true';
+      sectionsRoot.addEventListener('click', (event) => {
+        const target = event.target.closest('[data-agent-action]');
+        if (!target) {
+          return;
+        }
+        const playerId = String(target.dataset.playerId || '').trim();
+        const action = String(target.dataset.agentAction || '').trim();
+        if (!playerId || !action) {
+          return;
+        }
+        if (action === 'favorite') {
+          toggleAgentPlayerCollection(playerId, 'agentFavorites', 'agentPlayersStatus', back);
+        } else if (action === 'watch') {
+          toggleAgentPlayerCollection(playerId, 'agentWatchlist', 'agentPlayersStatus', back);
+        }
+      });
+    }
+
+    if (searchInput && searchInput.dataset.ready !== 'true') {
+      searchInput.dataset.ready = 'true';
+      searchInput.addEventListener('input', () => {
+        agentDashboardState.search = searchInput.value || '';
+        renderAgentPlayers(back);
+      });
+    }
+
+    if (ageFilter && ageFilter.dataset.ready !== 'true') {
+      ageFilter.dataset.ready = 'true';
+      ageFilter.addEventListener('change', () => {
+        agentDashboardState.ageGroup = ageFilter.value || 'all';
+        renderAgentPlayers(back);
+      });
+    }
+
+    if (notesButton && notesButton.dataset.ready !== 'true') {
+      notesButton.dataset.ready = 'true';
+      notesButton.addEventListener('click', () => {
+        saveAgentNote();
+      });
+    }
+
+    renderAgentPlayers(back);
+    renderAgentBucket('agentFavoritesList', getAgentFavorites(agentDashboardState.profile), 'რჩეულებში ჯერ არავინ არის დამატებული.', back);
+    renderAgentBucket('agentWatchlistList', getAgentWatchlist(agentDashboardState.profile), 'დასაკვირვებელ სიაში ჯერ არავინ არის დამატებული.', back);
+    renderAgentNotes();
+  }
+
   function getProfileViewKey(role) {
-    const raw = String(new URLSearchParams(location.search).get('view') || 'overview')
+    const defaultView = role === 'agent' ? 'data' : 'overview';
+    const raw = String(new URLSearchParams(location.search).get('view') || defaultView)
       .trim()
       .toLowerCase();
-    const allowed = ['overview', 'data', 'status', 'videos'];
+    const allowed = role === 'agent'
+      ? ['data', 'players', 'favorites', 'watchlist', 'notes']
+      : ['overview', 'data', 'status', 'videos'];
     if (role === 'player' || role === 'parent') {
       allowed.push('team');
     }
-    return allowed.includes(raw) ? raw : 'overview';
+    return allowed.includes(raw) ? raw : defaultView;
   }
 
   function buildProfileViewHref(viewKey, back) {
@@ -1936,6 +2272,19 @@
   }
 
   function getProfileViewItems(role, back) {
+    if (role === 'agent') {
+      return [
+        { key: 'data', label: 'მონაცემები', title: 'მონაცემები' },
+        { key: 'players', label: 'ფეხბურთელები', title: 'ფეხბურთელები' },
+        { key: 'favorites', label: 'რჩეულები', title: 'რჩეულები' },
+        { key: 'watchlist', label: 'დასაკვირვებელი', title: 'დასაკვირვებელი' },
+        { key: 'notes', label: 'ჩანაწერები', title: 'ჩანაწერები' }
+      ].map((item) => ({
+        ...item,
+        href: buildProfileViewHref(item.key, back)
+      }));
+    }
+
     const items = [
       { key: 'overview', label: 'პროფილი', title: 'პროფილი' },
       { key: 'data', label: 'მონაცემები', title: 'მონაცემები' },
@@ -1970,6 +2319,51 @@
   }
 
   function buildOverviewCards(role, profile, roleView, back) {
+    if (role === 'agent') {
+      return [
+        {
+          key: 'data',
+          kicker: 'მონაცემები',
+          title: 'აგენტის ძირითადი ინფორმაცია',
+          copy: 'სააგენტო, რეგიონი, საკონტაქტო ინფორმაცია და სამუშაო მიმართულება ერთ გვერდზეა თავმოყრილი.',
+          meta: `${safe(profile.agencyName)} • ${safe(profile.agencyRegion)}`,
+          href: buildProfileViewHref('data', back)
+        },
+        {
+          key: 'players',
+          kicker: 'ბაზა',
+          title: 'ფეხბურთელების ძებნა',
+          copy: 'საჯარო ფეხბურთელები მოძებნე ასაკობრივითა და სახელით, შემდეგ კი მონიშნე სამუშაო სიებში.',
+          meta: 'U8 - U18 • პროფესიონალები',
+          href: buildProfileViewHref('players', back)
+        },
+        {
+          key: 'favorites',
+          kicker: 'რჩეულები',
+          title: 'პრიორიტეტული მოთამაშეები',
+          copy: 'სწრაფად დაბრუნდი იმ ფეხბურთელებთან, რომლებიც უკვე გადაიყვანე რჩეულებში.',
+          meta: String(getAgentFavorites(profile).length),
+          href: buildProfileViewHref('favorites', back)
+        },
+        {
+          key: 'watchlist',
+          kicker: 'დაკვირვება',
+          title: 'მონიტორინგის სია',
+          copy: 'შეინახე ის მოთამაშეები, რომლებსაც ამ ეტაპზე აკვირდები და გინდა შემდეგ ხელახლა გადაამოწმო.',
+          meta: String(getAgentWatchlist(profile).length),
+          href: buildProfileViewHref('watchlist', back)
+        },
+        {
+          key: 'notes',
+          kicker: 'ჩანაწერები',
+          title: 'სამუშაო შენიშვნები',
+          copy: 'ყველა მოკლე კომენტარი და შემდეგი ნაბიჯი ერთ ადგილას დაალაგე.',
+          meta: String(getAgentNotes(profile).length),
+          href: buildProfileViewHref('notes', back)
+        }
+      ];
+    }
+
     const config = getManagedConfig(role);
     const ageState = config ? resolveAgeState(profile, config) : null;
     const ageText = ageState ? ageCategoryValue(ageState) : 'აქტიური';
@@ -2149,6 +2543,28 @@
       return;
     }
 
+    if (role === 'agent') {
+      hub.classList.add('overview-grid');
+      hub.classList.remove('profile-performance');
+      hub.innerHTML = buildOverviewCards(role, profile, roleView, back).map((item) => (
+        `<a href="${esc(item.href)}" class="overview-card">
+          <div class="overview-card-top">
+            <div>
+              <span class="overview-card-kicker">${esc(item.kicker)}</span>
+              <strong>${esc(item.title)}</strong>
+            </div>
+            <span class="overview-card-arrow">გახსენი</span>
+          </div>
+          <div class="overview-card-copy">${esc(item.copy)}</div>
+          <div class="overview-card-meta">
+            <span>${esc(item.meta)}</span>
+            <span>&rarr;</span>
+          </div>
+        </a>`
+      )).join('');
+      return;
+    }
+
     if (role === 'player' || role === 'parent') {
       const performance = buildPerformanceOverview(role, profile);
       hub.classList.remove('overview-grid');
@@ -2252,7 +2668,11 @@
       data: 'dataSection',
       status: 'stats',
       team: 'teamManage',
-      videos: 'videos'
+      videos: 'videos',
+      players: 'agentPlayers',
+      favorites: 'agentFavorites',
+      watchlist: 'agentWatchlist',
+      notes: 'agentNotes'
     };
 
     Object.keys(articleMap).forEach((key) => {
@@ -2260,14 +2680,16 @@
       if (!article) {
         return;
       }
-      article.hidden = currentView === 'overview' || key !== currentView;
+      article.hidden = role === 'agent'
+        ? key !== currentView
+        : currentView === 'overview' || key !== currentView;
     });
 
     if (hub) {
-      hub.hidden = currentView !== 'overview';
+      hub.hidden = role === 'agent' ? true : currentView !== 'overview';
     }
     if (sections) {
-      sections.hidden = currentView === 'overview';
+      sections.hidden = role === 'agent' ? false : currentView === 'overview';
     }
 
     if (sideCopy) {
@@ -2498,6 +2920,7 @@
     initializeVideos(role, currentUser, currentProfile, roleView);
     initializeTeamEditor();
     renderTeamManagement(role, currentProfile);
+    await initializeAgentDashboard(role, currentUser, currentProfile, client, back);
     renderProfileNavigation(role, back, currentView);
     renderProfileHub(role, currentProfile, roleView, back, currentUser);
     applyProfileView(role, currentView);
@@ -2509,6 +2932,10 @@
       team: role === 'parent' ? 'ბავშვის გუნდი' : 'გუნდი და ასაკობრივი',
       videos: 'ვიდეოები'
     };
+    titleMap.players = 'ფეხბურთელები';
+    titleMap.favorites = 'რჩეულები';
+    titleMap.watchlist = 'დასაკვირვებელი';
+    titleMap.notes = 'ჩანაწერები';
     document.title = `${titleMap[currentView] || roleView.name} | Football Georgia`;
     showApp();
   }
