@@ -305,16 +305,21 @@
           url: parsed.url,
           embedUrl: parsed.embedUrl,
           thumb: parsed.thumb,
-          title: String(item.title || parsed.defaultTitle || 'ვიდეო').trim() || 'ვიდეო'
+          title: String(item.title || parsed.defaultTitle || 'ვიდეო').trim() || 'ვიდეო',
+          comment: String(item.comment || '').trim(),
+          date: String(item.date || '').trim()
         };
       })
-      .filter(Boolean);
+      .filter(Boolean)
+      .sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')));
   }
 
   function setProfileVideos(role, nextProfile, videos) {
     nextProfile[getVideoProfileKey(role)] = videos.map((item) => ({
       title: String(item.title || '').trim(),
-      url: String(item.url || '').trim()
+      url: String(item.url || '').trim(),
+      comment: String(item.comment || '').trim(),
+      date: String(item.date || '').trim()
     }));
   }
 
@@ -1536,18 +1541,70 @@
     status.textContent = message;
   }
 
+  function formatVideoDate(value) {
+    if (!value) {
+      return 'თარიღი არ არის მითითებული';
+    }
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) {
+      return value;
+    }
+    return date.toLocaleDateString('ka-GE');
+  }
+
+  function getFilteredVideos(role, profile, query) {
+    const normalized = String(query || '').trim().toLowerCase();
+    const videos = getProfileVideos(role, profile);
+    if (!normalized) {
+      return videos;
+    }
+
+    return videos.filter((video) => {
+      const haystack = [
+        video.comment,
+        video.date,
+        formatVideoDate(video.date),
+        video.title
+      ].join(' ').toLowerCase();
+      return haystack.includes(normalized);
+    });
+  }
+
+  function updateVideoSearchMeta(total, visible, query) {
+    const meta = document.getElementById('videoSearchMeta');
+    if (!meta) {
+      return;
+    }
+    if (!query) {
+      meta.textContent = total ? `სულ ${total} ვიდეო • დალაგებულია ყველაზე ახალიდან.` : 'ვიდეოები დალაგდება ყველაზე ახალიდან.';
+      return;
+    }
+    meta.textContent = visible
+      ? `ნაპოვნია ${visible} ვიდეო მოთხოვნაზე: ${query}`
+      : `ვერ მოიძებნა ვიდეო მოთხოვნაზე: ${query}`;
+  }
+
   function renderVideoList(role, profile, notes = []) {
     const list = document.getElementById('videoList');
     if (!list) {
       return;
     }
 
-    const videos = getProfileVideos(role, profile);
-    if (!videos.length) {
+    const query = document.getElementById('videoSearchInput')?.value || '';
+    const allVideos = getProfileVideos(role, profile);
+    const videos = getFilteredVideos(role, profile, query);
+    updateVideoSearchMeta(allVideos.length, videos.length, query);
+
+    if (!allVideos.length) {
       const fallbackNotes = Array.isArray(notes) && notes.length
         ? `<div class="notes">${renderNotes(notes)}</div>`
         : '';
       list.innerHTML = `<div class="video-empty">ჯერ ვიდეო არ არის დამატებული. ჩასვი YouTube ბმული და ეს სივრცე მაშინვე შეივსება.${fallbackNotes}</div>`;
+      return;
+    }
+
+    if (!videos.length) {
+      list.innerHTML = '<div class="video-empty">ამ ძებნით შედეგი ვერ მოიძებნა. სცადე სხვა თარიღი ან კომენტარის სიტყვა.</div>';
       return;
     }
 
@@ -1561,14 +1618,19 @@
             <h3 class="video-card-title">${esc(video.title)}</h3>
             <div class="video-card-copy">${esc(video.url)}</div>
           </div>
-          <button type="button" class="btn btn-white remove-video-btn" data-video-index="${index}">წაშლა</button>
+          <button type="button" class="btn btn-white remove-video-btn" data-video-id="${esc(video.id)}" data-video-date="${esc(video.date)}">წაშლა</button>
         </div>
+        <div class="video-meta">
+          <span>${esc(formatVideoDate(video.date))}</span>
+          <span>YouTube</span>
+        </div>
+        <div class="video-comment">${esc(video.comment || 'კომენტარი არ არის დამატებული.')}</div>
       </article>
     `).join('');
 
     list.querySelectorAll('.remove-video-btn').forEach((button) => {
       button.addEventListener('click', () => {
-        removeVideoAtIndex(Number(button.dataset.videoIndex || -1));
+        removeVideoByIdentity(button.dataset.videoId || '', button.dataset.videoDate || '');
       });
     });
   }
@@ -1603,8 +1665,16 @@
       renderVideoList(role, profile, buildRoleView(role, profile, videoEditorState.user, from()).videos.n);
       setVideoStatus(successMessage, 'success');
       const input = document.getElementById('videoUrlInput');
+      const commentInput = document.getElementById('videoCommentInput');
+      const dateInput = document.getElementById('videoDateInput');
       if (input) {
         input.value = '';
+      }
+      if (commentInput) {
+        commentInput.value = '';
+      }
+      if (dateInput) {
+        dateInput.value = '';
       }
     } catch (error) {
       setVideoStatus(error?.message || 'ვიდეოების განახლება ვერ შესრულდა.', 'error');
@@ -1614,6 +1684,8 @@
   async function handleAddVideo() {
     const { role, profile } = videoEditorState;
     const input = document.getElementById('videoUrlInput');
+    const commentInput = document.getElementById('videoCommentInput');
+    const dateInput = document.getElementById('videoDateInput');
     const parsed = parseYouTubeVideo(input?.value);
     if (!parsed) {
       setVideoStatus('გთხოვ ჩასვა სწორი YouTube ბმული.', 'error');
@@ -1621,27 +1693,36 @@
       return;
     }
 
+    const comment = String(commentInput?.value || '').trim();
+    const date = String(dateInput?.value || '').trim();
+    if (!comment || !date) {
+      setVideoStatus('კომენტარი და თარიღი სავალდებულოა.', 'error');
+      return;
+    }
+
     const current = getProfileVideos(role, profile);
-    if (current.some((item) => item.id === parsed.id)) {
+    if (current.some((item) => item.id === parsed.id && item.date === date)) {
       setVideoStatus('ეს ვიდეო უკვე დამატებულია.', 'error');
       return;
     }
 
     current.unshift({
       title: `ვიდეო ${current.length + 1}`,
-      url: parsed.url
+      url: parsed.url,
+      comment,
+      date
     });
     await saveProfileVideos(current, 'ვიდეო წარმატებით დაემატა.');
   }
 
-  async function removeVideoAtIndex(index) {
+  async function removeVideoByIdentity(id, date) {
     const { role, profile } = videoEditorState;
     const current = getProfileVideos(role, profile);
-    if (!Number.isInteger(index) || index < 0 || index >= current.length) {
+    const next = current.filter((item) => !(item.id === id && String(item.date || '') === String(date || '')));
+    if (next.length === current.length) {
       return;
     }
-    current.splice(index, 1);
-    await saveProfileVideos(current, 'ვიდეო წაიშალა.');
+    await saveProfileVideos(next, 'ვიდეო წაიშალა.');
   }
 
   function initializeVideos(role, user, profile, roleView) {
@@ -1655,6 +1736,7 @@
 
     const addButton = document.getElementById('addVideoBtn');
     const input = document.getElementById('videoUrlInput');
+    const searchInput = document.getElementById('videoSearchInput');
 
     if (addButton && addButton.dataset.ready !== 'true') {
       addButton.dataset.ready = 'true';
@@ -1670,6 +1752,13 @@
           event.preventDefault();
           handleAddVideo();
         }
+      });
+    }
+
+    if (searchInput && searchInput.dataset.ready !== 'true') {
+      searchInput.dataset.ready = 'true';
+      searchInput.addEventListener('input', () => {
+        renderVideoList(videoEditorState.role, videoEditorState.profile, roleView.videos.n);
       });
     }
   }
