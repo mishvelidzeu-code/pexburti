@@ -1390,10 +1390,10 @@
     const store = getPerformanceStore(role, profile);
     const discipline = formatDiscipline(store);
     const coreCards = [
-      { label: 'საშუალო შეფასება', value: formatMetricValue('averageRating', store), copy: 'მატჩის საერთო შეფასება' },
+      { label: 'საშუალო შეფასება', value: formatMetricValue('averageRating', store), copy: 'სეზონის საერთო ფორმა' },
       { label: 'წუთები / 90', value: formatMetricValue('matches90', store), copy: 'რეალური 90-წუთიანები' },
-      { label: 'დისციპლინა', value: discipline.value, copy: discipline.copy },
-      { label: 'გოლში მონაწილეობა', value: formatMetricValue('goalContributions', store), copy: 'გოლი + ასისტი' }
+      { label: 'დისციპლინა', value: discipline.value, copy: `ბარათები • ${discipline.copy}` },
+      { label: 'გოლში მონაწილეობა', value: formatMetricValue('goalContributions', store), copy: 'გოლი და ასისტი' }
     ];
 
     const commonItems = [
@@ -1508,6 +1508,7 @@
 
     if (role === 'player' || role === 'parent') {
       const performance = buildPerformanceOverview(role, profile);
+      hub.classList.remove('overview-grid');
       hub.classList.add('profile-performance');
       hub.innerHTML = `
         <section class="performance-shell">
@@ -1580,6 +1581,7 @@
       return;
     }
 
+    hub.classList.add('overview-grid');
     hub.classList.remove('profile-performance');
     hub.innerHTML = buildOverviewCards(role, profile, roleView, back).map((item) => (
       `<a href="${esc(item.href)}" class="overview-card">
