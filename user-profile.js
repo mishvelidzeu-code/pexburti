@@ -88,37 +88,37 @@
   })[role] || 'მომხმარებელი';
 
   const PERFORMANCE_FIELDS = {
-    averageRating: { label: 'Average Rating', note: 'ავტომატურად დათვლილი საერთო შეფასება', max: 10, step: '0.1', precision: 1, computed: true },
-    matchesPlayed: { label: 'Games Played', note: 'ნათამაშები მატჩების რაოდენობა', max: 80, step: '1', precision: 0 },
-    matches90: { label: 'Minutes Played / 90', note: 'ფაქტობრივი 90-წუთიანები', max: 60, step: '0.1', precision: 1 },
-    yellowCards: { label: 'Yellow Cards', note: 'ყვითელი ბარათები', max: 25, step: '1', precision: 0 },
-    redCards: { label: 'Red Cards', note: 'წითელი ბარათები', max: 10, step: '1', precision: 0 },
-    goalContributions: { label: 'Goal Contributions', note: 'გოლი + ასისტი', max: 80, step: '1', precision: 0, computed: true },
-    savePercentage: { label: 'Save Percentage', note: 'სეივების პროცენტი', max: 100, step: '0.1', precision: 1, suffix: '%' },
-    goalsConcededPer90: { label: 'Goals Conceded / 90', note: 'გაშვებული გოლი / 90', max: 5, step: '0.1', precision: 1, inverse: true },
-    cleanSheets: { label: 'Clean Sheets', note: 'მშრალი მატჩები', max: 30, step: '1', precision: 0 },
-    successfulDistribution: { label: 'Successful Distribution %', note: 'ფეხით თამაშის სიზუსტე', max: 100, step: '0.1', precision: 1, suffix: '%' },
-    highClaims: { label: 'High Claims', note: 'გამოსვლების სიზუსტე', max: 50, step: '1', precision: 0 },
-    tacklesWon: { label: 'Tackles Won', note: 'მოგებული წართმევები', max: 120, step: '1', precision: 0 },
-    interceptions: { label: 'Interceptions', note: 'ბურთის ჩაჭრა', max: 100, step: '1', precision: 0 },
-    clearances: { label: 'Clearances', note: 'მოგერიებები საჯარიმოდან', max: 180, step: '1', precision: 0 },
-    aerialDuelsWon: { label: 'Aerial Duels Won %', note: 'ჰაერში მოგებული დუელები', max: 100, step: '0.1', precision: 1, suffix: '%' },
-    possessionRegained: { label: 'Possession Regained', note: 'დაბრუნებული ბურთები', max: 220, step: '1', precision: 0 },
-    keyPasses: { label: 'Key Passes', note: 'პასები დარტყმისთვის', max: 120, step: '1', precision: 0 },
-    progressivePasses: { label: 'Progressive Passes', note: 'წინ მიმტანი პასები', max: 220, step: '1', precision: 0 },
-    passAccuracy: { label: 'Pass Accuracy %', note: 'პასების სიზუსტე', max: 100, step: '0.1', precision: 1, suffix: '%' },
-    bigChancesCreated: { label: 'Big Chances Created', note: 'დიდი შანსების შექმნა', max: 60, step: '1', precision: 0 },
-    successfulDribbles: { label: 'Successful Dribbles', note: 'წარმატებული დრიბლინგები', max: 120, step: '1', precision: 0 },
-    actualGoals: { label: 'Goals', note: 'გატანილი გოლები', max: 50, step: '1', precision: 0 },
-    assists: { label: 'Assists', note: 'ასისტები', max: 50, step: '1', precision: 0 },
-    expectedGoals: { label: 'xG', note: 'მოსალოდნელი გოლები', max: 50, step: '0.1', precision: 1 },
-    shotsOnTarget: { label: 'Shots on Target', note: 'კარში დარტყმები', max: 120, step: '1', precision: 0 },
-    conversionRate: { label: 'Conversion Rate %', note: 'დარტყმიდან გოლის პროცენტი', max: 100, step: '0.1', precision: 1, suffix: '%' },
-    touchesInBox: { label: 'Touches in Box', note: 'ბურთთან შეხება საჯარიმოში', max: 200, step: '1', precision: 0 },
-    bigChancesMissed: { label: 'Big Chances Missed', note: 'გაფუჭებული რეალური მომენტები', max: 40, step: '1', precision: 0, inverse: true },
-    trainingConsistency: { label: 'Training Consistency', note: 'სავარჯიშო რიტმი', max: 100, step: '1', precision: 0, suffix: '%' },
-    duelWins: { label: 'Duel Wins', note: 'მოგებული დუელები', max: 120, step: '1', precision: 0 },
-    progressiveActions: { label: 'Progressive Actions', note: 'წინ მიმყვანი მოქმედებები', max: 120, step: '1', precision: 0 }
+    averageRating: { label: 'საშუალო შეფასება', note: 'ავტომატურად დათვლილი საერთო შეფასება', max: 10, step: '0.1', precision: 1, computed: true },
+    matchesPlayed: { label: 'თამაშები', note: 'ნათამაშები მატჩების რაოდენობა', max: 80, step: '1', precision: 0 },
+    matches90: { label: 'წუთები / 90', note: 'ფაქტობრივი 90-წუთიანები', max: 60, step: '0.1', precision: 1 },
+    yellowCards: { label: 'ყვითელი ბარათები', note: 'ყვითელი ბარათები', max: 25, step: '1', precision: 0 },
+    redCards: { label: 'წითელი ბარათები', note: 'წითელი ბარათები', max: 10, step: '1', precision: 0 },
+    goalContributions: { label: 'გოლში მონაწილეობა', note: 'გოლი + ასისტი', max: 80, step: '1', precision: 0, computed: true },
+    savePercentage: { label: 'სეივების პროცენტი', note: 'სეივების პროცენტი', max: 100, step: '0.1', precision: 1, suffix: '%' },
+    goalsConcededPer90: { label: 'გაშვებული გოლი / 90', note: 'გაშვებული გოლი / 90', max: 5, step: '0.1', precision: 1, inverse: true },
+    cleanSheets: { label: 'მშრალი მატჩები', note: 'მშრალი მატჩები', max: 30, step: '1', precision: 0 },
+    successfulDistribution: { label: 'განაწილების სიზუსტე %', note: 'ფეხით თამაშის სიზუსტე', max: 100, step: '0.1', precision: 1, suffix: '%' },
+    highClaims: { label: 'მაღალი ბურთების აღება', note: 'გამოსვლების სიზუსტე', max: 50, step: '1', precision: 0 },
+    tacklesWon: { label: 'მოგებული წართმევები', note: 'მოგებული წართმევები', max: 120, step: '1', precision: 0 },
+    interceptions: { label: 'ჩაჭრები', note: 'ბურთის ჩაჭრა', max: 100, step: '1', precision: 0 },
+    clearances: { label: 'მოგერიებები', note: 'მოგერიებები საჯარიმოდან', max: 180, step: '1', precision: 0 },
+    aerialDuelsWon: { label: 'ჰაერში მოგებული დუელები %', note: 'ჰაერში მოგებული დუელები', max: 100, step: '0.1', precision: 1, suffix: '%' },
+    possessionRegained: { label: 'დაბრუნებული ბურთები', note: 'დაბრუნებული ბურთები', max: 220, step: '1', precision: 0 },
+    keyPasses: { label: 'საკვანძო პასები', note: 'პასები დარტყმისთვის', max: 120, step: '1', precision: 0 },
+    progressivePasses: { label: 'პროგრესული პასები', note: 'წინ მიმტანი პასები', max: 220, step: '1', precision: 0 },
+    passAccuracy: { label: 'პასის სიზუსტე %', note: 'პასების სიზუსტე', max: 100, step: '0.1', precision: 1, suffix: '%' },
+    bigChancesCreated: { label: 'შექმნილი დიდი შანსები', note: 'დიდი შანსების შექმნა', max: 60, step: '1', precision: 0 },
+    successfulDribbles: { label: 'წარმატებული დრიბლინგები', note: 'წარმატებული დრიბლინგები', max: 120, step: '1', precision: 0 },
+    actualGoals: { label: 'გოლები', note: 'გატანილი გოლები', max: 50, step: '1', precision: 0 },
+    assists: { label: 'ასისტები', note: 'ასისტები', max: 50, step: '1', precision: 0 },
+    expectedGoals: { label: 'მოსალოდნელი გოლები (xG)', note: 'მოსალოდნელი გოლები', max: 50, step: '0.1', precision: 1 },
+    shotsOnTarget: { label: 'კარში დარტყმები', note: 'კარში დარტყმები', max: 120, step: '1', precision: 0 },
+    conversionRate: { label: 'რეალიზაციის პროცენტი %', note: 'დარტყმიდან გოლის პროცენტი', max: 100, step: '0.1', precision: 1, suffix: '%' },
+    touchesInBox: { label: 'შეხებები საჯარიმოში', note: 'ბურთთან შეხება საჯარიმოში', max: 200, step: '1', precision: 0 },
+    bigChancesMissed: { label: 'გაფუჭებული დიდი შანსები', note: 'გაფუჭებული რეალური მომენტები', max: 40, step: '1', precision: 0, inverse: true },
+    trainingConsistency: { label: 'სავარჯიშო სტაბილურობა', note: 'სავარჯიშო რიტმი', max: 100, step: '1', precision: 0, suffix: '%' },
+    duelWins: { label: 'მოგებული დუელები', note: 'მოგებული დუელები', max: 120, step: '1', precision: 0 },
+    progressiveActions: { label: 'პროგრესული მოქმედებები', note: 'წინ მიმყვანი მოქმედებები', max: 120, step: '1', precision: 0 }
   };
 
   const PERFORMANCE_COMMON_FIELDS = ['matchesPlayed', 'matches90', 'yellowCards', 'redCards'];
@@ -483,7 +483,7 @@
     }).join(' ');
 
     return [
-      `<svg viewBox="0 0 ${size} ${size}" role="img" aria-label="${esc(config.position)} radar chart">`,
+      `<svg viewBox="0 0 ${size} ${size}" role="img" aria-label="${esc(config.position)} რადარის გრაფიკი">`,
       rings,
       axes,
       `<polygon points="${polygon}" fill="${hasData ? 'rgba(185,28,28,.16)' : 'rgba(148,163,184,.14)'}" stroke="${hasData ? 'rgba(185,28,28,.95)' : 'rgba(100,116,139,.58)'}" stroke-width="3" stroke-dasharray="${hasData ? '0' : '8 8'}"></polygon>`,
@@ -1548,7 +1548,7 @@
     const advancedItems = config.key === 'forward'
       ? [
           {
-            title: 'Goals (Actual vs xG)',
+            title: 'გოლები / xG',
             value: `${formatMetricValue('actualGoals', store, metricContext)} / ${formatMetricValue('expectedGoals', store, metricContext)}`,
             copy: 'გატანილი გოლები მოსალოდნელ გოლებთან შედარებით.'
           }
