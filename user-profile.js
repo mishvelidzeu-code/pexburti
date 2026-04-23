@@ -88,11 +88,11 @@
   })[role] || 'მომხმარებელი';
 
   const PERFORMANCE_FIELDS = {
-    averageRating: { label: 'Average Rating', note: 'საშუალო შეფასება', max: 10, step: '0.1', precision: 1 },
+    averageRating: { label: 'Average Rating', note: 'ავტომატურად დათვლილი საერთო შეფასება', max: 10, step: '0.1', precision: 1, computed: true },
     matches90: { label: 'Minutes Played / 90', note: 'ფაქტობრივი 90-წუთიანები', max: 60, step: '0.1', precision: 1 },
     yellowCards: { label: 'Yellow Cards', note: 'ყვითელი ბარათები', max: 25, step: '1', precision: 0 },
     redCards: { label: 'Red Cards', note: 'წითელი ბარათები', max: 10, step: '1', precision: 0 },
-    goalContributions: { label: 'Goal Contributions', note: 'გოლი + ასისტი', max: 80, step: '1', precision: 0 },
+    goalContributions: { label: 'Goal Contributions', note: 'გოლი + ასისტი', max: 80, step: '1', precision: 0, computed: true },
     savePercentage: { label: 'Save Percentage', note: 'სეივების პროცენტი', max: 100, step: '0.1', precision: 1, suffix: '%' },
     goalsConcededPer90: { label: 'Goals Conceded / 90', note: 'გაშვებული გოლი / 90', max: 5, step: '0.1', precision: 1, inverse: true },
     cleanSheets: { label: 'Clean Sheets', note: 'მშრალი მატჩები', max: 30, step: '1', precision: 0 },
@@ -109,6 +109,7 @@
     bigChancesCreated: { label: 'Big Chances Created', note: 'დიდი შანსების შექმნა', max: 60, step: '1', precision: 0 },
     successfulDribbles: { label: 'Successful Dribbles', note: 'წარმატებული დრიბლინგები', max: 120, step: '1', precision: 0 },
     actualGoals: { label: 'Goals', note: 'გატანილი გოლები', max: 50, step: '1', precision: 0 },
+    assists: { label: 'Assists', note: 'ასისტები', max: 50, step: '1', precision: 0 },
     expectedGoals: { label: 'xG', note: 'მოსალოდნელი გოლები', max: 50, step: '0.1', precision: 1 },
     shotsOnTarget: { label: 'Shots on Target', note: 'კარში დარტყმები', max: 120, step: '1', precision: 0 },
     conversionRate: { label: 'Conversion Rate %', note: 'დარტყმიდან გოლის პროცენტი', max: 100, step: '0.1', precision: 1, suffix: '%' },
@@ -119,37 +120,37 @@
     progressiveActions: { label: 'Progressive Actions', note: 'წინ მიმყვანი მოქმედებები', max: 120, step: '1', precision: 0 }
   };
 
-  const PERFORMANCE_COMMON_FIELDS = ['averageRating', 'matches90', 'yellowCards', 'redCards', 'goalContributions'];
+  const PERFORMANCE_COMMON_FIELDS = ['matches90', 'yellowCards', 'redCards'];
   const PERFORMANCE_CONFIGS = {
     goalkeeper: {
       position: 'მეკარე',
       copy: 'მეკარის პროფილში აქცენტი კეთდება საიმედოობაზე, ფეხით თამაშზე და კარის დაცვაზე.',
       advanced: ['savePercentage', 'goalsConcededPer90', 'cleanSheets', 'successfulDistribution', 'highClaims'],
-      radar: ['savePercentage', 'successfulDistribution', 'highClaims', 'cleanSheets', 'averageRating']
+      radar: ['savePercentage', 'successfulDistribution', 'highClaims', 'cleanSheets', 'matches90']
     },
     defender: {
       position: 'დამცველი',
-      copy: 'დამცველისთვის მთავარი ხაზია ბურთის დაბრუნება, საჯარიმოს დაცვა და ორთაბრძოლების მოგება.',
-      advanced: ['tacklesWon', 'interceptions', 'clearances', 'aerialDuelsWon', 'possessionRegained'],
-      radar: ['tacklesWon', 'interceptions', 'clearances', 'aerialDuelsWon', 'possessionRegained']
+      copy: 'დამცველს უნდა უჩანდეს ბურთის დაბრუნებაც და შეტევაში ჩართვაც, ამიტომ აქ დაცვითი და შეტევითი რიცხვები ერთად იყრის თავს.',
+      advanced: ['tacklesWon', 'interceptions', 'clearances', 'aerialDuelsWon', 'possessionRegained', 'keyPasses', 'actualGoals', 'assists'],
+      radar: ['tacklesWon', 'interceptions', 'aerialDuelsWon', 'possessionRegained', 'keyPasses', 'goalContributions']
     },
     midfielder: {
       position: 'ნახევარმცველი',
-      copy: 'ნახევარმცველში ფოკუსია თამაშის წარმართვა, პასის ხარისხი და შეტევის გამწვავება.',
-      advanced: ['keyPasses', 'progressivePasses', 'passAccuracy', 'bigChancesCreated', 'successfulDribbles'],
-      radar: ['keyPasses', 'progressivePasses', 'passAccuracy', 'bigChancesCreated', 'successfulDribbles']
+      copy: 'ნახევარმცველის პროფილი ბალანსზეა აგებული: თამაშის მართვა, შემოქმედებითი პასი და დაცვითი ინტენსივობა ერთად უნდა ჩანდეს.',
+      advanced: ['keyPasses', 'progressivePasses', 'passAccuracy', 'bigChancesCreated', 'successfulDribbles', 'tacklesWon', 'interceptions', 'assists'],
+      radar: ['keyPasses', 'progressivePasses', 'passAccuracy', 'tacklesWon', 'successfulDribbles', 'goalContributions']
     },
     forward: {
       position: 'თავდამსხმელი',
       copy: 'თავდამსხმელისთვის აქცენტი ეფექტიანობაზეა: რამდენად კარგად აქცევს მომენტს რეალურ შედეგში.',
-      advanced: ['actualGoals', 'expectedGoals', 'shotsOnTarget', 'conversionRate', 'touchesInBox', 'bigChancesMissed'],
-      radar: ['actualGoals', 'shotsOnTarget', 'conversionRate', 'touchesInBox', 'goalContributions']
+      advanced: ['actualGoals', 'assists', 'expectedGoals', 'shotsOnTarget', 'conversionRate', 'touchesInBox', 'bigChancesMissed', 'keyPasses'],
+      radar: ['actualGoals', 'shotsOnTarget', 'conversionRate', 'touchesInBox', 'assists', 'goalContributions']
     },
     general: {
       position: 'უნივერსალური პროფილი',
       copy: 'თუ პოზიცია ჯერ არ არის საბოლოოდ არჩეული, შეგიძლია უნივერსალური ძირითადი მაჩვენებლები შეავსო.',
-      advanced: ['trainingConsistency', 'successfulDribbles', 'progressiveActions', 'duelWins', 'goalContributions'],
-      radar: ['trainingConsistency', 'successfulDribbles', 'progressiveActions', 'duelWins', 'averageRating']
+      advanced: ['trainingConsistency', 'successfulDribbles', 'progressiveActions', 'duelWins', 'keyPasses', 'actualGoals', 'assists'],
+      radar: ['trainingConsistency', 'successfulDribbles', 'progressiveActions', 'duelWins', 'keyPasses', 'goalContributions']
     }
   };
 
@@ -274,12 +275,82 @@
     return Number.isFinite(value) ? value : 0;
   }
 
-  function formatMetricValue(key, store) {
+  function computeGoalContributions(store) {
+    const goals = metricNumber(store, 'actualGoals');
+    const assists = metricNumber(store, 'assists');
+    const combined = goals + assists;
+    if (combined > 0) {
+      return combined;
+    }
+    return metricNumber(store, 'goalContributions');
+  }
+
+  function getPerformanceRatingWeights(configKey) {
+    if (configKey === 'goalkeeper') {
+      return { radar: 0.78, availability: 0.14, contribution: 0.02, discipline: 0.06 };
+    }
+    if (configKey === 'defender') {
+      return { radar: 0.68, availability: 0.14, contribution: 0.08, discipline: 0.10 };
+    }
+    if (configKey === 'midfielder') {
+      return { radar: 0.64, availability: 0.12, contribution: 0.14, discipline: 0.10 };
+    }
+    if (configKey === 'forward') {
+      return { radar: 0.60, availability: 0.10, contribution: 0.22, discipline: 0.08 };
+    }
+    return { radar: 0.66, availability: 0.14, contribution: 0.10, discipline: 0.10 };
+  }
+
+  function computeAverageRating(role, profile, store, config) {
+    const resolvedConfig = config || getPerformanceConfig(role, profile);
+    const activityKeys = Array.from(new Set(['matches90', 'yellowCards', 'redCards', 'actualGoals', 'assists'].concat(resolvedConfig?.advanced || [])));
+    const hasActivity = activityKeys.some((key) => resolveComputedMetricNumber(key, store, { role, profile, config: resolvedConfig }) > 0);
+    if (!hasActivity) {
+      return 0;
+    }
+    const radarKeys = (resolvedConfig?.radar || []).filter((key) => key !== 'averageRating');
+    const radarAverage = radarKeys.length
+      ? radarKeys.reduce((sum, key) => sum + normalizeRadarValue(key, store, { role, profile, config: resolvedConfig }), 0) / radarKeys.length
+      : 0;
+
+    const minutesScore = Math.max(0, Math.min(1, metricNumber(store, 'matches90') / 18));
+    const contributionCap = resolvedConfig?.key === 'forward'
+      ? 18
+      : resolvedConfig?.key === 'goalkeeper'
+        ? 8
+        : 12;
+    const contributionScore = Math.max(0, Math.min(1, computeGoalContributions(store) / contributionCap));
+    const yellow = metricNumber(store, 'yellowCards');
+    const red = metricNumber(store, 'redCards');
+    const disciplineLoad = Math.max(0, Math.min(1, (yellow / 12) + ((red / 3) * 0.9)));
+    const disciplineScore = 1 - disciplineLoad;
+    const weights = getPerformanceRatingWeights(resolvedConfig?.key);
+    const totalScore = (
+      radarAverage * weights.radar +
+      minutesScore * weights.availability +
+      contributionScore * weights.contribution +
+      disciplineScore * weights.discipline
+    ) * 10;
+
+    return Math.max(0, Math.min(10, Number(totalScore.toFixed(1))));
+  }
+
+  function resolveComputedMetricNumber(key, store, context = {}) {
+    if (key === 'goalContributions') {
+      return computeGoalContributions(store);
+    }
+    if (key === 'averageRating') {
+      return computeAverageRating(context.role, context.profile, store, context.config);
+    }
+    return metricNumber(store, key);
+  }
+
+  function formatMetricValue(key, store, context = {}) {
     const field = PERFORMANCE_FIELDS[key];
     if (!field) {
       return safe(store?.[key], '0');
     }
-    const value = metricNumber(store, key);
+    const value = resolveComputedMetricNumber(key, store, context);
     if (!value) {
       return field.precision === 1 ? '0.0' + (field.suffix || '') : '0' + (field.suffix || '');
     }
@@ -297,12 +368,12 @@
     };
   }
 
-  function normalizeRadarValue(key, store) {
+  function normalizeRadarValue(key, store, context = {}) {
     const field = PERFORMANCE_FIELDS[key];
     if (!field) {
       return 0;
     }
-    const value = metricNumber(store, key);
+    const value = resolveComputedMetricNumber(key, store, context);
     const ratio = Math.max(0, Math.min(1, value / (field.max || 100)));
     return field.inverse ? (1 - ratio) : ratio;
   }
@@ -787,10 +858,10 @@
         lead: 'ეს არის შენი მოთამაშის პროფილი. აქ დაგიგროვდება გუნდი, ვიდეო CV, სტატისტიკა და სეზონური ასაკობრივი ისტორია.',
         side: 'აქ ატვირთავ სურათს, ნახავ შენს მიმდინარე ფორმას და ყოველდღიურად განაახლებ პოზიციაზე მორგებულ პროფილს.',
         quick: [
-          { l: 'საშუალო შეფასება', v: formatMetricValue('averageRating', performanceStore) },
-          { l: 'წუთები / 90', v: formatMetricValue('matches90', performanceStore) },
+          { l: 'საშუალო შეფასება', v: formatMetricValue('averageRating', performanceStore, { role, profile, config }) },
+          { l: 'წუთები / 90', v: formatMetricValue('matches90', performanceStore, { role, profile, config }) },
           { l: 'დისციპლინა', v: discipline.value },
-          { l: 'გოლში მონაწილეობა', v: formatMetricValue('goalContributions', performanceStore) }
+          { l: 'გოლში მონაწილეობა', v: formatMetricValue('goalContributions', performanceStore, { role, profile, config }) }
         ],
         pass: common.concat([
           { l: 'დაბადების თარიღი', v: safe(dateText(profile.playerBirthDate)) },
@@ -844,10 +915,10 @@
         lead: 'ეს არის მშობლის სამუშაო სივრცე, სადაც ბავშვის მონაცემები, გუნდი და ასაკობრივი კატეგორია ერთად იმართება.',
         side: 'აქ ერთ სივრცეში ჩანს ბავშვის ფოტო, პოზიციაზე მორგებული ანალიზი და ყოველდღიური განახლებები, რომელსაც შენ მართავ.',
         quick: [
-          { l: 'საშუალო შეფასება', v: formatMetricValue('averageRating', performanceStore) },
-          { l: 'წუთები / 90', v: formatMetricValue('matches90', performanceStore) },
+          { l: 'საშუალო შეფასება', v: formatMetricValue('averageRating', performanceStore, { role, profile, config }) },
+          { l: 'წუთები / 90', v: formatMetricValue('matches90', performanceStore, { role, profile, config }) },
           { l: 'დისციპლინა', v: discipline.value },
-          { l: 'გოლში მონაწილეობა', v: formatMetricValue('goalContributions', performanceStore) }
+          { l: 'გოლში მონაწილეობა', v: formatMetricValue('goalContributions', performanceStore, { role, profile, config }) }
         ],
         pass: common.concat([
           { l: 'ბავშვის სახელი', v: safe(profile.childName) },
@@ -1389,25 +1460,26 @@
     const config = getPerformanceConfig(role, profile);
     const store = getPerformanceStore(role, profile);
     const discipline = formatDiscipline(store);
+    const metricContext = { role, profile, config };
     const coreCards = [
-      { label: 'საშუალო შეფასება', value: formatMetricValue('averageRating', store), copy: 'სეზონის საერთო ფორმა' },
-      { label: 'წუთები / 90', value: formatMetricValue('matches90', store), copy: 'რეალური 90-წუთიანები' },
+      { label: 'საშუალო შეფასება', value: formatMetricValue('averageRating', store, metricContext), copy: 'ავტომატურად დათვლილი ფორმა' },
+      { label: 'წუთები / 90', value: formatMetricValue('matches90', store, metricContext), copy: 'რეალური 90-წუთიანები' },
       { label: 'დისციპლინა', value: discipline.value, copy: `ბარათები • ${discipline.copy}` },
-      { label: 'გოლში მონაწილეობა', value: formatMetricValue('goalContributions', store), copy: 'გოლი და ასისტი' }
+      { label: 'გოლში მონაწილეობა', value: formatMetricValue('goalContributions', store, metricContext), copy: 'გოლი და ასისტი' }
     ];
 
     const commonItems = [
-      { title: 'საშუალო შეფასება', value: formatMetricValue('averageRating', store), copy: 'მატჩური საშუალო შეფასება.' },
-      { title: 'წუთები / 90', value: formatMetricValue('matches90', store), copy: 'რამდენი სრული 90-წუთიანი მატჩი დაუგროვდა.' },
+      { title: 'საშუალო შეფასება', value: formatMetricValue('averageRating', store, metricContext), copy: 'მეტრიკებიდან დათვლილი საერთო შეფასება.' },
+      { title: 'წუთები / 90', value: formatMetricValue('matches90', store, metricContext), copy: 'რამდენი სრული 90-წუთიანი მატჩი დაუგროვდა.' },
       { title: 'დისციპლინა', value: `${discipline.value} ბარათი`, copy: `${discipline.copy} — ჯამური დისციპლინა.` },
-      { title: 'გოლში მონაწილეობა', value: formatMetricValue('goalContributions', store), copy: 'პირდაპირი მონაწილეობა გოლში.' }
+      { title: 'გოლში მონაწილეობა', value: formatMetricValue('goalContributions', store, metricContext), copy: 'გოლებისა და ასისტების ჯამი.' }
     ];
 
     const advancedItems = config.key === 'forward'
       ? [
           {
             title: 'Goals (Actual vs xG)',
-            value: `${formatMetricValue('actualGoals', store)} / ${formatMetricValue('expectedGoals', store)}`,
+            value: `${formatMetricValue('actualGoals', store, metricContext)} / ${formatMetricValue('expectedGoals', store, metricContext)}`,
             copy: 'გატანილი გოლები მოსალოდნელ გოლებთან შედარებით.'
           }
         ].concat(
@@ -1415,13 +1487,13 @@
             .filter((key) => key !== 'actualGoals' && key !== 'expectedGoals')
             .map((key) => ({
               title: PERFORMANCE_FIELDS[key].label,
-              value: formatMetricValue(key, store),
+              value: formatMetricValue(key, store, metricContext),
               copy: PERFORMANCE_FIELDS[key].note
             }))
         )
       : config.advanced.map((key) => ({
           title: PERFORMANCE_FIELDS[key].label,
-          value: formatMetricValue(key, store),
+          value: formatMetricValue(key, store, metricContext),
           copy: PERFORMANCE_FIELDS[key].note
         }));
 
@@ -1434,7 +1506,7 @@
       radarSvg: buildRadarSvg(config, store),
       radarLegend: config.radar.map((key) => ({
         title: PERFORMANCE_FIELDS[key].label,
-        value: formatMetricValue(key, store)
+        value: formatMetricValue(key, store, metricContext)
       })),
       commonForm: buildPerformanceFieldMarkup(PERFORMANCE_COMMON_FIELDS, store, 'performance'),
       advancedForm: buildPerformanceFieldMarkup(config.advanced, store, 'performance')
@@ -1558,7 +1630,7 @@
             <div class="metric-form-grid">
               <section class="metric-form-section">
                 <h4>ძირითადი მაჩვენებლები</h4>
-                <p>ეს ოთხი ბლოკი ყველა პოზიციაზე ერთნაირად ჩანს და ყოველდღიურად შეიძლება განახლდეს.</p>
+                <p>აქ ავსებ წუთებსა და დისციპლინას. საშუალო შეფასება და გოლში მონაწილეობა ზემოთ ავტომატურად დაითვლება შეყვანილი მონაცემებიდან.</p>
                 ${performance.commonForm}
               </section>
               <section class="metric-form-section">
