@@ -180,6 +180,24 @@
     avatar.textContent = initials(user);
   }
 
+  function renderHeroCover(role, profile) {
+    const cover = document.getElementById('heroCover');
+    const media = document.getElementById('heroCoverMedia');
+    if (!cover || !media) {
+      return;
+    }
+
+    const image = getProfileImageSource(role, profile);
+    if (image) {
+      media.style.backgroundImage = `url("${String(image).replace(/"/g, '\\"')}")`;
+      cover.classList.add('has-photo');
+      return;
+    }
+
+    media.style.backgroundImage = '';
+    cover.classList.remove('has-photo');
+  }
+
   const renderItems = (list) => list.map((item) => (
     `<div class="info"><div class="label">${esc(item.l)}</div>${
       item.h
@@ -767,12 +785,12 @@
       return {
         eye: 'ციფრული საფეხბურთო პროფილი',
         lead: 'ეს არის შენი მოთამაშის პროფილი. აქ დაგიგროვდება გუნდი, ვიდეო CV, სტატისტიკა და სეზონური ასაკობრივი ისტორია.',
-        side: 'აქედან შეგიძლია მართო გუნდი, ასაკობრივი ჯგუფი და დაბრუნდე ზუსტად იმავე გვერდზე, საიდანაც გახსენი პროფილი.',
+        side: 'აქ ატვირთავ სურათს, ნახავ შენს მიმდინარე ფორმას და ყოველდღიურად განაახლებ პოზიციაზე მორგებულ პროფილს.',
         quick: [
-          { l: 'Average Rating', v: formatMetricValue('averageRating', performanceStore) },
-          { l: 'Minutes / 90', v: formatMetricValue('matches90', performanceStore) },
-          { l: 'Discipline', v: discipline.value },
-          { l: 'Goal Contributions', v: formatMetricValue('goalContributions', performanceStore) }
+          { l: 'საშუალო შეფასება', v: formatMetricValue('averageRating', performanceStore) },
+          { l: 'წუთები / 90', v: formatMetricValue('matches90', performanceStore) },
+          { l: 'დისციპლინა', v: discipline.value },
+          { l: 'გოლში მონაწილეობა', v: formatMetricValue('goalContributions', performanceStore) }
         ],
         pass: common.concat([
           { l: 'დაბადების თარიღი', v: safe(dateText(profile.playerBirthDate)) },
@@ -824,12 +842,12 @@
       return {
         eye: 'მშობლის პროფილი',
         lead: 'ეს არის მშობლის სამუშაო სივრცე, სადაც ბავშვის მონაცემები, გუნდი და ასაკობრივი კატეგორია ერთად იმართება.',
-        side: 'აქედან დაინახავ ბავშვის ასაკს, პოზიციას, გუნდს, ასაკობრივს და დაბრუნდები იმავე გვერდზე, საიდანაც გახსენი პროფილი.',
+        side: 'აქ ერთ სივრცეში ჩანს ბავშვის ფოტო, პოზიციაზე მორგებული ანალიზი და ყოველდღიური განახლებები, რომელსაც შენ მართავ.',
         quick: [
-          { l: 'Average Rating', v: formatMetricValue('averageRating', performanceStore) },
-          { l: 'Minutes / 90', v: formatMetricValue('matches90', performanceStore) },
-          { l: 'Discipline', v: discipline.value },
-          { l: 'Goal Contributions', v: formatMetricValue('goalContributions', performanceStore) }
+          { l: 'საშუალო შეფასება', v: formatMetricValue('averageRating', performanceStore) },
+          { l: 'წუთები / 90', v: formatMetricValue('matches90', performanceStore) },
+          { l: 'დისციპლინა', v: discipline.value },
+          { l: 'გოლში მონაწილეობა', v: formatMetricValue('goalContributions', performanceStore) }
         ],
         pass: common.concat([
           { l: 'ბავშვის სახელი', v: safe(profile.childName) },
@@ -877,7 +895,7 @@
     return {
       eye: 'აგენტის პროფილი',
       lead: 'ეს არის აგენტის პროფილი, სადაც მოთამაშეების პორტფოლიო და მომავალი შეთავაზებები გაერთიანდება.',
-      side: 'აქედან დაინახავ სააგენტოს ძირითად ინფორმაციას და დაბრუნდები საწყის გვერდზე.',
+      side: 'აქ ჩანს სააგენტოს მთავარი სურათი, სამუშაო სტატუსი და ის ბლოკები, რომლებსაც ყოველდღიურ მუშაობაში გამოიყენებ.',
       quick: [
         { l: 'სააგენტო', v: safe(profile.agencyName) },
         { l: 'მოთამაშეები', v: safe(profile.playersManaged, '0') },
@@ -1372,17 +1390,17 @@
     const store = getPerformanceStore(role, profile);
     const discipline = formatDiscipline(store);
     const coreCards = [
-      { label: 'Average Rating', value: formatMetricValue('averageRating', store), copy: 'საშუალო შეფასება' },
-      { label: 'Minutes Played / 90', value: formatMetricValue('matches90', store), copy: 'რეალური 90-წუთიანები' },
-      { label: 'Discipline', value: discipline.value, copy: discipline.copy },
-      { label: 'Goal Contributions', value: formatMetricValue('goalContributions', store), copy: 'გოლი + ასისტი' }
+      { label: 'საშუალო შეფასება', value: formatMetricValue('averageRating', store), copy: 'მატჩის საერთო შეფასება' },
+      { label: 'წუთები / 90', value: formatMetricValue('matches90', store), copy: 'რეალური 90-წუთიანები' },
+      { label: 'დისციპლინა', value: discipline.value, copy: discipline.copy },
+      { label: 'გოლში მონაწილეობა', value: formatMetricValue('goalContributions', store), copy: 'გოლი + ასისტი' }
     ];
 
     const commonItems = [
-      { title: 'Average Rating', value: formatMetricValue('averageRating', store), copy: 'მატჩური საშუალო შეფასება.' },
-      { title: 'Minutes Played / 90', value: formatMetricValue('matches90', store), copy: 'რამდენი სრული 90-წუთიანი მატჩი დაუგროვდა.' },
-      { title: 'Discipline', value: `${discipline.value} ბარათი`, copy: `${discipline.copy} — ჯამური დისციპლინა.` },
-      { title: 'Goal Contributions', value: formatMetricValue('goalContributions', store), copy: 'პირდაპირი მონაწილეობა გოლში.' }
+      { title: 'საშუალო შეფასება', value: formatMetricValue('averageRating', store), copy: 'მატჩური საშუალო შეფასება.' },
+      { title: 'წუთები / 90', value: formatMetricValue('matches90', store), copy: 'რამდენი სრული 90-წუთიანი მატჩი დაუგროვდა.' },
+      { title: 'დისციპლინა', value: `${discipline.value} ბარათი`, copy: `${discipline.copy} — ჯამური დისციპლინა.` },
+      { title: 'გოლში მონაწილეობა', value: formatMetricValue('goalContributions', store), copy: 'პირდაპირი მონაწილეობა გოლში.' }
     ];
 
     const advancedItems = config.key === 'forward'
@@ -1504,7 +1522,7 @@
           </div>
           <div class="performance-layout">
             <article class="radar-card">
-              <h3>${esc(performance.config.position)} Radar Chart</h3>
+              <h3>${esc(performance.config.position)} • რადარი</h3>
               <p class="position-copy">${esc(performance.config.copy)}</p>
               <div class="radar-wrap">${performance.radarSvg}</div>
               <div class="radar-caption">
@@ -1513,15 +1531,15 @@
             </article>
             <div class="metric-groups">
               <article class="performance-panel">
-                <h3>Core Metrics</h3>
-                <p class="position-copy">ძირითადი მაჩვენებლები, რომლებიც header-შიც ყველაზე სწრაფად უნდა იკითხებოდეს.</p>
+                <h3>ძირითადი მაჩვენებლები</h3>
+                <p class="position-copy">ყველაზე მთავარი რიცხვები, რომლებიც პირველი შეხედვით უნდა იკითხებოდეს.</p>
                 <div class="metric-grid">
                   ${performance.commonItems.map((item) => `<div class="metric-item"><strong>${esc(item.title)} · ${esc(item.value)}</strong><span>${esc(item.copy)}</span></div>`).join('')}
                 </div>
               </article>
               <article class="performance-panel">
-                <h3>Advanced Impact</h3>
-                <p class="position-copy">პოზიციაზე მორგებული გავლენის მაჩვენებლები, რომლებიც მოთამაშის რეალურ ტიპს უკეთ აჩვენებს.</p>
+                <h3>გავლენის მაჩვენებლები</h3>
+                <p class="position-copy">პოზიციაზე მორგებული დეტალები, რომლებიც მოთამაშის რეალურ პროფილს უფრო მკაფიოდ აჩვენებს.</p>
                 <div class="metric-grid">
                   ${performance.advancedItems.map((item) => `<div class="metric-item"><strong>${esc(item.title)} · ${esc(item.value)}</strong><span>${esc(item.copy)}</span></div>`).join('')}
                 </div>
@@ -1538,13 +1556,13 @@
             </div>
             <div class="metric-form-grid">
               <section class="metric-form-section">
-                <h4>Core Metrics</h4>
-                <p>ძირითადი ოთხი ბლოკი, რომლებიც ყველა პოზიციაზე ერთნაირად ჩანს.</p>
+                <h4>ძირითადი მაჩვენებლები</h4>
+                <p>ეს ოთხი ბლოკი ყველა პოზიციაზე ერთნაირად ჩანს და ყოველდღიურად შეიძლება განახლდეს.</p>
                 ${performance.commonForm}
               </section>
               <section class="metric-form-section">
-                <h4>${esc(performance.config.position)} · Advanced Impact</h4>
-                <p>აქ გამოჩნდება მხოლოდ იმ პოზიციის მაჩვენებლები, რომელიც პროფილში გაქვს მითითებული.</p>
+                <h4>${esc(performance.config.position)} · გავლენის მაჩვენებლები</h4>
+                <p>აქ მხოლოდ იმ პოზიციისთვის მნიშვნელოვანი მაჩვენებლები ჩნდება, რომელიც პროფილში გაქვს არჩეული.</p>
                 ${performance.advancedForm}
               </section>
             </div>
@@ -1609,13 +1627,13 @@
 
     if (currentView === 'overview') {
       if (sideCopy) {
-        sideCopy.textContent = 'ეს არის მთავარი პროფილი: აქ ხედავ სურათს, Core Metrics-ს, Advanced Impact-ს და პოზიციაზე მორგებულ დღიურ განახლებას.';
+        sideCopy.textContent = 'აქ ჩანს მთავარი ფოტო, სწრაფი სტატუსი, პოზიციური ანალიზი და ყოველდღიური განახლება ერთ სუფთა სივრცეში.';
       }
       return;
     }
 
     if (sideCopy) {
-      sideCopy.textContent = 'ეს არის პროფილის ცალკე სექცია. მარცხნივ შეგიძლია სხვა ბლოკზეც გადახვიდე ან დაბრუნდე მთავარ პროფილზე.';
+      sideCopy.textContent = 'ზემოთ მოცემული ნავიგაციიდან შეგიძლია სწრაფად გადახვიდე სხვა ბლოკებზე ან დაბრუნდე მთავარ პროფილზე.';
     }
   }
 
@@ -1798,17 +1816,27 @@
     document.getElementById('roleBadge').textContent = roleLabel(role);
     document.getElementById('memberSince').textContent = `გაწევრიანდა ${new Date(currentUser.created_at).toLocaleDateString('ka-GE')}`;
     renderAvatar(currentUser, role, currentProfile);
+    renderHeroCover(role, currentProfile);
     document.getElementById('name').textContent = roleView.name;
     document.getElementById('lead').textContent = roleView.lead;
-    document.getElementById('sideCopy').textContent = roleView.side;
-    document.getElementById('quick').innerHTML = renderQuick(roleView.quick);
+    const sideCopy = document.getElementById('sideCopy');
+    if (sideCopy) {
+      sideCopy.textContent = roleView.side;
+    }
+    const quick = document.getElementById('quick');
+    if (quick) {
+      quick.innerHTML = renderQuick(roleView.quick);
+    }
     document.getElementById('dataGrid').innerHTML = renderItems(roleView.pass);
     document.getElementById('statsGrid').innerHTML = renderStats(roleView.stat);
     document.getElementById('portfolioTitle').textContent = roleView.port.t;
     document.getElementById('portfolioCopy').textContent = roleView.port.c;
     document.getElementById('portfolioActions').innerHTML = renderActions(roleView.port.a);
     document.getElementById('notes').innerHTML = renderNotes(roleView.port.n);
-    document.getElementById('mini').innerHTML = renderMini(roleView.mini);
+    const mini = document.getElementById('mini');
+    if (mini) {
+      mini.innerHTML = renderMini(roleView.mini);
+    }
 
     if (window.siteAuth?.renderAuthNav) {
       window.siteAuth.renderAuthNav('#profileHeaderAuth', {
