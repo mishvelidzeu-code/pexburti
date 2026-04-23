@@ -1675,14 +1675,14 @@
             <div class="metric-groups">
               <article class="performance-panel">
                 <h3>ძირითადი მაჩვენებლები</h3>
-                <p class="position-copy">ყველაზე მთავარი რიცხვები, რომლებიც პირველი შეხედვით უნდა იკითხებოდეს.</p>
+                <p class="position-copy">პირველივე შეხედვით ყველაზე მნიშვნელოვანი რიცხვები.</p>
                 <div class="metric-grid">
                   ${performance.commonItems.map((item) => `<div class="metric-item"><span class="metric-item-label">${esc(item.title)}</span><strong class="metric-item-value">${esc(item.value)}</strong><span class="metric-item-copy">${esc(item.copy)}</span></div>`).join('')}
                 </div>
               </article>
               <article class="performance-panel">
                 <h3>გავლენის მაჩვენებლები</h3>
-                <p class="position-copy">პოზიციაზე მორგებული დეტალები, რომლებიც მოთამაშის რეალურ პროფილს უფრო მკაფიოდ აჩვენებს.</p>
+                <p class="position-copy">პოზიციაზე მორგებული დამატებითი სურათი და გავლენა.</p>
                 <div class="metric-grid">
                   ${performance.advancedItems.map((item) => `<div class="metric-item"><span class="metric-item-label">${esc(item.title)}</span><strong class="metric-item-value">${esc(item.value)}</strong><span class="metric-item-copy">${esc(item.copy)}</span></div>`).join('')}
                 </div>
@@ -1693,7 +1693,7 @@
             <div class="section-top">
               <div>
                 <h3>დღიური განახლება</h3>
-                <p class="position-copy">ეს ბლოკი შეავსე როცა გინდა ახალი მატჩის, ტრენინგის ან მიმდინარე ფორმის მონაცემების განახლება.</p>
+                <p class="position-copy">აქედან სწრაფად ანახლებ მატჩისა და ფორმის მონაცემებს.</p>
               </div>
               <div class="metric-updated">ბოლო განახლება: ${esc(performance.updatedAt)}</div>
             </div>
