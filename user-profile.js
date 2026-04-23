@@ -89,6 +89,7 @@
 
   const PERFORMANCE_FIELDS = {
     averageRating: { label: 'Average Rating', note: 'ავტომატურად დათვლილი საერთო შეფასება', max: 10, step: '0.1', precision: 1, computed: true },
+    matchesPlayed: { label: 'Games Played', note: 'ნათამაშები მატჩების რაოდენობა', max: 80, step: '1', precision: 0 },
     matches90: { label: 'Minutes Played / 90', note: 'ფაქტობრივი 90-წუთიანები', max: 60, step: '0.1', precision: 1 },
     yellowCards: { label: 'Yellow Cards', note: 'ყვითელი ბარათები', max: 25, step: '1', precision: 0 },
     redCards: { label: 'Red Cards', note: 'წითელი ბარათები', max: 10, step: '1', precision: 0 },
@@ -120,7 +121,7 @@
     progressiveActions: { label: 'Progressive Actions', note: 'წინ მიმყვანი მოქმედებები', max: 120, step: '1', precision: 0 }
   };
 
-  const PERFORMANCE_COMMON_FIELDS = ['matches90', 'yellowCards', 'redCards'];
+  const PERFORMANCE_COMMON_FIELDS = ['matchesPlayed', 'matches90', 'yellowCards', 'redCards'];
   const PERFORMANCE_CONFIGS = {
     goalkeeper: {
       position: 'მეკარე',
@@ -131,13 +132,13 @@
     defender: {
       position: 'დამცველი',
       copy: 'დამცველს უნდა უჩანდეს ბურთის დაბრუნებაც და შეტევაში ჩართვაც, ამიტომ აქ დაცვითი და შეტევითი რიცხვები ერთად იყრის თავს.',
-      advanced: ['tacklesWon', 'interceptions', 'clearances', 'aerialDuelsWon', 'possessionRegained', 'keyPasses', 'actualGoals', 'assists'],
-      radar: ['tacklesWon', 'interceptions', 'aerialDuelsWon', 'possessionRegained', 'keyPasses', 'goalContributions']
+      advanced: ['tacklesWon', 'interceptions', 'clearances', 'aerialDuelsWon', 'possessionRegained', 'cleanSheets', 'keyPasses', 'actualGoals', 'assists'],
+      radar: ['tacklesWon', 'interceptions', 'aerialDuelsWon', 'possessionRegained', 'cleanSheets', 'goalContributions']
     },
     midfielder: {
       position: 'ნახევარმცველი',
       copy: 'ნახევარმცველის პროფილი ბალანსზეა აგებული: თამაშის მართვა, შემოქმედებითი პასი და დაცვითი ინტენსივობა ერთად უნდა ჩანდეს.',
-      advanced: ['keyPasses', 'progressivePasses', 'passAccuracy', 'bigChancesCreated', 'successfulDribbles', 'tacklesWon', 'interceptions', 'assists'],
+      advanced: ['keyPasses', 'progressivePasses', 'passAccuracy', 'bigChancesCreated', 'successfulDribbles', 'tacklesWon', 'interceptions', 'cleanSheets', 'assists'],
       radar: ['keyPasses', 'progressivePasses', 'passAccuracy', 'tacklesWon', 'successfulDribbles', 'goalContributions']
     },
     forward: {
@@ -285,54 +286,113 @@
     return metricNumber(store, 'goalContributions');
   }
 
-  function getPerformanceRatingWeights(configKey) {
-    if (configKey === 'goalkeeper') {
-      return { radar: 0.78, availability: 0.14, contribution: 0.02, discipline: 0.06 };
-    }
-    if (configKey === 'defender') {
-      return { radar: 0.68, availability: 0.14, contribution: 0.08, discipline: 0.10 };
+  function getGoalPointsByRole(configKey) {
+    if (configKey === 'goalkeeper' || configKey === 'defender') {
+      return 6;
     }
     if (configKey === 'midfielder') {
-      return { radar: 0.64, availability: 0.12, contribution: 0.14, discipline: 0.10 };
+      return 5;
     }
-    if (configKey === 'forward') {
-      return { radar: 0.60, availability: 0.10, contribution: 0.22, discipline: 0.08 };
+    return 4;
+  }
+
+  function getCleanSheetPointsByRole(configKey) {
+    if (configKey === 'goalkeeper' || configKey === 'defender') {
+      return 4;
     }
-    return { radar: 0.66, availability: 0.14, contribution: 0.10, discipline: 0.10 };
+    if (configKey === 'midfielder') {
+      return 1;
+    }
+    return 0;
+  }
+
+  function estimateRecoveredBalls(store, configKey) {
+    const direct = metricNumber(store, 'possessionRegained');
+    if (direct > 0) {
+      return direct;
+    }
+    const interceptions = metricNumber(store, 'interceptions');
+    const tackles = metricNumber(store, 'tacklesWon');
+    const duelWins = metricNumber(store, 'duelWins');
+    if (configKey === 'defender' || configKey === 'midfielder') {
+      return interceptions + tackles;
+    }
+    return Math.max(0, interceptions + Math.round(duelWins * 0.5));
+  }
+
+  function estimateGoalkeeperSaveCount(store) {
+    const savePct = metricNumber(store, 'savePercentage') / 100;
+    const goalsConceded = metricNumber(store, 'goalsConcededPer90') * metricNumber(store, 'matches90');
+    if (savePct <= 0 || savePct >= 0.995 || goalsConceded <= 0) {
+      return 0;
+    }
+    return goalsConceded * (savePct / Math.max(0.01, 1 - savePct));
+  }
+
+  // UEFA publicly documents Fantasy points, but not a public 10-point rating formula.
+  // We estimate a season score from those official scoring rules, then normalize it by games played.
+  function computeEstimatedUefaFantasyPoints(role, profile, store, config) {
+    const resolvedConfig = config || getPerformanceConfig(role, profile);
+    const gamesPlayed = Math.max(0, Math.round(metricNumber(store, 'matchesPlayed')));
+    if (!gamesPlayed) {
+      return 0;
+    }
+
+    const matches90 = Math.max(0, metricNumber(store, 'matches90'));
+    const minutesQualifiedMatches = Math.min(gamesPlayed, Math.round(matches90));
+    const actualGoals = metricNumber(store, 'actualGoals');
+    const assists = metricNumber(store, 'assists');
+    const yellow = metricNumber(store, 'yellowCards');
+    const red = metricNumber(store, 'redCards');
+    const cleanSheets = metricNumber(store, 'cleanSheets');
+    const totalGoalsConceded = metricNumber(store, 'goalsConcededPer90') * matches90;
+    const recoveredBalls = estimateRecoveredBalls(store, resolvedConfig?.key);
+    const saveCount = resolvedConfig?.key === 'goalkeeper' ? estimateGoalkeeperSaveCount(store) : 0;
+
+    let total = 0;
+    total += gamesPlayed;
+    total += minutesQualifiedMatches;
+    total += actualGoals * getGoalPointsByRole(resolvedConfig?.key);
+    total += assists * 3;
+    total += Math.floor(recoveredBalls / 3);
+    total += cleanSheets * getCleanSheetPointsByRole(resolvedConfig?.key);
+    total -= yellow;
+    total -= red * 3;
+
+    if (resolvedConfig?.key === 'goalkeeper') {
+      total += Math.floor(saveCount / 3);
+      total -= Math.floor(totalGoalsConceded / 2);
+    }
+
+    if (resolvedConfig?.key === 'defender') {
+      total -= Math.floor(totalGoalsConceded / 2);
+    }
+
+    return total;
   }
 
   function computeAverageRating(role, profile, store, config) {
     const resolvedConfig = config || getPerformanceConfig(role, profile);
-    const activityKeys = Array.from(new Set(['matches90', 'yellowCards', 'redCards', 'actualGoals', 'assists'].concat(resolvedConfig?.advanced || [])));
+    const activityKeys = Array.from(new Set(['matchesPlayed', 'matches90', 'yellowCards', 'redCards', 'actualGoals', 'assists'].concat(resolvedConfig?.advanced || [])));
     const hasActivity = activityKeys.some((key) => resolveComputedMetricNumber(key, store, { role, profile, config: resolvedConfig }) > 0);
     if (!hasActivity) {
       return 0;
     }
-    const radarKeys = (resolvedConfig?.radar || []).filter((key) => key !== 'averageRating');
-    const radarAverage = radarKeys.length
-      ? radarKeys.reduce((sum, key) => sum + normalizeRadarValue(key, store, { role, profile, config: resolvedConfig }), 0) / radarKeys.length
-      : 0;
+    const gamesPlayed = Math.max(0, Math.round(metricNumber(store, 'matchesPlayed')));
+    if (!gamesPlayed) {
+      return 0;
+    }
 
-    const minutesScore = Math.max(0, Math.min(1, metricNumber(store, 'matches90') / 18));
-    const contributionCap = resolvedConfig?.key === 'forward'
-      ? 18
-      : resolvedConfig?.key === 'goalkeeper'
-        ? 8
-        : 12;
-    const contributionScore = Math.max(0, Math.min(1, computeGoalContributions(store) / contributionCap));
-    const yellow = metricNumber(store, 'yellowCards');
-    const red = metricNumber(store, 'redCards');
-    const disciplineLoad = Math.max(0, Math.min(1, (yellow / 12) + ((red / 3) * 0.9)));
-    const disciplineScore = 1 - disciplineLoad;
-    const weights = getPerformanceRatingWeights(resolvedConfig?.key);
-    const totalScore = (
-      radarAverage * weights.radar +
-      minutesScore * weights.availability +
-      contributionScore * weights.contribution +
-      disciplineScore * weights.discipline
-    ) * 10;
+    const totalFantasyPoints = computeEstimatedUefaFantasyPoints(role, profile, store, resolvedConfig);
+    const pointsPerGame = totalFantasyPoints / Math.max(1, gamesPlayed);
+    const normalizedPpg = Math.max(0, Math.min(1, pointsPerGame / 12));
+    const confidence = Math.max(0.2, Math.min(1, gamesPlayed / 8));
+    const baseline = 6.0;
+    const ceiling = 9.9;
+    const modeled = baseline + ((ceiling - baseline) * normalizedPpg);
+    const finalScore = (baseline * (1 - confidence)) + (modeled * confidence);
 
-    return Math.max(0, Math.min(10, Number(totalScore.toFixed(1))));
+    return Math.max(0, Math.min(10, Number(finalScore.toFixed(1))));
   }
 
   function resolveComputedMetricNumber(key, store, context = {}) {
@@ -378,7 +438,7 @@
     return field.inverse ? (1 - ratio) : ratio;
   }
 
-  function buildRadarSvg(config, store) {
+  function buildRadarSvg(config, store, context = {}) {
     const keys = config.radar || [];
     if (!keys.length) {
       return '';
@@ -414,8 +474,11 @@
       ].join('');
     }).join('');
 
+    const values = keys.map((key) => normalizeRadarValue(key, store, context));
+    const hasData = values.some((value) => value > 0.02);
+    const plotValues = hasData ? values : keys.map(() => 0.34);
     const polygon = keys.map((key, index) => {
-      const point = toPoint(normalizeRadarValue(key, store), index);
+      const point = toPoint(plotValues[index], index);
       return `${point.x.toFixed(1)},${point.y.toFixed(1)}`;
     }).join(' ');
 
@@ -423,11 +486,14 @@
       `<svg viewBox="0 0 ${size} ${size}" role="img" aria-label="${esc(config.position)} radar chart">`,
       rings,
       axes,
-      `<polygon points="${polygon}" fill="rgba(185,28,28,.16)" stroke="rgba(185,28,28,.95)" stroke-width="3"></polygon>`,
+      `<polygon points="${polygon}" fill="${hasData ? 'rgba(185,28,28,.16)' : 'rgba(148,163,184,.14)'}" stroke="${hasData ? 'rgba(185,28,28,.95)' : 'rgba(100,116,139,.58)'}" stroke-width="3" stroke-dasharray="${hasData ? '0' : '8 8'}"></polygon>`,
       keys.map((key, index) => {
-        const point = toPoint(normalizeRadarValue(key, store), index);
-        return `<circle cx="${point.x.toFixed(1)}" cy="${point.y.toFixed(1)}" r="4.5" fill="#b91c1c"></circle>`;
+        const point = toPoint(plotValues[index], index);
+        return `<circle cx="${point.x.toFixed(1)}" cy="${point.y.toFixed(1)}" r="4.5" fill="${hasData ? '#b91c1c' : '#94a3b8'}"></circle>`;
       }).join(''),
+      !hasData
+        ? `<text x="${center}" y="${center - 8}" text-anchor="middle" font-size="15" font-weight="900" fill="#0f172a">შეავსე სტატისტიკა</text><text x="${center}" y="${center + 18}" text-anchor="middle" font-size="11.5" font-weight="700" fill="#64748b">შეიყვანე თამაშები და ძირითადი მონაცემები</text>`
+        : '',
       `</svg>`
     ].join('');
   }
@@ -859,6 +925,7 @@
         side: 'აქ ატვირთავ სურათს, ნახავ შენს მიმდინარე ფორმას და ყოველდღიურად განაახლებ პოზიციაზე მორგებულ პროფილს.',
         quick: [
           { l: 'საშუალო შეფასება', v: formatMetricValue('averageRating', performanceStore, { role, profile, config }) },
+          { l: 'თამაშები', v: formatMetricValue('matchesPlayed', performanceStore, { role, profile, config }) },
           { l: 'წუთები / 90', v: formatMetricValue('matches90', performanceStore, { role, profile, config }) },
           { l: 'დისციპლინა', v: discipline.value },
           { l: 'გოლში მონაწილეობა', v: formatMetricValue('goalContributions', performanceStore, { role, profile, config }) }
@@ -916,6 +983,7 @@
         side: 'აქ ერთ სივრცეში ჩანს ბავშვის ფოტო, პოზიციაზე მორგებული ანალიზი და ყოველდღიური განახლებები, რომელსაც შენ მართავ.',
         quick: [
           { l: 'საშუალო შეფასება', v: formatMetricValue('averageRating', performanceStore, { role, profile, config }) },
+          { l: 'თამაშები', v: formatMetricValue('matchesPlayed', performanceStore, { role, profile, config }) },
           { l: 'წუთები / 90', v: formatMetricValue('matches90', performanceStore, { role, profile, config }) },
           { l: 'დისციპლინა', v: discipline.value },
           { l: 'გოლში მონაწილეობა', v: formatMetricValue('goalContributions', performanceStore, { role, profile, config }) }
@@ -1462,17 +1530,19 @@
     const discipline = formatDiscipline(store);
     const metricContext = { role, profile, config };
     const coreCards = [
-      { label: 'საშუალო შეფასება', value: formatMetricValue('averageRating', store, metricContext), copy: 'ავტომატურად დათვლილი ფორმა' },
+      { label: 'საშუალო შეფასება', value: formatMetricValue('averageRating', store, metricContext), copy: 'თამაშებზე და გავლენაზე დაფუძნებული ფორმა' },
+      { label: 'თამაშები', value: formatMetricValue('matchesPlayed', store, metricContext), copy: 'ოფიციალურად დაფიქსირებული მატჩები' },
       { label: 'წუთები / 90', value: formatMetricValue('matches90', store, metricContext), copy: 'რეალური 90-წუთიანები' },
       { label: 'დისციპლინა', value: discipline.value, copy: `ბარათები • ${discipline.copy}` },
       { label: 'გოლში მონაწილეობა', value: formatMetricValue('goalContributions', store, metricContext), copy: 'გოლი და ასისტი' }
     ];
 
     const commonItems = [
-      { title: 'საშუალო შეფასება', value: formatMetricValue('averageRating', store, metricContext), copy: 'მეტრიკებიდან დათვლილი საერთო შეფასება.' },
-      { title: 'წუთები / 90', value: formatMetricValue('matches90', store, metricContext), copy: 'რამდენი სრული 90-წუთიანი მატჩი დაუგროვდა.' },
-      { title: 'დისციპლინა', value: `${discipline.value} ბარათი`, copy: `${discipline.copy} — ჯამური დისციპლინა.` },
-      { title: 'გოლში მონაწილეობა', value: formatMetricValue('goalContributions', store, metricContext), copy: 'გოლებისა და ასისტების ჯამი.' }
+      { title: 'საშუალო შეფასება', value: formatMetricValue('averageRating', store, metricContext), copy: 'მთლიანი გავლენა, თამაშების რაოდენობით დაბალანსებული.' },
+      { title: 'თამაშები', value: formatMetricValue('matchesPlayed', store, metricContext), copy: 'რამდენ ოფიციალურ მატჩზეა შეფასება აშენებული.' },
+      { title: 'წუთები / 90', value: formatMetricValue('matches90', store, metricContext), copy: 'სრული 90-წუთიანების დაგროვილი მოცულობა.' },
+      { title: 'დისციპლინა', value: `${discipline.value} ბარათი`, copy: `${discipline.copy} • ყვითლებისა და წითლების ჯამი.` },
+      { title: 'გოლში მონაწილეობა', value: formatMetricValue('goalContributions', store, metricContext), copy: 'გატანილი გოლებისა და ასისტების ჯამი.' }
     ];
 
     const advancedItems = config.key === 'forward'
@@ -1503,7 +1573,7 @@
       coreCards,
       commonItems,
       advancedItems,
-      radarSvg: buildRadarSvg(config, store),
+      radarSvg: buildRadarSvg(config, store, metricContext),
       radarLegend: config.radar.map((key) => ({
         title: PERFORMANCE_FIELDS[key].label,
         value: formatMetricValue(key, store, metricContext)
@@ -1587,9 +1657,9 @@
           <div class="performance-top">
             ${performance.coreCards.map((item) => `
               <div class="metric-card">
+                <span class="metric-card-label">${esc(item.label)}</span>
                 <strong>${esc(item.value)}</strong>
-                <span>${esc(item.label)}</span>
-                <span>${esc(item.copy)}</span>
+                <span class="metric-card-copy">${esc(item.copy)}</span>
               </div>
             `).join('')}
           </div>
@@ -1607,14 +1677,14 @@
                 <h3>ძირითადი მაჩვენებლები</h3>
                 <p class="position-copy">ყველაზე მთავარი რიცხვები, რომლებიც პირველი შეხედვით უნდა იკითხებოდეს.</p>
                 <div class="metric-grid">
-                  ${performance.commonItems.map((item) => `<div class="metric-item"><strong>${esc(item.title)} · ${esc(item.value)}</strong><span>${esc(item.copy)}</span></div>`).join('')}
+                  ${performance.commonItems.map((item) => `<div class="metric-item"><span class="metric-item-label">${esc(item.title)}</span><strong class="metric-item-value">${esc(item.value)}</strong><span class="metric-item-copy">${esc(item.copy)}</span></div>`).join('')}
                 </div>
               </article>
               <article class="performance-panel">
                 <h3>გავლენის მაჩვენებლები</h3>
                 <p class="position-copy">პოზიციაზე მორგებული დეტალები, რომლებიც მოთამაშის რეალურ პროფილს უფრო მკაფიოდ აჩვენებს.</p>
                 <div class="metric-grid">
-                  ${performance.advancedItems.map((item) => `<div class="metric-item"><strong>${esc(item.title)} · ${esc(item.value)}</strong><span>${esc(item.copy)}</span></div>`).join('')}
+                  ${performance.advancedItems.map((item) => `<div class="metric-item"><span class="metric-item-label">${esc(item.title)}</span><strong class="metric-item-value">${esc(item.value)}</strong><span class="metric-item-copy">${esc(item.copy)}</span></div>`).join('')}
                 </div>
               </article>
             </div>
@@ -1630,7 +1700,7 @@
             <div class="metric-form-grid">
               <section class="metric-form-section">
                 <h4>ძირითადი მაჩვენებლები</h4>
-                <p>აქ ავსებ წუთებსა და დისციპლინას. საშუალო შეფასება და გოლში მონაწილეობა ზემოთ ავტომატურად დაითვლება შეყვანილი მონაცემებიდან.</p>
+                <p>აქ ავსებ თამაშების რაოდენობას, წუთებს / 90-ს და დისციპლინას. საშუალო შეფასება და გოლში მონაწილეობა ზემოთ ავტომატურად დაითვლება შეყვანილი მონაცემებიდან.</p>
                 ${performance.commonForm}
               </section>
               <section class="metric-form-section">
