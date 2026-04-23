@@ -208,6 +208,198 @@
     document.head.appendChild(style);
   }
 
+  function ensureMobileMenuStyles() {
+    if (document.getElementById('siteAuthMobileMenuStyles')) {
+      return;
+    }
+
+    const style = document.createElement('style');
+    style.id = 'siteAuthMobileMenuStyles';
+    style.textContent = [
+      '.site-mobile-toggle{display:none;align-items:center;justify-content:center;width:44px;height:44px;border-radius:14px;border:1px solid rgba(15,23,42,.12);background:#fff;color:#0f172a;box-shadow:0 10px 22px rgba(15,23,42,.08);cursor:pointer;transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease}',
+      '.site-mobile-toggle:hover{transform:translateY(-1px);box-shadow:0 14px 28px rgba(15,23,42,.12);border-color:rgba(185,28,28,.22)}',
+      '.site-mobile-toggle span,.site-mobile-toggle::before,.site-mobile-toggle::after{content:"";display:block;width:18px;height:2px;border-radius:999px;background:currentColor;transition:transform .22s ease,opacity .22s ease}',
+      '.site-mobile-toggle-inner{display:grid;gap:4px}',
+      '.site-mobile-toggle.is-open .site-mobile-toggle-inner span:nth-child(1){transform:translateY(6px) rotate(45deg)}',
+      '.site-mobile-toggle.is-open .site-mobile-toggle-inner span:nth-child(2){opacity:0}',
+      '.site-mobile-toggle.is-open .site-mobile-toggle-inner span:nth-child(3){transform:translateY(-6px) rotate(-45deg)}',
+      '.site-mobile-overlay{position:fixed;inset:0;background:rgba(15,23,42,.42);backdrop-filter:blur(6px);opacity:0;visibility:hidden;transition:opacity .22s ease,visibility .22s ease;z-index:1090}',
+      '.site-mobile-panel{position:fixed;top:0;right:0;width:min(360px,100vw);height:100vh;padding:18px 18px 26px;background:linear-gradient(180deg,#ffffff 0%,#f8fafc 100%);box-shadow:-24px 0 48px rgba(15,23,42,.18);transform:translateX(100%);transition:transform .25s ease;z-index:1100;display:grid;grid-template-rows:auto 1fr auto;gap:18px}',
+      '.site-mobile-panel-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-bottom:14px;border-bottom:1px solid rgba(15,23,42,.08)}',
+      '.site-mobile-panel-title{font-size:1rem;font-weight:900;color:#0f172a}',
+      '.site-mobile-close{display:inline-flex;align-items:center;justify-content:center;width:42px;height:42px;border:none;border-radius:14px;background:#fff;color:#0f172a;box-shadow:0 10px 22px rgba(15,23,42,.08);cursor:pointer}',
+      '.site-mobile-body{overflow:auto;display:grid;align-content:start;gap:18px;padding-right:2px}',
+      '.site-mobile-links,.site-mobile-actions{display:grid;gap:10px}',
+      '.site-mobile-link{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-radius:18px;background:#fff;border:1px solid rgba(15,23,42,.08);font-size:.96rem;font-weight:800;color:#0f172a;box-shadow:0 10px 22px rgba(15,23,42,.05)}',
+      '.site-mobile-link::after{content:"›";font-size:1.1rem;color:#94a3b8}',
+      '.site-mobile-link.is-active{background:#fff1f2;border-color:rgba(185,28,28,.14);color:#b91c1c}',
+      '.site-mobile-section-label{font-size:.74rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:#64748b;padding:0 4px}',
+      '.site-mobile-actions > *{width:100% !important;justify-content:center}',
+      '.site-mobile-open .site-mobile-overlay{opacity:1;visibility:visible}',
+      '.site-mobile-open .site-mobile-panel{transform:translateX(0)}',
+      '.site-mobile-lock{overflow:hidden}',
+      '@media (max-width:760px){.site-mobile-toggle{display:inline-flex}.nav>.nav-links,.nav>.links,.nav>.nav-actions,.nav>.actions{display:none !important}}'
+    ].join('');
+
+    document.head.appendChild(style);
+  }
+
+  function initMobileMenu(options) {
+    const settings = options || {};
+    const navRoot = document.querySelector(settings.navRootSelector || '.nav');
+    const linkContainer = navRoot?.querySelector(settings.linksSelector || '.nav-links, .links');
+    const actionsContainer = navRoot?.querySelector(settings.actionsSelector || '.nav-actions, .actions');
+
+    if (!navRoot || !linkContainer) {
+      return null;
+    }
+
+    if (navRoot.querySelector('.site-mobile-toggle')) {
+      return navRoot.__siteMobileMenu || null;
+    }
+
+    ensureMobileMenuStyles();
+
+    const toggle = document.createElement('button');
+    toggle.type = 'button';
+    toggle.className = 'site-mobile-toggle';
+    toggle.setAttribute('aria-label', 'მენიუს გახსნა');
+    toggle.setAttribute('aria-expanded', 'false');
+    toggle.innerHTML = '<span class="site-mobile-toggle-inner"><span></span><span></span><span></span></span>';
+
+    const host = document.createElement('div');
+    host.className = 'site-mobile-host';
+    host.innerHTML = [
+      '<div class="site-mobile-overlay" hidden></div>',
+      '<aside class="site-mobile-panel" aria-hidden="true">',
+        '<div class="site-mobile-panel-head">',
+          '<div class="site-mobile-panel-title">მენიუ</div>',
+          '<button type="button" class="site-mobile-close" aria-label="მენიუს დახურვა">×</button>',
+        '</div>',
+        '<div class="site-mobile-body">',
+          '<div class="site-mobile-links-wrap">',
+            '<div class="site-mobile-section-label">გვერდები</div>',
+            '<div class="site-mobile-links"></div>',
+          '</div>',
+          '<div class="site-mobile-actions-wrap">',
+            '<div class="site-mobile-section-label">პროფილი</div>',
+            '<div class="site-mobile-actions"></div>',
+          '</div>',
+        '</div>',
+      '</aside>'
+    ].join('');
+
+    document.body.appendChild(host);
+    navRoot.appendChild(toggle);
+
+    const overlay = host.querySelector('.site-mobile-overlay');
+    const panel = host.querySelector('.site-mobile-panel');
+    const closeButton = host.querySelector('.site-mobile-close');
+    const mobileLinks = host.querySelector('.site-mobile-links');
+    const mobileActions = host.querySelector('.site-mobile-actions');
+
+    function setOpen(nextOpen) {
+      const isOpen = Boolean(nextOpen);
+      document.body.classList.toggle('site-mobile-open', isOpen);
+      document.body.classList.toggle('site-mobile-lock', isOpen);
+      toggle.classList.toggle('is-open', isOpen);
+      toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+      panel.setAttribute('aria-hidden', isOpen ? 'false' : 'true');
+      overlay.hidden = !isOpen;
+    }
+
+    function syncMenuContent() {
+      const currentPath = getCurrentPagePath().split('?')[0];
+      const links = Array.from(linkContainer.querySelectorAll('a')).map(function (anchor) {
+        const href = anchor.getAttribute('href') || '#';
+        const label = anchor.textContent || '';
+        const isActive = anchor.classList.contains('active') || stripAuthHash(href).split('?')[0] === currentPath;
+        return '<a class="site-mobile-link' + (isActive ? ' is-active' : '') + '" href="' + href + '">' + escapeHtml(label) + '</a>';
+      }).join('');
+      mobileLinks.innerHTML = links || '<div class="site-mobile-link">გვერდები ვერ მოიძებნა</div>';
+
+      let actionMarkup = '';
+      if (actionsContainer) {
+        if (actionsContainer.querySelector('.site-auth-profile-menu')) {
+          const profileLabel = actionsContainer.querySelector('.site-auth-profile-label strong')?.textContent || 'პროფილი';
+          const profileLinks = Array.from(actionsContainer.querySelectorAll('.site-auth-profile-link')).map(function (anchor) {
+            return '<a class="site-mobile-link" href="' + (anchor.getAttribute('href') || '#') + '">' + escapeHtml(anchor.textContent || '') + '</a>';
+          }).join('');
+          const logoutButton = actionsContainer.querySelector('[data-auth-logout]');
+          actionMarkup = [
+            '<div class="site-mobile-section-label">', escapeHtml(profileLabel), '</div>',
+            profileLinks,
+            logoutButton
+              ? '<button type="button" class="site-auth-profile-logout site-mobile-logout" data-mobile-auth-logout>გასვლა</button>'
+              : ''
+          ].join('');
+        } else {
+          actionMarkup = Array.from(actionsContainer.querySelectorAll('a,button')).map(function (item) {
+            if (!item.textContent.trim()) {
+              return '';
+            }
+            const href = item.tagName === 'A' ? (item.getAttribute('href') || '#') : '#';
+            const tag = item.tagName === 'A' ? 'a' : 'button';
+            const attr = tag === 'a'
+              ? 'href="' + href + '"'
+              : 'type="button"';
+            return '<' + tag + ' class="' + escapeHtml(item.className || 'btn btn-white') + '" ' + attr + '>' + escapeHtml(item.textContent || '') + '</' + tag + '>';
+          }).join('');
+        }
+      }
+
+      mobileActions.innerHTML = actionMarkup || '<a class="btn btn-primary" href="' + buildLoginHref(currentPath) + '">შესვლა</a>';
+
+      const mobileLogout = mobileActions.querySelector('[data-mobile-auth-logout]');
+      if (mobileLogout) {
+        mobileLogout.addEventListener('click', async function () {
+          setOpen(false);
+          await signOut({ redirect: settings.afterLogout || 'index.html' });
+        });
+      }
+
+      Array.from(host.querySelectorAll('a')).forEach(function (anchor) {
+        anchor.addEventListener('click', function () {
+          setOpen(false);
+        });
+      });
+    }
+
+    toggle.addEventListener('click', function () {
+      const nextOpen = toggle.getAttribute('aria-expanded') !== 'true';
+      syncMenuContent();
+      setOpen(nextOpen);
+    });
+
+    overlay.addEventListener('click', function () {
+      setOpen(false);
+    });
+
+    closeButton.addEventListener('click', function () {
+      setOpen(false);
+    });
+
+    document.addEventListener('keydown', function (event) {
+      if (event.key === 'Escape') {
+        setOpen(false);
+      }
+    });
+
+    const observer = new MutationObserver(function () {
+      syncMenuContent();
+    });
+    observer.observe(linkContainer, { childList: true, subtree: true, attributes: true });
+    if (actionsContainer) {
+      observer.observe(actionsContainer, { childList: true, subtree: true, attributes: true });
+    }
+
+    syncMenuContent();
+
+    const api = { sync: syncMenuContent, close: function () { setOpen(false); } };
+    navRoot.__siteMobileMenu = api;
+    return api;
+  }
+
   function getProfileMenuFromPath(currentPath) {
     const normalized = stripAuthHash(currentPath);
     const parts = String(normalized || '').split('?');
@@ -479,9 +671,18 @@
     getUserDisplayName: getUserDisplayName,
     getUserRole: getUserRole,
     renderAuthNav: renderAuthNav,
+    initMobileMenu: initMobileMenu,
     requireAuth: requireAuth,
     resolvePostAuthTarget: resolvePostAuthTarget,
     sanitizeInternalPath: sanitizeInternalPath,
     signOut: signOut
   };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function () {
+      initMobileMenu();
+    }, { once: true });
+  } else {
+    initMobileMenu();
+  }
 })();

@@ -25,6 +25,12 @@
     back: 'index.html',
     client: null
   };
+  const videoEditorState = {
+    role: '',
+    user: null,
+    profile: {},
+    client: null
+  };
 
   const from = () => window.siteAuth?.sanitizeInternalPath(
     new URLSearchParams(location.search).get('from'),
@@ -228,6 +234,90 @@
     `<a href="${esc(item.h)}" class="btn ${esc(item.c)}">${esc(item.l)}</a>`
   )).join('');
 
+  function getVideoProfileKey(role) {
+    if (role === 'parent') {
+      return 'childVideos';
+    }
+    if (role === 'player') {
+      return 'playerVideos';
+    }
+    return 'profileVideos';
+  }
+
+  function parseYouTubeVideo(rawUrl) {
+    const value = String(rawUrl || '').trim();
+    if (!value) {
+      return null;
+    }
+
+    let url;
+    try {
+      url = new URL(value);
+    } catch (error) {
+      return null;
+    }
+
+    const host = url.hostname.replace(/^www\./, '').toLowerCase();
+    let id = '';
+    if (host === 'youtu.be') {
+      id = url.pathname.split('/').filter(Boolean)[0] || '';
+    } else if (host === 'youtube.com' || host === 'm.youtube.com' || host === 'music.youtube.com') {
+      if (url.pathname === '/watch') {
+        id = url.searchParams.get('v') || '';
+      } else if (url.pathname.startsWith('/shorts/')) {
+        id = url.pathname.split('/')[2] || '';
+      } else if (url.pathname.startsWith('/embed/')) {
+        id = url.pathname.split('/')[2] || '';
+      }
+    }
+
+    id = String(id || '').replace(/[^a-zA-Z0-9_-]/g, '').trim();
+    if (!id) {
+      return null;
+    }
+
+    return {
+      id,
+      url: `https://www.youtube.com/watch?v=${id}`,
+      embedUrl: `https://www.youtube.com/embed/${id}`,
+      thumb: `https://img.youtube.com/vi/${id}/hqdefault.jpg`,
+      defaultTitle: 'YouTube ვიდეო'
+    };
+  }
+
+  function getProfileVideos(role, profile) {
+    const list = Array.isArray(profile?.[getVideoProfileKey(role)]) ? profile[getVideoProfileKey(role)] : [];
+    return list
+      .map((item) => {
+        if (typeof item === 'string') {
+          return { url: item };
+        }
+        return item && typeof item === 'object' ? item : null;
+      })
+      .filter(Boolean)
+      .map((item) => {
+        const parsed = parseYouTubeVideo(item.url);
+        if (!parsed) {
+          return null;
+        }
+        return {
+          id: parsed.id,
+          url: parsed.url,
+          embedUrl: parsed.embedUrl,
+          thumb: parsed.thumb,
+          title: String(item.title || parsed.defaultTitle || 'ვიდეო').trim() || 'ვიდეო'
+        };
+      })
+      .filter(Boolean);
+  }
+
+  function setProfileVideos(role, nextProfile, videos) {
+    nextProfile[getVideoProfileKey(role)] = videos.map((item) => ({
+      title: String(item.title || '').trim(),
+      url: String(item.url || '').trim()
+    }));
+  }
+
   function resolveProfilePosition(role, profile) {
     const raw = role === 'parent' ? profile?.childPosition : profile?.playerPosition;
     const normalized = String(raw || '').trim().toLowerCase();
@@ -395,6 +485,14 @@
     return Math.max(0, Math.min(10, Number(finalScore.toFixed(1))));
   }
 
+  function computeOverallPoints(role, profile, store, config) {
+    const average = computeAverageRating(role, profile, store, config);
+    if (!average) {
+      return 0;
+    }
+    return Math.max(0, Math.min(99, Math.round(average * 10)));
+  }
+
   function resolveComputedMetricNumber(key, store, context = {}) {
     if (key === 'goalContributions') {
       return computeGoalContributions(store);
@@ -416,6 +514,11 @@
     }
     const formatted = field.precision === 1 ? value.toFixed(1) : String(Math.round(value));
     return formatted + (field.suffix || '');
+  }
+
+  function formatOverallPoints(store, context = {}) {
+    const points = computeOverallPoints(context.role, context.profile, store, context.config);
+    return `${points} / 99`;
   }
 
   function formatDiscipline(store) {
@@ -912,6 +1015,7 @@
     const displayName = window.siteAuth?.getUserDisplayName
       ? window.siteAuth.getUserDisplayName(user)
       : (user.email || 'პროფილი');
+    const videoCount = getProfileVideos(role, profile).length;
 
     if (role === 'player') {
       const config = getManagedConfig(role);
@@ -919,12 +1023,13 @@
       const currentAge = state.actualAge ?? profile.playerAge ?? '-';
       const performanceStore = getPerformanceStore(role, profile);
       const discipline = formatDiscipline(performanceStore);
+      const videoCount = getProfileVideos(role, profile).length;
       return {
         eye: 'ციფრული საფეხბურთო პროფილი',
-        lead: 'ეს არის შენი მოთამაშის პროფილი. აქ დაგიგროვდება გუნდი, ვიდეო CV, სტატისტიკა და სეზონური ასაკობრივი ისტორია.',
+        lead: 'ეს არის შენი მოთამაშის პროფილი. აქ დაგიგროვდება გუნდი, ვიდეო პროფილი, სტატისტიკა და სეზონური ასაკობრივი ისტორია.',
         side: 'აქ ატვირთავ სურათს, ნახავ შენს მიმდინარე ფორმას და ყოველდღიურად განაახლებ პოზიციაზე მორგებულ პროფილს.',
         quick: [
-          { l: 'საშუალო შეფასება', v: formatMetricValue('averageRating', performanceStore, { role, profile, config }) },
+          { l: 'საერთო ქულა', v: formatOverallPoints(performanceStore, { role, profile, config }) },
           { l: 'თამაშები', v: formatMetricValue('matchesPlayed', performanceStore, { role, profile, config }) },
           { l: 'წუთები / 90', v: formatMetricValue('matches90', performanceStore, { role, profile, config }) },
           { l: 'დისციპლინა', v: discipline.value },
@@ -940,13 +1045,13 @@
           { l: 'გუნდის სტატუსი', v: teamStatusText(profile.playerTeamStatus) }
         ]),
         stat: [
-          { l: 'ვიდეო CV', v: '0', c: 'ატვირთული highlights აქ გამოჩნდება.' },
+          { l: 'ვიდეოები', v: String(videoCount), c: 'დამატებული YouTube ვიდეოები აქ ითვლება.' },
           { l: 'სტატისტიკა', v: 'მალე', c: 'გოლები, ასისტები და წუთები ამ პროფილს დაემატება.' },
           { l: 'ასაკობრივი', v: ageGroupLabel(state.effectiveKey), c: state.manual ? 'კატეგორია ახლა ხელით არის მითითებული.' : 'კატეგორია სეზონურად ავტომატურად ითვლება.' }
         ],
-        port: {
-          t: 'მოთამაშის კარიერული ჰაბი',
-          c: 'ეს სექცია გახდება შენი ძირითადი სამუშაო სივრცე ვიდეო CV-სთვის, სტატისტიკისთვის და სკაუტინგის ბმებისთვის.',
+        videos: {
+          t: 'მოთამაშის ვიდეო ცენტრი',
+          c: 'აქ დაამატებ YouTube ვიდეოებს, გამორჩეულ ეპიზოდებს და შენს ვიდეო არქივს ერთ სივრცეში დაალაგებ.',
           a: [
             profile.playerTeamRoute
               ? { h: profile.playerTeamRoute, l: 'ჩემი გუნდის გვერდი', c: 'btn-red' }
@@ -955,9 +1060,9 @@
             { h: 'gundebi.html', l: 'გუნდების გვერდი', c: 'btn-white' }
           ],
           n: [
-            { t: 'პროფილი', c: 'რეგისტრაციისას შევსებული მოთამაშის მონაცემები უკვე ჩანს.' },
-            { t: 'სეზონი', c: 'ასაკობრივი ჯგუფი დაბადების დღეზე არ იცვლება და იანვრიდან ახლდება.' },
-            { t: 'შემდეგი ნაბიჯი', c: 'შემდეგ ეტაპზე აქ შეგვიძლია ვიდეო CV-ს ატვირთვაც მივაბათ.' }
+            { t: 'ვიდეო პროფილი', c: 'ლინკით დამატებული YouTube ვიდეოები აქვე გამოჩნდება და პროფილის ნაწილად დარჩება.' },
+            { t: 'შენახვა', c: 'ვიდეო ფაილი ცალკე არ იტვირთება, ინახება მხოლოდ YouTube ბმული.' },
+            { t: 'გამოყენება', c: 'ეს ბმულები შეგიძლია გამოიყენო სკაუტინგის, გუნდის და პირადი პრეზენტაციისთვის.' }
           ]
         },
         mini: [
@@ -977,12 +1082,13 @@
       const currentAge = state.actualAge ?? profile.childAge ?? '-';
       const performanceStore = getPerformanceStore(role, profile);
       const discipline = formatDiscipline(performanceStore);
+      const videoCount = getProfileVideos(role, profile).length;
       return {
         eye: 'მშობლის პროფილი',
         lead: 'ეს არის მშობლის სამუშაო სივრცე, სადაც ბავშვის მონაცემები, გუნდი და ასაკობრივი კატეგორია ერთად იმართება.',
         side: 'აქ ერთ სივრცეში ჩანს ბავშვის ფოტო, პოზიციაზე მორგებული ანალიზი და ყოველდღიური განახლებები, რომელსაც შენ მართავ.',
         quick: [
-          { l: 'საშუალო შეფასება', v: formatMetricValue('averageRating', performanceStore, { role, profile, config }) },
+          { l: 'საერთო ქულა', v: formatOverallPoints(performanceStore, { role, profile, config }) },
           { l: 'თამაშები', v: formatMetricValue('matchesPlayed', performanceStore, { role, profile, config }) },
           { l: 'წუთები / 90', v: formatMetricValue('matches90', performanceStore, { role, profile, config }) },
           { l: 'დისციპლინა', v: discipline.value },
@@ -1001,12 +1107,12 @@
         ]),
         stat: [
           { l: 'პროგრესი', v: 'მალე', c: 'შვილის პროგრესის მონიტორინგი აქ დაემატება.' },
-          { l: 'ვიდეოები', v: '0', c: 'ვიდეო CV-ები და ატვირთვები აქ გამოჩნდება.' },
+          { l: 'ვიდეოები', v: String(videoCount), c: 'ბავშვის დამატებული YouTube ვიდეოები აქ ითვლება.' },
           { l: 'ასაკობრივი', v: ageGroupLabel(state.effectiveKey), c: state.manual ? 'ბავშვის კატეგორია ხელით არის მორგებული.' : 'ბავშვის კატეგორია სეზონურად ავტომატურად ითვლება.' }
         ],
-        port: {
-          t: 'მშობლის პანელი',
-          c: 'ეს სივრცე განკუთვნილია შვილის პროგრესის, გუნდის ბმის, ვიდეოების და მომავალში გამოწერების ან გადახდების მართვისთვის.',
+        videos: {
+          t: 'ბავშვის ვიდეო ცენტრი',
+          c: 'აქედან მართავ ბავშვის YouTube ვიდეოებს, გამორჩეულ ეპიზოდებს და მთლიან ვიდეო პროფილს.',
           a: [
             profile.childTeamRoute
               ? { h: profile.childTeamRoute, l: 'ბავშვის გუნდის გვერდი', c: 'btn-red' }
@@ -1015,9 +1121,9 @@
             { h: 'pexburtelebi.html', l: 'ტალანტების ბაზა', c: 'btn-white' }
           ],
           n: [
-            { t: 'აქტიური პროფილი', c: 'მშობლის საკონტაქტო მონაცემები უკვე შენახულია.' },
-            { t: 'ბავშვის გუნდი', c: 'თუ გუნდი დარეგისტრირებულია, პროფილიდან პირდაპირ შეგიძლია გუნდზე გადასვლაც.' },
-            { t: 'შემდეგი ნაბიჯი', c: 'შემდეგ ეტაპზე ბავშვის სტატისტიკაც აქვე დაემატება.' }
+            { t: 'ბავშვის პროფილი', c: 'ვიდეოები ბავშვის პროფილზე შენს მიერ იმართება და ერთ სივრცეში გროვდება.' },
+            { t: 'YouTube ბმული', c: 'საკმარისია სწორი YouTube ბმული, რომ ვიდეო პროფილში დაემატოს.' },
+            { t: 'გაზიარება', c: 'ეს ვიდეოები მარტივად გაუზიარდება გუნდს, სკაუტს ან სხვა დაინტერესებულ მხარეს.' }
           ]
         },
         mini: [
@@ -1033,7 +1139,7 @@
 
     return {
       eye: 'აგენტის პროფილი',
-      lead: 'ეს არის აგენტის პროფილი, სადაც მოთამაშეების პორტფოლიო და მომავალი შეთავაზებები გაერთიანდება.',
+      lead: 'ეს არის აგენტის პროფილი, სადაც მოთამაშეების ვიდეოები, პრეზენტაციები და მომავალი შეთავაზებები გაერთიანდება.',
       side: 'აქ ჩანს სააგენტოს მთავარი სურათი, სამუშაო სტატუსი და ის ბლოკები, რომლებსაც ყოველდღიურ მუშაობაში გამოიყენებ.',
       quick: [
         { l: 'სააგენტო', v: safe(profile.agencyName) },
@@ -1050,20 +1156,20 @@
       stat: [
         { l: 'მოთამაშეები', v: safe(profile.playersManaged, '0'), c: 'რეგისტრაციაში მითითებული რაოდენობა.' },
         { l: 'აქტიური კავშირები', v: '0', c: 'კლუბებთან და სკაუტებთან ბმები აქ დაემატება.' },
-        { l: 'შეთავაზებები', v: 'მალე', c: 'აგენტის სამუშაო მოდულები აქ გამოჩნდება.' }
+        { l: 'ვიდეოები', v: String(videoCount), c: 'დამატებული YouTube ვიდეოები აქ ითვლება.' }
       ],
-      port: {
-        t: 'აგენტის სამუშაო სივრცე',
-        c: 'შემდეგ ეტაპზე შეგვიძლია ამ პროფილზე მოთამაშეების ცალკე დამატება, შეთავაზებები და კლუბებთან ბმებიც მივაბათ.',
+      videos: {
+        t: 'ვიდეო და პრეზენტაციის სივრცე',
+        c: 'აქ შეგიძლია მოთამაშეების ვიდეო ბმულები შეაგროვო და სამუშაო პრეზენტაციისთვის ერთ ადგილას დაალაგო.',
         a: [
           { h: buildProfileViewHref('overview', back), l: 'პროფილი', c: 'btn-red' },
           { h: 'pexburtelebi.html', l: 'ფეხბურთელების ბაზა', c: 'btn-white' },
           { h: 'gundebi.html', l: 'გუნდების ბაზა', c: 'btn-white' }
         ],
         n: [
-          { t: 'სააგენტო', c: 'აგენტის ძირითადი მონაცემები უკვე შენახულია.' },
-          { t: 'ნავიგაცია', c: 'სხვა გვერდებზე გადასვლა ზედა მენიუდან შეგიძლია.' },
-          { t: 'შემდეგი ნაბიჯი', c: 'შემდეგ ეტაპზე მოთამაშეების მიბმასაც დავამატებთ.' }
+          { t: 'ვიდეოები', c: 'YouTube ბმულებით შეგიძლია შენი სამუშაო ვიდეოები ერთ სივრცეში დაალაგო.' },
+          { t: 'ნავიგაცია', c: 'სხვა გვერდებზე გადასვლა ისევ ზედა მენიუდან შეგიძლია.' },
+          { t: 'შემდეგი ნაბიჯი', c: 'მომდევნო ეტაპზე ამავე სივრცეს მოთამაშეების მიბმასაც მოვარგებთ.' }
         ]
       },
       mini: [
@@ -1414,11 +1520,165 @@
     }
   }
 
+  function setVideoStatus(message, state) {
+    const status = document.getElementById('videoStatus');
+    if (!status) {
+      return;
+    }
+    if (!message) {
+      status.hidden = true;
+      status.textContent = '';
+      status.dataset.state = 'info';
+      return;
+    }
+    status.hidden = false;
+    status.dataset.state = state || 'info';
+    status.textContent = message;
+  }
+
+  function renderVideoList(role, profile, notes = []) {
+    const list = document.getElementById('videoList');
+    if (!list) {
+      return;
+    }
+
+    const videos = getProfileVideos(role, profile);
+    if (!videos.length) {
+      const fallbackNotes = Array.isArray(notes) && notes.length
+        ? `<div class="notes">${renderNotes(notes)}</div>`
+        : '';
+      list.innerHTML = `<div class="video-empty">ჯერ ვიდეო არ არის დამატებული. ჩასვი YouTube ბმული და ეს სივრცე მაშინვე შეივსება.${fallbackNotes}</div>`;
+      return;
+    }
+
+    list.innerHTML = videos.map((video, index) => `
+      <article class="video-card">
+        <div class="video-frame">
+          <iframe src="${esc(video.embedUrl)}" title="${esc(video.title)}" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+        </div>
+        <div class="video-card-top">
+          <div>
+            <h3 class="video-card-title">${esc(video.title)}</h3>
+            <div class="video-card-copy">${esc(video.url)}</div>
+          </div>
+          <button type="button" class="btn btn-white remove-video-btn" data-video-index="${index}">წაშლა</button>
+        </div>
+      </article>
+    `).join('');
+
+    list.querySelectorAll('.remove-video-btn').forEach((button) => {
+      button.addEventListener('click', () => {
+        removeVideoAtIndex(Number(button.dataset.videoIndex || -1));
+      });
+    });
+  }
+
+  async function saveProfileVideos(nextVideos, successMessage) {
+    const { role, user, client } = videoEditorState;
+    const profile = { ...(videoEditorState.profile || {}) };
+    if (!role || !user || !client) {
+      return;
+    }
+
+    setProfileVideos(role, profile, nextVideos);
+    setVideoStatus('ვიდეოების განახლება მიმდინარეობს...', 'info');
+
+    try {
+      const { data, error } = await client.auth.updateUser({
+        data: {
+          ...user.user_metadata,
+          profile
+        }
+      });
+      if (error) {
+        throw error;
+      }
+
+      if (window.sitePlayerDomain?.syncMyAccountDomain) {
+        await window.sitePlayerDomain.syncMyAccountDomain(client);
+      }
+
+      videoEditorState.user = data?.user || user;
+      videoEditorState.profile = profile;
+      renderVideoList(role, profile, buildRoleView(role, profile, videoEditorState.user, from()).videos.n);
+      setVideoStatus(successMessage, 'success');
+      const input = document.getElementById('videoUrlInput');
+      if (input) {
+        input.value = '';
+      }
+    } catch (error) {
+      setVideoStatus(error?.message || 'ვიდეოების განახლება ვერ შესრულდა.', 'error');
+    }
+  }
+
+  async function handleAddVideo() {
+    const { role, profile } = videoEditorState;
+    const input = document.getElementById('videoUrlInput');
+    const parsed = parseYouTubeVideo(input?.value);
+    if (!parsed) {
+      setVideoStatus('გთხოვ ჩასვა სწორი YouTube ბმული.', 'error');
+      input?.focus();
+      return;
+    }
+
+    const current = getProfileVideos(role, profile);
+    if (current.some((item) => item.id === parsed.id)) {
+      setVideoStatus('ეს ვიდეო უკვე დამატებულია.', 'error');
+      return;
+    }
+
+    current.unshift({
+      title: `ვიდეო ${current.length + 1}`,
+      url: parsed.url
+    });
+    await saveProfileVideos(current, 'ვიდეო წარმატებით დაემატა.');
+  }
+
+  async function removeVideoAtIndex(index) {
+    const { role, profile } = videoEditorState;
+    const current = getProfileVideos(role, profile);
+    if (!Number.isInteger(index) || index < 0 || index >= current.length) {
+      return;
+    }
+    current.splice(index, 1);
+    await saveProfileVideos(current, 'ვიდეო წაიშალა.');
+  }
+
+  function initializeVideos(role, user, profile, roleView) {
+    videoEditorState.role = role;
+    videoEditorState.user = user;
+    videoEditorState.profile = { ...(profile || {}) };
+    videoEditorState.client = dataEditorState.client;
+
+    renderVideoList(role, profile, roleView.videos.n);
+    setVideoStatus('');
+
+    const addButton = document.getElementById('addVideoBtn');
+    const input = document.getElementById('videoUrlInput');
+
+    if (addButton && addButton.dataset.ready !== 'true') {
+      addButton.dataset.ready = 'true';
+      addButton.addEventListener('click', () => {
+        handleAddVideo();
+      });
+    }
+
+    if (input && input.dataset.ready !== 'true') {
+      input.dataset.ready = 'true';
+      input.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+          event.preventDefault();
+          handleAddVideo();
+        }
+      });
+    }
+  }
+
   function getProfileViewKey(role) {
     const raw = String(new URLSearchParams(location.search).get('view') || 'overview')
       .trim()
       .toLowerCase();
-    const allowed = ['overview', 'data', 'status', 'portfolio'];
+    const allowed = ['overview', 'data', 'status', 'videos'];
     if (role === 'player' || role === 'parent') {
       allowed.push('team');
     }
@@ -1449,7 +1709,7 @@
       });
     }
 
-    items.push({ key: 'portfolio', label: 'პორტფოლიო', title: 'პორტფოლიო' });
+    items.push({ key: 'videos', label: 'ვიდეოები', title: 'ვიდეოები' });
 
     return items.map((item) => ({
       ...item,
@@ -1513,12 +1773,12 @@
     }
 
     commonCards.push({
-      key: 'portfolio',
-      kicker: 'პორტფოლიო',
-      title: roleView.port.t,
-      copy: roleView.port.c,
-      meta: 'ვიდეო CV • ბმები • შემდეგი ნაბიჯები',
-      href: buildProfileViewHref('portfolio', back)
+      key: 'videos',
+      kicker: 'ვიდეოები',
+      title: roleView.videos.t,
+      copy: roleView.videos.c,
+      meta: 'YouTube • გამორჩეული ეპიზოდები • ვიდეო პროფილი',
+      href: buildProfileViewHref('videos', back)
     });
 
     return commonCards;
@@ -1530,7 +1790,7 @@
     const discipline = formatDiscipline(store);
     const metricContext = { role, profile, config };
     const coreCards = [
-      { label: 'საშუალო შეფასება', value: formatMetricValue('averageRating', store, metricContext), copy: 'თამაშებზე და გავლენაზე დაფუძნებული ფორმა' },
+      { label: 'საერთო ქულა', value: formatOverallPoints(store, metricContext), copy: 'არსებული ქულა / მაქსიმუმი • 99' },
       { label: 'თამაშები', value: formatMetricValue('matchesPlayed', store, metricContext), copy: 'ოფიციალურად დაფიქსირებული მატჩები' },
       { label: 'წუთები / 90', value: formatMetricValue('matches90', store, metricContext), copy: 'რეალური 90-წუთიანები' },
       { label: 'დისციპლინა', value: discipline.value, copy: `ბარათები • ${discipline.copy}` },
@@ -1538,7 +1798,7 @@
     ];
 
     const commonItems = [
-      { title: 'საშუალო შეფასება', value: formatMetricValue('averageRating', store, metricContext), copy: 'მთლიანი გავლენა, თამაშების რაოდენობით დაბალანსებული.' },
+      { title: 'საერთო ქულა', value: formatOverallPoints(store, metricContext), copy: 'ქულა ითვლება თამაშების, გავლენისა და პოზიციური მონაცემების კომბინაციით.' },
       { title: 'თამაშები', value: formatMetricValue('matchesPlayed', store, metricContext), copy: 'რამდენ ოფიციალურ მატჩზეა შეფასება აშენებული.' },
       { title: 'წუთები / 90', value: formatMetricValue('matches90', store, metricContext), copy: 'სრული 90-წუთიანების დაგროვილი მოცულობა.' },
       { title: 'დისციპლინა', value: `${discipline.value} ბარათი`, copy: `${discipline.copy} • ყვითლებისა და წითლების ჯამი.` },
@@ -1700,7 +1960,7 @@
             <div class="metric-form-grid">
               <section class="metric-form-section">
                 <h4>ძირითადი მაჩვენებლები</h4>
-                <p>აქ ავსებ თამაშების რაოდენობას, წუთებს / 90-ს და დისციპლინას. საშუალო შეფასება და გოლში მონაწილეობა ზემოთ ავტომატურად დაითვლება შეყვანილი მონაცემებიდან.</p>
+                <p>აქ ავსებ თამაშების რაოდენობას, წუთებს / 90-ს და დისციპლინას. საერთო ქულა და გოლში მონაწილეობა ზემოთ ავტომატურად დაითვლება შეყვანილი მონაცემებიდან.</p>
                 ${performance.commonForm}
               </section>
               <section class="metric-form-section">
@@ -1751,7 +2011,7 @@
       data: 'dataSection',
       status: 'stats',
       team: 'teamManage',
-      portfolio: 'portfolio'
+      videos: 'videos'
     };
 
     Object.keys(articleMap).forEach((key) => {
@@ -1953,6 +2213,10 @@
     dataEditorState.profile = currentProfile;
     dataEditorState.back = back;
     dataEditorState.client = client;
+    videoEditorState.role = role;
+    videoEditorState.user = currentUser;
+    videoEditorState.profile = currentProfile;
+    videoEditorState.client = client;
 
     const roleView = buildRoleView(role, currentProfile, currentUser, back);
     const currentView = getProfileViewKey(role);
@@ -1973,10 +2237,9 @@
     }
     document.getElementById('dataGrid').innerHTML = renderItems(roleView.pass);
     document.getElementById('statsGrid').innerHTML = renderStats(roleView.stat);
-    document.getElementById('portfolioTitle').textContent = roleView.port.t;
-    document.getElementById('portfolioCopy').textContent = roleView.port.c;
-    document.getElementById('portfolioActions').innerHTML = renderActions(roleView.port.a);
-    document.getElementById('notes').innerHTML = renderNotes(roleView.port.n);
+    document.getElementById('videosTitle').textContent = roleView.videos.t;
+    document.getElementById('videosCopy').textContent = roleView.videos.c;
+    document.getElementById('videosActions').innerHTML = renderActions(roleView.videos.a);
     const mini = document.getElementById('mini');
     if (mini) {
       mini.innerHTML = renderMini(roleView.mini);
@@ -1993,6 +2256,7 @@
     }
 
     initializeDataEditor(role, currentUser, currentProfile);
+    initializeVideos(role, currentUser, currentProfile, roleView);
     initializeTeamEditor();
     renderTeamManagement(role, currentProfile);
     renderProfileNavigation(role, back, currentView);
@@ -2004,7 +2268,7 @@
       data: 'მონაცემები',
       status: 'სტატუსი',
       team: role === 'parent' ? 'ბავშვის გუნდი' : 'გუნდი და ასაკობრივი',
-      portfolio: 'პორტფოლიო'
+      videos: 'ვიდეოები'
     };
     document.title = `${titleMap[currentView] || roleView.name} | Football Georgia`;
     showApp();
