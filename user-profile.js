@@ -206,6 +206,17 @@
     cover.classList.remove('has-photo');
   }
 
+  function setHeroPhotoStatus(message, state) {
+    const status = document.getElementById('heroPhotoStatus');
+    if (!status) {
+      return;
+    }
+    status.textContent = message || '';
+    status.style.color = state === 'error'
+      ? '#fecaca'
+      : (state === 'success' ? '#bbf7d0' : 'rgba(255,255,255,.82)');
+  }
+
   const renderItems = (list) => list.map((item) => (
     `<div class="info"><div class="label">${esc(item.l)}</div>${
       item.h
@@ -1031,8 +1042,8 @@
       const videoCount = getProfileVideos(role, profile).length;
       return {
         eye: 'ციფრული საფეხბურთო პროფილი',
-        lead: 'ეს არის შენი მოთამაშის პროფილი. აქ დაგიგროვდება გუნდი, ვიდეო პროფილი, სტატისტიკა და სეზონური ასაკობრივი ისტორია.',
-        side: 'აქ ატვირთავ სურათს, ნახავ შენს მიმდინარე ფორმას და ყოველდღიურად განაახლებ პოზიციაზე მორგებულ პროფილს.',
+        lead: '',
+        side: '',
         quick: [
           { l: 'საერთო ქულა', v: formatOverallPoints(performanceStore, { role, profile, config }) },
           { l: 'თამაშები', v: formatMetricValue('matchesPlayed', performanceStore, { role, profile, config }) },
@@ -1084,8 +1095,8 @@
       const videoCount = getProfileVideos(role, profile).length;
       return {
         eye: 'მშობლის პროფილი',
-        lead: 'ეს არის მშობლის სამუშაო სივრცე, სადაც ბავშვის მონაცემები, გუნდი და ასაკობრივი კატეგორია ერთად იმართება.',
-        side: 'აქ ერთ სივრცეში ჩანს ბავშვის ფოტო, პოზიციაზე მორგებული ანალიზი და ყოველდღიური განახლებები, რომელსაც შენ მართავ.',
+        lead: '',
+        side: '',
         quick: [
           { l: 'საერთო ქულა', v: formatOverallPoints(performanceStore, { role, profile, config }) },
           { l: 'თამაშები', v: formatMetricValue('matchesPlayed', performanceStore, { role, profile, config }) },
@@ -1132,8 +1143,8 @@
 
     return {
       eye: 'აგენტის პროფილი',
-      lead: 'ეს არის აგენტის პროფილი, სადაც მოთამაშეების ვიდეოები, პრეზენტაციები და მომავალი შეთავაზებები გაერთიანდება.',
-      side: 'აქ ჩანს სააგენტოს მთავარი სურათი, სამუშაო სტატუსი და ის ბლოკები, რომლებსაც ყოველდღიურ მუშაობაში გამოიყენებ.',
+      lead: '',
+      side: '',
       quick: [
         { l: 'სააგენტო', v: safe(profile.agencyName) },
         { l: 'მოთამაშეები', v: safe(profile.playersManaged, '0') },
@@ -1505,6 +1516,80 @@
       saveButton.dataset.ready = 'true';
       saveButton.addEventListener('click', () => {
         saveDataEditor();
+      });
+    }
+  }
+
+  async function saveHeroPhoto() {
+    const role = dataEditorState.role;
+    const user = dataEditorState.user;
+    const client = dataEditorState.client;
+    const input = document.getElementById('heroPhotoInput');
+    if (!role || !user || !client || !input?.files?.[0]) {
+      return;
+    }
+
+    setHeroPhotoStatus('ფოტო იტვირთება...');
+    const nextProfile = { ...(dataEditorState.profile || {}) };
+
+    try {
+      const photoData = await compressImageFile(input.files[0]);
+      nextProfile.profilePhoto = photoData;
+      if (role === 'player') {
+        nextProfile.playerPhoto = photoData;
+      } else if (role === 'parent') {
+        nextProfile.childPhoto = photoData;
+      }
+
+      const payload = {
+        ...user.user_metadata,
+        profile: nextProfile
+      };
+
+      const { data, error } = await client.auth.updateUser({ data: payload });
+      if (error) {
+        throw error;
+      }
+
+      if (window.sitePlayerDomain?.syncMyAccountDomain) {
+        await window.sitePlayerDomain.syncMyAccountDomain(client);
+      }
+
+      const nextUser = data?.user || user;
+      dataEditorState.user = nextUser;
+      dataEditorState.profile = nextProfile;
+      videoEditorState.user = nextUser;
+      videoEditorState.profile = nextProfile;
+      teamManageState.user = nextUser;
+      teamManageState.profile = nextProfile;
+
+      renderAvatar(nextUser, role, nextProfile);
+      renderHeroCover(role, nextProfile);
+      input.value = '';
+      setHeroPhotoStatus('ფოტო განახლდა.', 'success');
+    } catch (error) {
+      setHeroPhotoStatus(error?.message || 'ფოტოს ატვირთვა ვერ შესრულდა.', 'error');
+    }
+  }
+
+  function initializeHeroPhotoUpload() {
+    const button = document.getElementById('heroPhotoBtn');
+    const input = document.getElementById('heroPhotoInput');
+    if (!button || !input) {
+      return;
+    }
+
+    if (button.dataset.ready !== 'true') {
+      button.dataset.ready = 'true';
+      button.addEventListener('click', () => {
+        input.click();
+      });
+    }
+
+    if (input.dataset.ready !== 'true') {
+      input.dataset.ready = 'true';
+      input.addEventListener('change', () => {
+        saveHeroPhoto();
       });
     }
   }
@@ -2107,15 +2192,8 @@
       sections.hidden = currentView === 'overview';
     }
 
-    if (currentView === 'overview') {
-      if (sideCopy) {
-        sideCopy.textContent = 'აქ ჩანს მთავარი ფოტო, სწრაფი სტატუსი, პოზიციური ანალიზი და ყოველდღიური განახლება ერთ სუფთა სივრცეში.';
-      }
-      return;
-    }
-
     if (sideCopy) {
-      sideCopy.textContent = 'ზემოთ მოცემული ნავიგაციიდან შეგიძლია სწრაფად გადახვიდე სხვა ბლოკებზე ან დაბრუნდე მთავარ პროფილზე.';
+      sideCopy.textContent = '';
     }
   }
 
@@ -2334,6 +2412,7 @@
     }
 
     initializeDataEditor(role, currentUser, currentProfile);
+    initializeHeroPhotoUpload();
     initializeVideos(role, currentUser, currentProfile, roleView);
     initializeTeamEditor();
     renderTeamManagement(role, currentProfile);

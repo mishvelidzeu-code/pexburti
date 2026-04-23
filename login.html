@@ -279,6 +279,9 @@
       grid-template-columns:1fr 1fr;
       gap:12px;
     }
+    .form-row.single{
+      grid-template-columns:1fr;
+    }
     .form-label{
       display:block;
       font-size:.82rem;
@@ -978,7 +981,8 @@
         title: 'მშობლის რეგისტრაცია',
         description: 'ზედა ველები ეკუთვნის მშობელს. ბავშვის დაბადების თარიღს აირჩევ კალენდრიდან, გუნდს კი იმავე წესით მიუთითებ როგორც მოთამაშის რეგისტრაციაში, ასაკობრივი ჯგუფი კი სეზონურად განისაზღვრება.',
         fields: [
-          { id: 'childName', label: 'ბავშვის სახელი და გვარი', type: 'text', placeholder: 'მაგ: ლუკა გიორგაძე' },
+          { id: 'childFirstName', label: 'ბავშვის სახელი', type: 'text', placeholder: 'მაგ: ლუკა', autocomplete: 'off' },
+          { id: 'childLastName', label: 'ბავშვის გვარი', type: 'text', placeholder: 'მაგ: გიორგაძე', autocomplete: 'off' },
           {
             id: 'childBirthDate',
             label: 'ბავშვის დაბადების თარიღი',
@@ -1320,8 +1324,9 @@
 
       const rows = [];
       for (let i = 0; i < config.fields.length; i += 2) {
-        const currentFields = config.fields.slice(i, i + 2).map(renderField).join('');
-        rows.push(`<div class="form-row">${currentFields}</div>`);
+        const chunk = config.fields.slice(i, i + 2);
+        const currentFields = chunk.map(renderField).join('');
+        rows.push(`<div class="form-row${chunk.length === 1 ? ' single' : ''}">${currentFields}</div>`);
       }
 
       roleFields.innerHTML = rows.join('');
@@ -1419,6 +1424,8 @@
 
       if (role === 'parent') {
         const childBirth = parseBirthDate(payload.childBirthDate);
+        const childFirstName = String(payload.childFirstName || '').trim();
+        const childLastName = String(payload.childLastName || '').trim();
         const teamSelection = resolveTeamSelection(document.getElementById('childTeam')?.value);
         const childAgeState = window.siteAgeGroups?.resolveAgeGroupState
           ? window.siteAgeGroups.resolveAgeGroupState({ birthDate: payload.childBirthDate, birthYear: childBirth?.year })
@@ -1426,6 +1433,7 @@
             seasonYear: currentYear,
             autoKey: childBirth ? getAgeCategoryByBirthYear(childBirth.year) : ''
           };
+        payload.childName = `${childFirstName} ${childLastName}`.trim();
         payload.childBirthYear = childBirth ? String(childBirth.year) : '';
         payload.childAgeCategory = childAgeState.autoKey || '';
         payload.childAgeCategoryAuto = childAgeState.autoKey || '';
