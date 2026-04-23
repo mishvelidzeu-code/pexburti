@@ -87,6 +87,72 @@
     admin: 'ადმინისტრატორი'
   })[role] || 'მომხმარებელი';
 
+  const PERFORMANCE_FIELDS = {
+    averageRating: { label: 'Average Rating', note: 'საშუალო შეფასება', max: 10, step: '0.1', precision: 1 },
+    matches90: { label: 'Minutes Played / 90', note: 'ფაქტობრივი 90-წუთიანები', max: 60, step: '0.1', precision: 1 },
+    yellowCards: { label: 'Yellow Cards', note: 'ყვითელი ბარათები', max: 25, step: '1', precision: 0 },
+    redCards: { label: 'Red Cards', note: 'წითელი ბარათები', max: 10, step: '1', precision: 0 },
+    goalContributions: { label: 'Goal Contributions', note: 'გოლი + ასისტი', max: 80, step: '1', precision: 0 },
+    savePercentage: { label: 'Save Percentage', note: 'სეივების პროცენტი', max: 100, step: '0.1', precision: 1, suffix: '%' },
+    goalsConcededPer90: { label: 'Goals Conceded / 90', note: 'გაშვებული გოლი / 90', max: 5, step: '0.1', precision: 1, inverse: true },
+    cleanSheets: { label: 'Clean Sheets', note: 'მშრალი მატჩები', max: 30, step: '1', precision: 0 },
+    successfulDistribution: { label: 'Successful Distribution %', note: 'ფეხით თამაშის სიზუსტე', max: 100, step: '0.1', precision: 1, suffix: '%' },
+    highClaims: { label: 'High Claims', note: 'გამოსვლების სიზუსტე', max: 50, step: '1', precision: 0 },
+    tacklesWon: { label: 'Tackles Won', note: 'მოგებული წართმევები', max: 120, step: '1', precision: 0 },
+    interceptions: { label: 'Interceptions', note: 'ბურთის ჩაჭრა', max: 100, step: '1', precision: 0 },
+    clearances: { label: 'Clearances', note: 'მოგერიებები საჯარიმოდან', max: 180, step: '1', precision: 0 },
+    aerialDuelsWon: { label: 'Aerial Duels Won %', note: 'ჰაერში მოგებული დუელები', max: 100, step: '0.1', precision: 1, suffix: '%' },
+    possessionRegained: { label: 'Possession Regained', note: 'დაბრუნებული ბურთები', max: 220, step: '1', precision: 0 },
+    keyPasses: { label: 'Key Passes', note: 'პასები დარტყმისთვის', max: 120, step: '1', precision: 0 },
+    progressivePasses: { label: 'Progressive Passes', note: 'წინ მიმტანი პასები', max: 220, step: '1', precision: 0 },
+    passAccuracy: { label: 'Pass Accuracy %', note: 'პასების სიზუსტე', max: 100, step: '0.1', precision: 1, suffix: '%' },
+    bigChancesCreated: { label: 'Big Chances Created', note: 'დიდი შანსების შექმნა', max: 60, step: '1', precision: 0 },
+    successfulDribbles: { label: 'Successful Dribbles', note: 'წარმატებული დრიბლინგები', max: 120, step: '1', precision: 0 },
+    actualGoals: { label: 'Goals', note: 'გატანილი გოლები', max: 50, step: '1', precision: 0 },
+    expectedGoals: { label: 'xG', note: 'მოსალოდნელი გოლები', max: 50, step: '0.1', precision: 1 },
+    shotsOnTarget: { label: 'Shots on Target', note: 'კარში დარტყმები', max: 120, step: '1', precision: 0 },
+    conversionRate: { label: 'Conversion Rate %', note: 'დარტყმიდან გოლის პროცენტი', max: 100, step: '0.1', precision: 1, suffix: '%' },
+    touchesInBox: { label: 'Touches in Box', note: 'ბურთთან შეხება საჯარიმოში', max: 200, step: '1', precision: 0 },
+    bigChancesMissed: { label: 'Big Chances Missed', note: 'გაფუჭებული რეალური მომენტები', max: 40, step: '1', precision: 0, inverse: true },
+    trainingConsistency: { label: 'Training Consistency', note: 'სავარჯიშო რიტმი', max: 100, step: '1', precision: 0, suffix: '%' },
+    duelWins: { label: 'Duel Wins', note: 'მოგებული დუელები', max: 120, step: '1', precision: 0 },
+    progressiveActions: { label: 'Progressive Actions', note: 'წინ მიმყვანი მოქმედებები', max: 120, step: '1', precision: 0 }
+  };
+
+  const PERFORMANCE_COMMON_FIELDS = ['averageRating', 'matches90', 'yellowCards', 'redCards', 'goalContributions'];
+  const PERFORMANCE_CONFIGS = {
+    goalkeeper: {
+      position: 'მეკარე',
+      copy: 'მეკარის პროფილში აქცენტი კეთდება საიმედოობაზე, ფეხით თამაშზე და კარის დაცვაზე.',
+      advanced: ['savePercentage', 'goalsConcededPer90', 'cleanSheets', 'successfulDistribution', 'highClaims'],
+      radar: ['savePercentage', 'successfulDistribution', 'highClaims', 'cleanSheets', 'averageRating']
+    },
+    defender: {
+      position: 'დამცველი',
+      copy: 'დამცველისთვის მთავარი ხაზია ბურთის დაბრუნება, საჯარიმოს დაცვა და ორთაბრძოლების მოგება.',
+      advanced: ['tacklesWon', 'interceptions', 'clearances', 'aerialDuelsWon', 'possessionRegained'],
+      radar: ['tacklesWon', 'interceptions', 'clearances', 'aerialDuelsWon', 'possessionRegained']
+    },
+    midfielder: {
+      position: 'ნახევარმცველი',
+      copy: 'ნახევარმცველში ფოკუსია თამაშის წარმართვა, პასის ხარისხი და შეტევის გამწვავება.',
+      advanced: ['keyPasses', 'progressivePasses', 'passAccuracy', 'bigChancesCreated', 'successfulDribbles'],
+      radar: ['keyPasses', 'progressivePasses', 'passAccuracy', 'bigChancesCreated', 'successfulDribbles']
+    },
+    forward: {
+      position: 'თავდამსხმელი',
+      copy: 'თავდამსხმელისთვის აქცენტი ეფექტიანობაზეა: რამდენად კარგად აქცევს მომენტს რეალურ შედეგში.',
+      advanced: ['actualGoals', 'expectedGoals', 'shotsOnTarget', 'conversionRate', 'touchesInBox', 'bigChancesMissed'],
+      radar: ['actualGoals', 'shotsOnTarget', 'conversionRate', 'touchesInBox', 'goalContributions']
+    },
+    general: {
+      position: 'უნივერსალური პროფილი',
+      copy: 'თუ პოზიცია ჯერ არ არის საბოლოოდ არჩეული, შეგიძლია უნივერსალური ძირითადი მაჩვენებლები შეავსო.',
+      advanced: ['trainingConsistency', 'successfulDribbles', 'progressiveActions', 'duelWins', 'goalContributions'],
+      radar: ['trainingConsistency', 'successfulDribbles', 'progressiveActions', 'duelWins', 'averageRating']
+    }
+  };
+
   const initials = (user) => (
     (user.user_metadata?.full_name || user.email || 'MF')
       .split(/\s+/)
@@ -141,6 +207,170 @@
   const renderActions = (list) => list.map((item) => (
     `<a href="${esc(item.h)}" class="btn ${esc(item.c)}">${esc(item.l)}</a>`
   )).join('');
+
+  function resolveProfilePosition(role, profile) {
+    const raw = role === 'parent' ? profile?.childPosition : profile?.playerPosition;
+    const normalized = String(raw || '').trim().toLowerCase();
+    if (!normalized) {
+      return 'general';
+    }
+    if (normalized.includes('მეკარე')) {
+      return 'goalkeeper';
+    }
+    if (normalized.includes('დამცველი')) {
+      return 'defender';
+    }
+    if (normalized.includes('ნახევარმცველი')) {
+      return 'midfielder';
+    }
+    if (normalized.includes('თავდამსხმელი')) {
+      return 'forward';
+    }
+    return 'general';
+  }
+
+  function getPerformanceConfig(role, profile) {
+    const key = resolveProfilePosition(role, profile);
+    return {
+      key,
+      ...(PERFORMANCE_CONFIGS[key] || PERFORMANCE_CONFIGS.general)
+    };
+  }
+
+  function getPerformanceStore(role, profile) {
+    return role === 'parent'
+      ? { ...(profile?.childPerformance || {}) }
+      : { ...(profile?.playerPerformance || {}) };
+  }
+
+  function setPerformanceStore(role, nextProfile, store) {
+    if (role === 'parent') {
+      nextProfile.childPerformance = store;
+      return;
+    }
+    nextProfile.playerPerformance = store;
+  }
+
+  function metricNumber(store, key) {
+    const value = Number(store?.[key]);
+    return Number.isFinite(value) ? value : 0;
+  }
+
+  function formatMetricValue(key, store) {
+    const field = PERFORMANCE_FIELDS[key];
+    if (!field) {
+      return safe(store?.[key], '0');
+    }
+    const value = metricNumber(store, key);
+    if (!value) {
+      return field.precision === 1 ? '0.0' + (field.suffix || '') : '0' + (field.suffix || '');
+    }
+    const formatted = field.precision === 1 ? value.toFixed(1) : String(Math.round(value));
+    return formatted + (field.suffix || '');
+  }
+
+  function formatDiscipline(store) {
+    const yellow = metricNumber(store, 'yellowCards');
+    const red = metricNumber(store, 'redCards');
+    const total = yellow + red;
+    return {
+      value: String(total),
+      copy: `${yellow}Y / ${red}R`
+    };
+  }
+
+  function normalizeRadarValue(key, store) {
+    const field = PERFORMANCE_FIELDS[key];
+    if (!field) {
+      return 0;
+    }
+    const value = metricNumber(store, key);
+    const ratio = Math.max(0, Math.min(1, value / (field.max || 100)));
+    return field.inverse ? (1 - ratio) : ratio;
+  }
+
+  function buildRadarSvg(config, store) {
+    const keys = config.radar || [];
+    if (!keys.length) {
+      return '';
+    }
+
+    const size = 320;
+    const center = 160;
+    const radius = 104;
+    const angleStep = (Math.PI * 2) / keys.length;
+    const toPoint = (ratio, index) => {
+      const angle = (-Math.PI / 2) + (angleStep * index);
+      return {
+        x: center + Math.cos(angle) * radius * ratio,
+        y: center + Math.sin(angle) * radius * ratio
+      };
+    };
+
+    const rings = [0.25, 0.5, 0.75, 1].map((ratio) => {
+      const points = keys.map((_, index) => {
+        const point = toPoint(ratio, index);
+        return `${point.x.toFixed(1)},${point.y.toFixed(1)}`;
+      }).join(' ');
+      return `<polygon points="${points}" fill="none" stroke="rgba(15,23,42,.1)" stroke-width="1"></polygon>`;
+    }).join('');
+
+    const axes = keys.map((key, index) => {
+      const end = toPoint(1, index);
+      const label = PERFORMANCE_FIELDS[key]?.label || key;
+      const labelPoint = toPoint(1.14, index);
+      return [
+        `<line x1="${center}" y1="${center}" x2="${end.x.toFixed(1)}" y2="${end.y.toFixed(1)}" stroke="rgba(15,23,42,.12)" stroke-width="1"></line>`,
+        `<text x="${labelPoint.x.toFixed(1)}" y="${labelPoint.y.toFixed(1)}" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="800" fill="#334155">${esc(label)}</text>`
+      ].join('');
+    }).join('');
+
+    const polygon = keys.map((key, index) => {
+      const point = toPoint(normalizeRadarValue(key, store), index);
+      return `${point.x.toFixed(1)},${point.y.toFixed(1)}`;
+    }).join(' ');
+
+    return [
+      `<svg viewBox="0 0 ${size} ${size}" role="img" aria-label="${esc(config.position)} radar chart">`,
+      rings,
+      axes,
+      `<polygon points="${polygon}" fill="rgba(185,28,28,.16)" stroke="rgba(185,28,28,.95)" stroke-width="3"></polygon>`,
+      keys.map((key, index) => {
+        const point = toPoint(normalizeRadarValue(key, store), index);
+        return `<circle cx="${point.x.toFixed(1)}" cy="${point.y.toFixed(1)}" r="4.5" fill="#b91c1c"></circle>`;
+      }).join(''),
+      `</svg>`
+    ].join('');
+  }
+
+  function setInlineStatus(elementId, message, state) {
+    const element = document.getElementById(elementId);
+    if (!element) {
+      return;
+    }
+    if (!message) {
+      element.hidden = true;
+      element.textContent = '';
+      element.dataset.state = 'info';
+      return;
+    }
+    element.hidden = false;
+    element.textContent = message;
+    element.dataset.state = state || 'info';
+  }
+
+  function buildPerformanceFieldMarkup(keys, store, sectionId) {
+    return keys.map((key) => {
+      const field = PERFORMANCE_FIELDS[key];
+      return [
+        `<div class="form-group">`,
+          `<label class="form-label" for="${sectionId}_${key}">${esc(field.label)}</label>`,
+          `<input id="${sectionId}_${key}" class="form-input" type="number" min="0" max="${esc(field.max)}" step="${esc(field.step)}" value="${esc(String(store?.[key] || ''))}" placeholder="${esc(field.note)}">`,
+          `<div class="form-hint">${esc(field.note)}</div>`,
+        `</div>`
+      ].join('');
+    }).join('');
+  }
 
   function parseBirthDate(value) {
     return ageApi.parseBirthDate ? ageApi.parseBirthDate(value) : null;
@@ -532,15 +762,17 @@
       const config = getManagedConfig(role);
       const state = resolveAgeState(profile, config);
       const currentAge = state.actualAge ?? profile.playerAge ?? '-';
+      const performanceStore = getPerformanceStore(role, profile);
+      const discipline = formatDiscipline(performanceStore);
       return {
         eye: 'ციფრული საფეხბურთო პროფილი',
         lead: 'ეს არის შენი მოთამაშის პროფილი. აქ დაგიგროვდება გუნდი, ვიდეო CV, სტატისტიკა და სეზონური ასაკობრივი ისტორია.',
         side: 'აქედან შეგიძლია მართო გუნდი, ასაკობრივი ჯგუფი და დაბრუნდე ზუსტად იმავე გვერდზე, საიდანაც გახსენი პროფილი.',
         quick: [
-          { l: 'ასაკი', v: safe(currentAge, '-') },
-          { l: 'ასაკობრივი', v: ageCategoryValue(state) },
-          { l: 'პოზიცია', v: safe(profile.playerPosition) },
-          { l: 'გუნდი', v: safe(profile.playerTeam, TEAM_FREE_AGENT) }
+          { l: 'Average Rating', v: formatMetricValue('averageRating', performanceStore) },
+          { l: 'Minutes / 90', v: formatMetricValue('matches90', performanceStore) },
+          { l: 'Discipline', v: discipline.value },
+          { l: 'Goal Contributions', v: formatMetricValue('goalContributions', performanceStore) }
         ],
         pass: common.concat([
           { l: 'დაბადების თარიღი', v: safe(dateText(profile.playerBirthDate)) },
@@ -562,7 +794,7 @@
           a: [
             profile.playerTeamRoute
               ? { h: profile.playerTeamRoute, l: 'ჩემი გუნდის გვერდი', c: 'btn-red' }
-              : { h: buildProfileViewHref('overview', back), l: 'პროფილის მთავარი', c: 'btn-red' },
+              : { h: buildProfileViewHref('overview', back), l: 'პროფილი', c: 'btn-red' },
             { h: 'pexburtelebi.html', l: 'ფეხბურთელების ბაზა', c: 'btn-white' },
             { h: 'gundebi.html', l: 'გუნდების გვერდი', c: 'btn-white' }
           ],
@@ -587,15 +819,17 @@
       const config = getManagedConfig(role);
       const state = resolveAgeState(profile, config);
       const currentAge = state.actualAge ?? profile.childAge ?? '-';
+      const performanceStore = getPerformanceStore(role, profile);
+      const discipline = formatDiscipline(performanceStore);
       return {
         eye: 'მშობლის პროფილი',
         lead: 'ეს არის მშობლის სამუშაო სივრცე, სადაც ბავშვის მონაცემები, გუნდი და ასაკობრივი კატეგორია ერთად იმართება.',
         side: 'აქედან დაინახავ ბავშვის ასაკს, პოზიციას, გუნდს, ასაკობრივს და დაბრუნდები იმავე გვერდზე, საიდანაც გახსენი პროფილი.',
         quick: [
-          { l: 'ბავშვი', v: safe(profile.childName) },
-          { l: 'ბავშვის ასაკი', v: safe(currentAge, '-') },
-          { l: 'ასაკობრივი', v: ageCategoryValue(state) },
-          { l: 'გუნდი', v: safe(profile.childTeam, TEAM_FREE_AGENT) }
+          { l: 'Average Rating', v: formatMetricValue('averageRating', performanceStore) },
+          { l: 'Minutes / 90', v: formatMetricValue('matches90', performanceStore) },
+          { l: 'Discipline', v: discipline.value },
+          { l: 'Goal Contributions', v: formatMetricValue('goalContributions', performanceStore) }
         ],
         pass: common.concat([
           { l: 'ბავშვის სახელი', v: safe(profile.childName) },
@@ -619,7 +853,7 @@
           a: [
             profile.childTeamRoute
               ? { h: profile.childTeamRoute, l: 'ბავშვის გუნდის გვერდი', c: 'btn-red' }
-              : { h: buildProfileViewHref('overview', back), l: 'პროფილის მთავარი', c: 'btn-red' },
+              : { h: buildProfileViewHref('overview', back), l: 'პროფილი', c: 'btn-red' },
             { h: 'gundebi.html', l: 'გუნდების ნახვა', c: 'btn-white' },
             { h: 'pexburtelebi.html', l: 'ტალანტების ბაზა', c: 'btn-white' }
           ],
@@ -665,7 +899,7 @@
         t: 'აგენტის სამუშაო სივრცე',
         c: 'შემდეგ ეტაპზე შეგვიძლია ამ პროფილზე მოთამაშეების ცალკე დამატება, შეთავაზებები და კლუბებთან ბმებიც მივაბათ.',
         a: [
-          { h: buildProfileViewHref('overview', back), l: 'პროფილის მთავარი', c: 'btn-red' },
+          { h: buildProfileViewHref('overview', back), l: 'პროფილი', c: 'btn-red' },
           { h: 'pexburtelebi.html', l: 'ფეხბურთელების ბაზა', c: 'btn-white' },
           { h: 'gundebi.html', l: 'გუნდების ბაზა', c: 'btn-white' }
         ],
@@ -1045,7 +1279,7 @@
 
   function getProfileViewItems(role, back) {
     const items = [
-      { key: 'overview', label: 'მთავარი', title: 'პროფილის მთავარი' },
+      { key: 'overview', label: 'პროფილი', title: 'პროფილი' },
       { key: 'data', label: 'მონაცემები', title: 'მონაცემები' },
       { key: 'status', label: 'სტატუსი', title: 'სტატუსი' }
     ];
@@ -1133,12 +1367,202 @@
     return commonCards;
   }
 
-  function renderProfileHub(role, profile, roleView, back) {
+  function buildPerformanceOverview(role, profile) {
+    const config = getPerformanceConfig(role, profile);
+    const store = getPerformanceStore(role, profile);
+    const discipline = formatDiscipline(store);
+    const coreCards = [
+      { label: 'Average Rating', value: formatMetricValue('averageRating', store), copy: 'საშუალო შეფასება' },
+      { label: 'Minutes Played / 90', value: formatMetricValue('matches90', store), copy: 'რეალური 90-წუთიანები' },
+      { label: 'Discipline', value: discipline.value, copy: discipline.copy },
+      { label: 'Goal Contributions', value: formatMetricValue('goalContributions', store), copy: 'გოლი + ასისტი' }
+    ];
+
+    const commonItems = [
+      { title: 'Average Rating', value: formatMetricValue('averageRating', store), copy: 'მატჩური საშუალო შეფასება.' },
+      { title: 'Minutes Played / 90', value: formatMetricValue('matches90', store), copy: 'რამდენი სრული 90-წუთიანი მატჩი დაუგროვდა.' },
+      { title: 'Discipline', value: `${discipline.value} ბარათი`, copy: `${discipline.copy} — ჯამური დისციპლინა.` },
+      { title: 'Goal Contributions', value: formatMetricValue('goalContributions', store), copy: 'პირდაპირი მონაწილეობა გოლში.' }
+    ];
+
+    const advancedItems = config.key === 'forward'
+      ? [
+          {
+            title: 'Goals (Actual vs xG)',
+            value: `${formatMetricValue('actualGoals', store)} / ${formatMetricValue('expectedGoals', store)}`,
+            copy: 'გატანილი გოლები მოსალოდნელ გოლებთან შედარებით.'
+          }
+        ].concat(
+          config.advanced
+            .filter((key) => key !== 'actualGoals' && key !== 'expectedGoals')
+            .map((key) => ({
+              title: PERFORMANCE_FIELDS[key].label,
+              value: formatMetricValue(key, store),
+              copy: PERFORMANCE_FIELDS[key].note
+            }))
+        )
+      : config.advanced.map((key) => ({
+          title: PERFORMANCE_FIELDS[key].label,
+          value: formatMetricValue(key, store),
+          copy: PERFORMANCE_FIELDS[key].note
+        }));
+
+    return {
+      config,
+      updatedAt: store.updatedAt ? new Date(store.updatedAt).toLocaleString('ka-GE') : 'ჯერ არ განახლებულა',
+      coreCards,
+      commonItems,
+      advancedItems,
+      radarSvg: buildRadarSvg(config, store),
+      radarLegend: config.radar.map((key) => ({
+        title: PERFORMANCE_FIELDS[key].label,
+        value: formatMetricValue(key, store)
+      })),
+      commonForm: buildPerformanceFieldMarkup(PERFORMANCE_COMMON_FIELDS, store, 'performance'),
+      advancedForm: buildPerformanceFieldMarkup(config.advanced, store, 'performance')
+    };
+  }
+
+  async function savePerformanceEditor() {
+    const role = dataEditorState.role;
+    const user = dataEditorState.user;
+    const client = dataEditorState.client;
+    const currentProfile = { ...(dataEditorState.profile || {}) };
+    const statusId = 'performanceStatus';
+    if (!(role === 'player' || role === 'parent') || !user || !client) {
+      return;
+    }
+
+    const config = getPerformanceConfig(role, currentProfile);
+    const keys = PERFORMANCE_COMMON_FIELDS.concat(config.advanced);
+    const nextStore = { ...getPerformanceStore(role, currentProfile) };
+    keys.forEach((key) => {
+      const input = document.getElementById(`performance_${key}`);
+      if (input) {
+        nextStore[key] = String(input.value || '').trim();
+      }
+    });
+    nextStore.updatedAt = new Date().toISOString();
+
+    const nextProfile = { ...currentProfile };
+    setPerformanceStore(role, nextProfile, nextStore);
+    setDataEditorStatus('');
+    setTeamEditorStatus('');
+    setInlineStatus(statusId, 'მონაცემები ინახება...', 'info');
+
+    try {
+      const { error } = await client.auth.updateUser({
+        data: {
+          ...user.user_metadata,
+          profile: nextProfile
+        }
+      });
+      if (error) {
+        throw error;
+      }
+      dataEditorState.profile = nextProfile;
+      teamManageState.profile = nextProfile;
+      setInlineStatus(statusId, 'პოზიციაზე მორგებული პროფილის მაჩვენებლები განახლდა.', 'success');
+      window.setTimeout(() => {
+        window.location.reload();
+      }, 500);
+    } catch (error) {
+      setInlineStatus(statusId, error?.message || 'განახლება ვერ შესრულდა. სცადე თავიდან.', 'error');
+    }
+  }
+
+  function initializePerformanceEditor(role) {
+    const saveButton = document.getElementById('savePerformanceBtn');
+    if (!saveButton || saveButton.dataset.ready === 'true' || !(role === 'player' || role === 'parent')) {
+      return;
+    }
+    saveButton.dataset.ready = 'true';
+    saveButton.addEventListener('click', () => {
+      savePerformanceEditor();
+    });
+  }
+
+  function renderProfileHub(role, profile, roleView, back, user) {
     const hub = document.getElementById('profileHub');
     if (!hub) {
       return;
     }
 
+    if (role === 'player' || role === 'parent') {
+      const performance = buildPerformanceOverview(role, profile);
+      hub.classList.add('profile-performance');
+      hub.innerHTML = `
+        <section class="performance-shell">
+          <div class="performance-top">
+            ${performance.coreCards.map((item) => `
+              <div class="metric-card">
+                <strong>${esc(item.value)}</strong>
+                <span>${esc(item.label)}</span>
+                <span>${esc(item.copy)}</span>
+              </div>
+            `).join('')}
+          </div>
+          <div class="performance-layout">
+            <article class="radar-card">
+              <h3>${esc(performance.config.position)} Radar Chart</h3>
+              <p class="position-copy">${esc(performance.config.copy)}</p>
+              <div class="radar-wrap">${performance.radarSvg}</div>
+              <div class="radar-caption">
+                ${performance.radarLegend.map((item) => `<span><strong>${esc(item.title)}</strong><strong>${esc(item.value)}</strong></span>`).join('')}
+              </div>
+            </article>
+            <div class="metric-groups">
+              <article class="performance-panel">
+                <h3>Core Metrics</h3>
+                <p class="position-copy">ძირითადი მაჩვენებლები, რომლებიც header-შიც ყველაზე სწრაფად უნდა იკითხებოდეს.</p>
+                <div class="metric-grid">
+                  ${performance.commonItems.map((item) => `<div class="metric-item"><strong>${esc(item.title)} · ${esc(item.value)}</strong><span>${esc(item.copy)}</span></div>`).join('')}
+                </div>
+              </article>
+              <article class="performance-panel">
+                <h3>Advanced Impact</h3>
+                <p class="position-copy">პოზიციაზე მორგებული გავლენის მაჩვენებლები, რომლებიც მოთამაშის რეალურ ტიპს უკეთ აჩვენებს.</p>
+                <div class="metric-grid">
+                  ${performance.advancedItems.map((item) => `<div class="metric-item"><strong>${esc(item.title)} · ${esc(item.value)}</strong><span>${esc(item.copy)}</span></div>`).join('')}
+                </div>
+              </article>
+            </div>
+          </div>
+          <article class="metric-form-card">
+            <div class="section-top">
+              <div>
+                <h3>დღიური განახლება</h3>
+                <p class="position-copy">ეს ბლოკი შეავსე როცა გინდა ახალი მატჩის, ტრენინგის ან მიმდინარე ფორმის მონაცემების განახლება.</p>
+              </div>
+              <div class="metric-updated">ბოლო განახლება: ${esc(performance.updatedAt)}</div>
+            </div>
+            <div class="metric-form-grid">
+              <section class="metric-form-section">
+                <h4>Core Metrics</h4>
+                <p>ძირითადი ოთხი ბლოკი, რომლებიც ყველა პოზიციაზე ერთნაირად ჩანს.</p>
+                ${performance.commonForm}
+              </section>
+              <section class="metric-form-section">
+                <h4>${esc(performance.config.position)} · Advanced Impact</h4>
+                <p>აქ გამოჩნდება მხოლოდ იმ პოზიციის მაჩვენებლები, რომელიც პროფილში გაქვს მითითებული.</p>
+                ${performance.advancedForm}
+              </section>
+            </div>
+            <div class="actions team-actions">
+              <button id="savePerformanceBtn" type="button" class="btn btn-red">განახლების შენახვა</button>
+            </div>
+            <div id="performanceStatus" class="form-status" data-state="info" hidden></div>
+          </article>
+        </section>
+      `;
+      dataEditorState.role = role;
+      dataEditorState.user = user;
+      dataEditorState.profile = { ...(profile || {}) };
+      initializePerformanceEditor(role);
+      return;
+    }
+
+    hub.classList.remove('profile-performance');
     hub.innerHTML = buildOverviewCards(role, profile, roleView, back).map((item) => (
       `<a href="${esc(item.href)}" class="overview-card">
         <div class="overview-card-top">
@@ -1185,13 +1609,13 @@
 
     if (currentView === 'overview') {
       if (sideCopy) {
-        sideCopy.textContent = 'აირჩიე რომელი ბლოკი გინდა ცალკე გვერდზე გახსნა. თითო სექცია დამოუკიდებლადაა დალაგებული და სწრაფად იხსნება.';
+        sideCopy.textContent = 'ეს არის მთავარი პროფილი: აქ ხედავ სურათს, Core Metrics-ს, Advanced Impact-ს და პოზიციაზე მორგებულ დღიურ განახლებას.';
       }
       return;
     }
 
     if (sideCopy) {
-      sideCopy.textContent = 'ეს არის პროფილის ცალკე სექცია. მარცხნივ შეგიძლია სხვა ბლოკზეც გადახვიდე ან დაბრუნდე პროფილის მთავარ გვერდზე.';
+      sideCopy.textContent = 'ეს არის პროფილის ცალკე სექცია. მარცხნივ შეგიძლია სხვა ბლოკზეც გადახვიდე ან დაბრუნდე მთავარ პროფილზე.';
     }
   }
 
@@ -1400,7 +1824,7 @@
     initializeTeamEditor();
     renderTeamManagement(role, currentProfile);
     renderProfileNavigation(role, back, currentView);
-    renderProfileHub(role, currentProfile, roleView, back);
+    renderProfileHub(role, currentProfile, roleView, back, currentUser);
     applyProfileView(role, currentView);
 
     const titleMap = {
