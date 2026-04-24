@@ -361,7 +361,7 @@
           .eq('is_public', true)
           .eq('is_active', true)
           .order('name', { ascending: true }),
-        fetchPublicPlayers(client)
+        fetchPublicPlayers(client).catch(function () { return []; })
       ]);
 
       const clubRows = Array.isArray(clubResponse.data) && !clubResponse.error
