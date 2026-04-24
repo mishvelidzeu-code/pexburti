@@ -15,10 +15,10 @@
       --red: #b91c1c;
       --red-dark: #991b1b;
       --green: #166534;
-      --green-bg: #dcfce7;
-      --yellow: #854d0e;
-      --yellow-bg: #fef3c7;
-      --shadow: 0 18px 45px rgba(15, 23, 42, 0.08);
+      --green-soft: #dcfce7;
+      --yellow: #92400e;
+      --yellow-soft: #fef3c7;
+      --shadow: 0 20px 45px rgba(15, 23, 42, 0.08);
       --radius: 24px;
     }
 
@@ -32,7 +32,7 @@
     }
 
     a { color: inherit; text-decoration: none; }
-    button, input, textarea { font: inherit; }
+    button, input, select, textarea { font: inherit; }
 
     .shell {
       min-height: 100vh;
@@ -44,9 +44,9 @@
       position: sticky;
       top: 0;
       height: 100vh;
+      padding: 24px 18px;
       background: #fff;
       border-right: 1px solid var(--line);
-      padding: 24px 18px;
       display: grid;
       grid-template-rows: auto 1fr auto;
       gap: 22px;
@@ -64,13 +64,13 @@
     .logo {
       width: 42px;
       height: 42px;
+      border-radius: 14px;
       display: grid;
       place-items: center;
-      border-radius: 14px;
       background: var(--red);
       color: #fff;
       font-weight: 900;
-      box-shadow: 0 10px 24px rgba(185, 28, 28, 0.22);
+      box-shadow: 0 10px 22px rgba(185, 28, 28, 0.22);
     }
 
     .nav-list {
@@ -92,8 +92,8 @@
 
     .nav-link:hover,
     .nav-link.active {
-      background: #fff1f2;
       color: var(--red);
+      background: #fff1f2;
     }
 
     .nav-link svg {
@@ -102,23 +102,17 @@
       flex: 0 0 auto;
     }
 
-    .admin-badge {
+    .sidebar-note {
       border: 1px solid var(--line);
       border-radius: 20px;
-      padding: 16px;
       background: var(--panel-soft);
+      padding: 16px;
+      display: grid;
+      gap: 6px;
     }
 
-    .admin-badge strong {
-      display: block;
-      font-size: .95rem;
-      margin-bottom: 4px;
-    }
-
-    .admin-badge span {
-      color: var(--muted);
-      font-size: .85rem;
-    }
+    .sidebar-note strong { font-size: .95rem; }
+    .sidebar-note span { color: var(--muted); font-size: .85rem; }
 
     .main {
       padding: 28px;
@@ -127,15 +121,14 @@
     }
 
     .hero {
-      background: linear-gradient(135deg, #0f172a 0%, #1e293b 70%, #3f1d2e 100%);
-      color: #fff;
+      background: linear-gradient(135deg, #0f172a 0%, #1f2937 62%, #3b1d2e 100%);
       border-radius: 34px;
+      color: #fff;
       padding: 28px;
-      box-shadow: var(--shadow);
       display: grid;
-      grid-template-columns: minmax(0, 1.3fr) minmax(280px, .9fr);
-      gap: 22px;
-      align-items: start;
+      grid-template-columns: minmax(0, 1.3fr) minmax(320px, .9fr);
+      gap: 24px;
+      box-shadow: var(--shadow);
     }
 
     .eyebrow {
@@ -144,7 +137,7 @@
       border-radius: 999px;
       background: rgba(255,255,255,.1);
       border: 1px solid rgba(255,255,255,.12);
-      font-size: .76rem;
+      font-size: .75rem;
       font-weight: 900;
       letter-spacing: .04em;
       text-transform: uppercase;
@@ -153,15 +146,14 @@
     .hero h1 {
       margin: 14px 0 10px;
       font-size: clamp(2rem, 4vw, 2.9rem);
-      line-height: 1.05;
+      line-height: 1.02;
       letter-spacing: -.05em;
     }
 
     .hero p {
       margin: 0;
       color: rgba(255,255,255,.82);
-      max-width: 58ch;
-      font-size: .98rem;
+      max-width: 62ch;
     }
 
     .hero-actions {
@@ -194,35 +186,37 @@
     .btn-white {
       background: #fff;
       color: var(--text);
-      border-color: rgba(255,255,255,.16);
+      border-color: rgba(15, 23, 42, 0.08);
     }
 
     .btn-white:hover { transform: translateY(-1px); }
 
-    .hero-side {
+    .btn-soft {
+      background: var(--panel-soft);
+      color: var(--text);
+      border-color: var(--line);
+    }
+
+    .btn-soft:hover { transform: translateY(-1px); }
+
+    .hero-grid {
       display: grid;
       gap: 14px;
     }
 
-    .hero-side-card {
+    .hero-card {
       background: rgba(255,255,255,.08);
       border: 1px solid rgba(255,255,255,.1);
       border-radius: 24px;
       padding: 18px;
+      display: grid;
+      gap: 8px;
     }
 
-    .hero-side-card strong {
-      display: block;
-      font-size: .9rem;
-      margin-bottom: 8px;
-    }
+    .hero-card strong { font-size: .95rem; }
+    .hero-card span { color: rgba(255,255,255,.78); font-size: .9rem; }
 
-    .hero-side-card span {
-      color: rgba(255,255,255,.78);
-      font-size: .9rem;
-    }
-
-    .stats-grid {
+    .stats {
       display: grid;
       grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 16px;
@@ -251,26 +245,26 @@
     .stat-value {
       font-size: 2rem;
       font-weight: 900;
-      letter-spacing: -.05em;
       line-height: 1;
+      letter-spacing: -.05em;
     }
 
-    .layout {
+    .workspace {
       display: grid;
-      grid-template-columns: minmax(0, 1.25fr) minmax(340px, .9fr);
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
       gap: 20px;
       align-items: start;
     }
 
-    .panel {
-      padding: 22px;
+    .stack {
+      display: grid;
+      gap: 20px;
     }
 
-    .panel h2,
-    .panel h3 {
-      margin: 0;
-      font-size: 1.08rem;
-      letter-spacing: -.03em;
+    .panel {
+      padding: 22px;
+      display: grid;
+      gap: 18px;
     }
 
     .panel-head {
@@ -278,7 +272,14 @@
       align-items: center;
       justify-content: space-between;
       gap: 14px;
-      margin-bottom: 18px;
+      flex-wrap: wrap;
+    }
+
+    .panel-head h2,
+    .panel-head h3 {
+      margin: 0;
+      font-size: 1.06rem;
+      letter-spacing: -.03em;
     }
 
     .chip {
@@ -288,159 +289,222 @@
       border-radius: 999px;
       background: #fff1f2;
       color: var(--red);
-      font-size: .78rem;
-      font-weight: 900;
       border: 1px solid rgba(185, 28, 28, 0.12);
+      font-size: .77rem;
+      font-weight: 900;
     }
 
-    .requests-state {
-      padding: 18px;
+    .state-box {
+      padding: 16px 18px;
       border-radius: 18px;
       background: var(--panel-soft);
-      color: var(--muted);
       border: 1px dashed rgba(15,23,42,.12);
+      color: var(--muted);
     }
 
-    .requests-state.error {
+    .state-box.error {
       color: var(--red);
       background: #fff1f2;
       border-style: solid;
-      border-color: rgba(185, 28, 28, 0.12);
     }
 
-    .request-list {
+    .toolbar {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 12px;
+    }
+
+    .field,
+    .textarea,
+    .select {
+      width: 100%;
+      min-height: 48px;
+      border-radius: 16px;
+      border: 1px solid var(--line);
+      background: #fff;
+      padding: 0 14px;
+      color: var(--text);
+    }
+
+    .textarea {
+      min-height: 112px;
+      padding-block: 12px;
+      resize: vertical;
+    }
+
+    .grid-2,
+    .grid-3 {
+      display: grid;
+      gap: 12px;
+    }
+
+    .grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .request-list,
+    .club-list,
+    .player-list,
+    .user-list {
       display: grid;
       gap: 14px;
     }
 
-    .request-card {
+    .request-card,
+    .club-card,
+    .player-card,
+    .user-card {
       border: 1px solid var(--line);
       border-radius: 22px;
-      padding: 18px;
+      padding: 16px;
       background: var(--panel-soft);
       display: grid;
       gap: 12px;
     }
 
-    .request-card-top {
+    .request-top,
+    .club-top,
+    .player-top,
+    .user-top {
       display: flex;
       align-items: start;
       justify-content: space-between;
-      gap: 14px;
+      gap: 12px;
+      flex-wrap: wrap;
     }
 
-    .request-card-top h4 {
+    .request-top h4,
+    .club-top h4,
+    .player-top h4,
+    .user-top h4 {
       margin: 0 0 6px;
-      font-size: 1.03rem;
+      font-size: 1rem;
     }
 
-    .request-meta,
-    .request-route {
+    .meta {
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
       color: var(--muted);
-      font-size: .84rem;
+      font-size: .83rem;
     }
 
-    .request-meta span,
-    .request-route a {
+    .meta span,
+    .meta a {
       padding: 6px 10px;
       border-radius: 999px;
       background: #fff;
       border: 1px solid var(--line);
     }
 
-    .request-actions {
+    .request-actions,
+    .club-actions,
+    .player-actions,
+    .user-actions {
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
+      align-items: center;
     }
 
-    .request-actions .btn {
+    .request-actions .btn,
+    .club-actions .btn,
+    .player-actions .btn,
+    .user-actions .btn {
       min-height: 42px;
       padding-inline: 16px;
     }
 
-    .mini-grid {
+    .club-logo-row {
       display: grid;
+      grid-template-columns: 88px minmax(0, 1fr);
       gap: 14px;
+      align-items: center;
     }
 
-    .mini-card {
+    .club-logo-preview {
+      width: 88px;
+      height: 88px;
+      border-radius: 22px;
       border: 1px solid var(--line);
-      border-radius: 20px;
-      padding: 16px;
-      background: var(--panel-soft);
-    }
-
-    .mini-card strong {
-      display: block;
-      margin-bottom: 8px;
-      font-size: .94rem;
-    }
-
-    .mini-card p {
-      margin: 0;
+      background: #fff;
+      background-size: cover;
+      background-position: center;
+      display: grid;
+      place-items: center;
       color: var(--muted);
-      font-size: .9rem;
+      font-size: .78rem;
+      font-weight: 800;
+      overflow: hidden;
     }
 
-    .status-ok {
-      color: var(--green);
-      background: var(--green-bg);
-      border-color: rgba(34, 197, 94, 0.15);
+    .file-input {
+      display: none;
     }
 
-    .status-warn {
-      color: var(--yellow);
-      background: var(--yellow-bg);
-      border-color: rgba(234, 179, 8, 0.18);
+    .upload-trigger {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 42px;
+      padding: 0 16px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: #fff;
+      font-weight: 800;
+      cursor: pointer;
     }
 
-    @media (max-width: 1180px) {
+    .inline-select {
+      min-width: 160px;
+      min-height: 42px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      padding: 0 14px;
+      background: #fff;
+    }
+
+    .muted {
+      color: var(--muted);
+      font-size: .88rem;
+    }
+
+    @media (max-width: 1260px) {
       .hero,
-      .layout {
+      .workspace {
         grid-template-columns: 1fr;
       }
-
-      .stats-grid {
+      .stats {
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
     }
 
-    @media (max-width: 820px) {
-      .shell {
-        grid-template-columns: 1fr;
-      }
-
+    @media (max-width: 860px) {
+      .shell { grid-template-columns: 1fr; }
       .sidebar {
         position: static;
         height: auto;
         border-right: none;
         border-bottom: 1px solid var(--line);
       }
-
-      .main {
-        padding: 18px;
-      }
-
+      .main { padding: 18px; }
       .hero,
-      .panel {
-        padding: 18px;
+      .panel { padding: 18px; }
+      .grid-2,
+      .grid-3,
+      .toolbar {
+        grid-template-columns: 1fr;
       }
     }
 
     @media (max-width: 620px) {
-      .stats-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .request-card-top,
-      .panel-head {
-        flex-direction: column;
-        align-items: start;
-      }
+      .stats { grid-template-columns: 1fr; }
+      .club-logo-row { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -455,66 +519,67 @@
       <nav class="nav-list">
         <a href="index.html" class="nav-link active">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
-          <span>მთავარი დაფა</span>
-        </a>
-        <a href="../pexburtelebi.html" class="nav-link">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-          <span>ფეხბურთელები</span>
+          <span>ადმინ პანელი</span>
         </a>
         <a href="../gundebi.html" class="nav-link">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
           <span>გუნდები</span>
         </a>
+        <a href="../pexburtelebi.html" class="nav-link">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg>
+          <span>ფეხბურთელები</span>
+        </a>
+        <a href="../gamokitkhvebi.html" class="nav-link">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          <span>გამოკითხვები</span>
+        </a>
         <a href="../user-profile.html?from=admin/" class="nav-link">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20a8 8 0 0 1 16 0"/></svg>
           <span>ჩემი პროფილი</span>
         </a>
-        <a href="../index.html" class="nav-link">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l9-9 9 9"/><path d="M9 21V9h6v12"/></svg>
-          <span>მთავარი საიტი</span>
-        </a>
       </nav>
 
-      <div class="admin-badge">
-        <strong>ადმინის რეჟიმი</strong>
-        <span>მოთხოვნების დამტკიცება, საჯარო კლუბების მართვა და მთლიანი პლატფორმის კონტროლი.</span>
+      <div class="sidebar-note">
+        <strong>აქედან მართავ ყველაფერს</strong>
+        <span>მოთხოვნების დამტკიცება, კლუბების რედაქტირება, ლოგოს ატვირთვა, ფეხბურთელების საჯარო სტატუსი და მომხმარებლების როლები.</span>
       </div>
     </aside>
 
     <main class="main">
       <section class="hero">
         <div>
-          <span class="eyebrow">Admin Dashboard</span>
-          <h1>საიტის მართვა ერთი ადგილიდან</h1>
-          <p>აქედან ამტკიცებ ახალი გუნდების მოთხოვნებს, აკონტროლებ საჯარო ფეხბურთელებს, მომხმარებლების რაოდენობას და მთლიან პლატფორმის დინამიკას.</p>
+          <span class="eyebrow">Admin Control</span>
+          <h1>სრული მართვა ერთი დაფიდან</h1>
+          <p>აქედან შეგიძლია ახალი გუნდის მოთხოვნის დამტკიცება, კლუბის შექმნა ან რედაქტირება, ლოგოს ატვირთვა, ფეხბურთელის საჯარო სტატუსის შეცვლა და მომხმარებლის როლის მართვა.</p>
           <div class="hero-actions">
-            <a href="../gundebi.html" class="btn btn-white">გუნდების გვერდი</a>
-            <a href="../pexburtelebi.html" class="btn btn-red">ფეხბურთელების ბაზა</a>
+            <button class="btn btn-white" type="button" data-scroll-target="requestsPanel">მოთხოვნები</button>
+            <button class="btn btn-white" type="button" data-scroll-target="clubsPanel">კლუბები</button>
+            <button class="btn btn-red" type="button" data-scroll-target="playersPanel">ფეხბურთელები</button>
           </div>
         </div>
-        <div class="hero-side">
-          <div class="hero-side-card">
-            <strong>მიმდინარე პრიორიტეტი</strong>
-            <span>პირველ რიგში დადასტურე ახალი გუნდების მოთხოვნები, რომ ისინი საჯაროდ გამოჩნდნენ საიტზე.</span>
+        <div class="hero-grid">
+          <div class="hero-card">
+            <strong>მთავარი პრიორიტეტი</strong>
+            <span>დაუმტკიცე ან უარყავი გუნდების მოთხოვნები და საჭიროების შემთხვევაში მაშინვე გაასწორე მათი საჯარო ინფორმაცია.</span>
           </div>
-          <div class="hero-side-card">
-            <strong>სწრაფი წესი</strong>
-            <span>დამტკიცებული გუნდი ავტომატურად ხვდება საჯარო `clubs` ბაზაში და გამოჩნდება `გუნდები` გვერდზე.</span>
+          <div class="hero-card">
+            <strong>ლოგოს ატვირთვა</strong>
+            <span>კლუბის ბარათიდან ან ფორმიდან პირდაპირ შეგიძლია ახალი ლოგოს ჩასმა და შენახვა.</span>
           </div>
         </div>
       </section>
 
-      <section class="stats-grid">
+      <section class="stats">
         <article class="stat-card">
           <div class="stat-label">საჯარო ფეხბურთელები</div>
           <div class="stat-value" id="adminPlayersCount">0</div>
         </article>
         <article class="stat-card">
-          <div class="stat-label">რეგისტრირებული მომხმარებლები</div>
+          <div class="stat-label">მომხმარებლები</div>
           <div class="stat-value" id="adminUsersCount">0</div>
         </article>
         <article class="stat-card">
-          <div class="stat-label">საჯარო გუნდები</div>
+          <div class="stat-label">საჯარო კლუბები</div>
           <div class="stat-value" id="adminClubsCount">0</div>
         </article>
         <article class="stat-card">
@@ -523,318 +588,150 @@
         </article>
       </section>
 
-      <section class="layout">
-        <section class="panel">
-          <div class="panel-head">
-            <h2>გუნდის დამატების მოთხოვნები</h2>
-            <span class="chip" id="clubRequestCountChip">იტვირთება...</span>
-          </div>
-          <div class="requests-state" id="clubRequestState">ახლავე ვტვირთავ მოთხოვნებს.</div>
-          <div class="request-list" id="clubRequestList" hidden></div>
-        </section>
-
-        <aside class="mini-grid">
-          <section class="panel">
+      <section class="workspace">
+        <div class="stack">
+          <section class="panel" id="requestsPanel">
             <div class="panel-head">
-              <h3>რას აკეთებს ეს პანელი</h3>
+              <h2>გუნდის მოთხოვნები</h2>
+              <span class="chip" id="clubRequestCountChip">იტვირთება...</span>
             </div>
-            <div class="mini-grid">
-              <article class="mini-card">
-                <strong>გუნდის დამტკიცება</strong>
-                <p>დამტკიცების შემდეგ გუნდი ავტომატურად ემატება საჯარო კლუბების სიას და ხილული ხდება საიტზე.</p>
-              </article>
-              <article class="mini-card">
-                <strong>გამომგზავნის დეტალები</strong>
-                <p>თითოეულ მოთხოვნაზე ჩანს ვინ გამოგზავნა, რა როლით, რა ელფოსტით და რომელი ნომრით.</p>
-              </article>
-              <article class="mini-card">
-                <strong>მოდერაცია</strong>
-                <p>შეგიძლია მოთხოვნა დაადასტურო ან უარყო. სტატუსი მაშინვე იცვლება ბაზაშიც.</p>
-              </article>
+            <div class="state-box" id="clubRequestState">მოთხოვნები იტვირთება...</div>
+            <div class="request-list" id="clubRequestList" hidden></div>
+          </section>
+
+          <section class="panel" id="clubsPanel">
+            <div class="panel-head">
+              <h2>კლუბების მართვა</h2>
+              <div class="actions">
+                <button class="btn btn-soft" type="button" id="clubFormReset">ახალი კლუბი</button>
+                <button class="btn btn-white" type="button" id="reloadClubsButton">განახლება</button>
+              </div>
+            </div>
+
+            <div class="grid-2">
+              <div class="toolbar">
+                <input class="field" id="clubSearchInput" placeholder="მოძებნე კლუბი სახელით ან ქალაქით">
+                <button class="btn btn-soft" type="button" id="clubSearchClear">გასუფთავება</button>
+              </div>
+              <div class="state-box" id="clubSaveState">აქედან შეგიძლია კლუბის შექმნა, რედაქტირება და ლოგოს ატვირთვა.</div>
+            </div>
+
+            <form id="clubForm" class="stack">
+              <input type="hidden" id="clubIdInput">
+              <div class="club-logo-row">
+                <div class="club-logo-preview" id="clubLogoPreview">ლოგო</div>
+                <div class="stack">
+                  <input class="field" id="clubLogoInput" placeholder="ლოგოს ბმული ან data URL">
+                  <div class="actions">
+                    <label class="upload-trigger" for="clubLogoFile">ლოგოს ატვირთვა</label>
+                    <input class="file-input" type="file" id="clubLogoFile" accept="image/*">
+                    <button class="btn btn-soft" type="button" id="clubLogoClear">ლოგოს წაშლა</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="grid-2">
+                <input class="field" id="clubNameInput" placeholder="გუნდის სახელი" required>
+                <input class="field" id="clubCityInput" placeholder="ქალაქი / მდებარეობა" required>
+              </div>
+
+              <div class="grid-3">
+                <input class="field" id="clubShortCodeInput" placeholder="Short code">
+                <input class="field" id="clubAgeBandInput" placeholder="ასაკობრივი დიაპაზონი, მაგ. U8-PRO">
+                <input class="field" id="clubCoachInput" placeholder="მთავარი მწვრთნელი ან აღწერა">
+              </div>
+
+              <textarea class="textarea" id="clubSummaryInput" placeholder="კლუბის მოკლე აღწერა"></textarea>
+
+              <div class="grid-2">
+                <select class="select" id="clubPublicInput">
+                  <option value="true">საჯაროდ ხილული</option>
+                  <option value="false">დამალული</option>
+                </select>
+                <select class="select" id="clubActiveInput">
+                  <option value="true">აქტიური</option>
+                  <option value="false">არააქტიური</option>
+                </select>
+              </div>
+
+              <div class="actions">
+                <button class="btn btn-red" type="submit">შენახვა</button>
+                <button class="btn btn-white" type="button" id="clubCancelEdit">გაუქმება</button>
+              </div>
+            </form>
+
+            <div class="club-list" id="clubList"></div>
+          </section>
+        </div>
+
+        <div class="stack">
+          <section class="panel" id="playersPanel">
+            <div class="panel-head">
+              <h3>ფეხბურთელების moderation</h3>
+              <button class="btn btn-white" type="button" id="reloadPlayersButton">განახლება</button>
+            </div>
+            <div class="toolbar">
+              <input class="field" id="playerSearchInput" placeholder="მოძებნე ფეხბურთელი, გუნდი ან პოზიცია">
+              <button class="btn btn-soft" type="button" id="playerSearchClear">გასუფთავება</button>
+            </div>
+            <div class="player-list" id="playerList"></div>
+          </section>
+
+          <section class="panel" id="monthlyPanel">
+            <div class="panel-head">
+              <h3>თვის შედეგების მართვა</h3>
+              <button class="btn btn-white" type="button" id="reloadMonthlyButton">განახლება</button>
+            </div>
+            <div class="state-box" id="monthlyState">აქედან შეგიძლია მართო თვის საუკეთესო ფეხბურთელი და სიმბოლური 11-ეული.</div>
+            <div class="grid-2">
+              <input class="field" id="monthlyCycleInput" placeholder="ციკლი" readonly>
+              <input class="field" id="monthlyFeaturedVotesInput" placeholder="თვის ფეხბურთელის ხმები" readonly>
+            </div>
+            <div class="stack">
+              <select class="select" id="monthlyFeaturedPlayerSelect"></select>
+              <div class="actions">
+                <button class="btn btn-red" type="button" id="saveFeaturedPlayerButton">თვის ფეხბურთელის შენახვა</button>
+                <button class="btn btn-soft" type="button" id="resetFeaturedPlayerButton">ავტომატურზე დაბრუნება</button>
+              </div>
+            </div>
+            <div class="grid-2">
+              <select class="select" id="lineup-gk"></select>
+              <select class="select" id="lineup-rb"></select>
+              <select class="select" id="lineup-rcb"></select>
+              <select class="select" id="lineup-lcb"></select>
+              <select class="select" id="lineup-lb"></select>
+              <select class="select" id="lineup-rcm"></select>
+              <select class="select" id="lineup-cm"></select>
+              <select class="select" id="lineup-lcm"></select>
+              <select class="select" id="lineup-rw"></select>
+              <select class="select" id="lineup-st"></select>
+              <select class="select" id="lineup-lw"></select>
+            </div>
+            <div class="actions">
+              <button class="btn btn-red" type="button" id="saveLineupButton">11-ეულის შენახვა</button>
+              <button class="btn btn-soft" type="button" id="resetLineupButton">ავტომატურზე დაბრუნება</button>
             </div>
           </section>
 
-          <section class="panel">
+          <section class="panel" id="usersPanel">
             <div class="panel-head">
-              <h3>სისტემის სტატუსი</h3>
+              <h3>მომხმარებლების როლები</h3>
+              <button class="btn btn-white" type="button" id="reloadUsersButton">განახლება</button>
             </div>
-            <div class="mini-grid">
-              <article class="mini-card status-ok">
-                <strong>როლების სისტემა</strong>
-                <p>ადმინის route ახლა მუშაობს `/admin/` მისამართით.</p>
-              </article>
-              <article class="mini-card status-ok">
-                <strong>კლუბების moderation flow</strong>
-                <p>დადასტურებული მოთხოვნები გადადის public კლუბებში.</p>
-              </article>
-              <article class="mini-card status-warn">
-                <strong>შემდეგი ეტაპი</strong>
-                <p>საჭიროა მომხმარებლების, ფეხბურთელების და გამოკითხვების ცალკე მართვის ბლოკების დამატება.</p>
-              </article>
+            <div class="toolbar">
+              <input class="field" id="userSearchInput" placeholder="მოძებნე მომხმარებელი ელფოსტით ან როლით">
+              <button class="btn btn-soft" type="button" id="userSearchClear">გასუფთავება</button>
             </div>
+            <div class="user-list" id="userList"></div>
           </section>
-        </aside>
+        </div>
       </section>
     </main>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="../auth-shared.js"></script>
-  <script>
-    (async function () {
-      const stateNode = document.getElementById('clubRequestState');
-      const listNode = document.getElementById('clubRequestList');
-      const chipNode = document.getElementById('clubRequestCountChip');
-
-      function setState(message, type) {
-        if (!stateNode) return;
-        stateNode.hidden = false;
-        stateNode.textContent = message;
-        stateNode.className = 'requests-state' + (type ? ' ' + type : '');
-      }
-
-      function escapeHtml(value) {
-        return String(value || '')
-          .replace(/&/g, '&amp;')
-          .replace(/</g, '&lt;')
-          .replace(/>/g, '&gt;')
-          .replace(/"/g, '&quot;')
-          .replace(/'/g, '&#39;');
-      }
-
-      function formatStatus(status) {
-        if (status === 'approved') return 'დადასტურებული';
-        if (status === 'rejected') return 'უარყოფილი';
-        return 'მოლოდინში';
-      }
-
-      function formatDate(value) {
-        if (!value) return 'ახლახან';
-        try {
-          return new Intl.DateTimeFormat('ka-GE', {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-          }).format(new Date(value));
-        } catch (error) {
-          return value;
-        }
-      }
-
-      function slugify(value) {
-        return String(value || '')
-          .trim()
-          .toLowerCase()
-          .replace(/[^a-z0-9\u10d0-\u10ff\s-]/g, '')
-          .replace(/\s+/g, '-')
-          .replace(/-+/g, '-')
-          .replace(/^-|-$/g, '');
-      }
-
-      function buildShortCode(name, requestId) {
-        const parts = String(name || '').trim().split(/\s+/).filter(Boolean);
-        const letters = (parts.map((part) => part.charAt(0)).join('') || String(name || '').replace(/\s+/g, '').slice(0, 3) || 'FG')
-          .toUpperCase()
-          .replace(/[^A-Z0-9]/g, '')
-          .slice(0, 3);
-        const suffix = String(requestId || '').replace(/[^A-Za-z0-9]/g, '').slice(-2).toUpperCase();
-        return (letters + suffix).slice(0, 5) || 'FG01';
-      }
-
-      if (!window.siteAuth?.requireAuth) {
-        setState('ავტორიზაციის მოდული ვერ ჩაიტვირთა.', 'error');
-        return;
-      }
-
-      const authState = await window.siteAuth.requireAuth('admin/');
-      const client = authState?.client || null;
-      const user = authState?.user || null;
-
-      if (!client || !user) {
-        return;
-      }
-
-      if ((window.siteAuth?.getUserRole ? window.siteAuth.getUserRole(user) : '') !== 'admin') {
-        setState('ამ გვერდზე წვდომა მხოლოდ ადმინისთვის არის ხელმისაწვდომი.', 'error');
-        if (chipNode) chipNode.textContent = 'ადმინი';
-        return;
-      }
-
-      async function loadOverviewStats() {
-        const playersNode = document.getElementById('adminPlayersCount');
-        const usersNode = document.getElementById('adminUsersCount');
-        const clubsNode = document.getElementById('adminClubsCount');
-        const pendingNode = document.getElementById('adminPendingRequests');
-
-        try {
-          const [playersRes, usersRes, clubsRes, pendingRes] = await Promise.all([
-            client.from('player_registry').select('id', { count: 'exact', head: true }).eq('visibility_public', true).eq('is_active', true),
-            client.from('profiles').select('id', { count: 'exact', head: true }),
-            client.from('clubs').select('id', { count: 'exact', head: true }).eq('is_public', true).eq('is_active', true),
-            client.from('club_submission_requests').select('id', { count: 'exact', head: true }).eq('status', 'pending')
-          ]);
-
-          if (playersNode) playersNode.textContent = String(playersRes.count || 0);
-          if (usersNode) usersNode.textContent = String(usersRes.count || 0);
-          if (clubsNode) clubsNode.textContent = String(clubsRes.count || 0);
-          if (pendingNode) pendingNode.textContent = String(pendingRes.count || 0);
-        } catch (error) {
-          if (playersNode) playersNode.textContent = '—';
-          if (usersNode) usersNode.textContent = '—';
-          if (clubsNode) clubsNode.textContent = '—';
-          if (pendingNode) pendingNode.textContent = '—';
-        }
-      }
-
-      async function approveClubRequest(row) {
-        const slugBase = row.public_club_slug || slugify((row.club_name || '') + ' ' + (row.city || ''));
-        const slug = slugBase || slugify(row.club_name || 'club');
-        const shortCode = buildShortCode(row.club_name, row.id);
-
-        const { error: clubError } = await client
-          .from('clubs')
-          .upsert({
-            slug: slug,
-            short_code: shortCode,
-            name: row.club_name,
-            city: row.city,
-            country: 'Georgia',
-            age_band: 'U8-PRO',
-            coach_name: 'ადმინის მიერ დადასტურებული გუნდი',
-            players_count: 0,
-            summary: 'ადმინის მიერ დადასტურებული საჯარო გუნდი.',
-            is_public: true,
-            is_active: true
-          }, { onConflict: 'slug' });
-
-        if (clubError) throw clubError;
-
-        const { error: requestError } = await client
-          .from('club_submission_requests')
-          .update({
-            status: 'approved',
-            public_club_slug: slug,
-            approved_at: new Date().toISOString(),
-            approved_by: user.id
-          })
-          .eq('id', row.id);
-
-        if (requestError) throw requestError;
-      }
-
-      async function updateRequestStatus(row, status, button) {
-        const originalText = button.textContent;
-        button.disabled = true;
-        button.textContent = 'მუშავდება...';
-
-        let error = null;
-
-        try {
-          if (status === 'approved') {
-            await approveClubRequest(row);
-          } else {
-            const result = await client
-              .from('club_submission_requests')
-              .update({ status: status })
-              .eq('id', row.id);
-            error = result.error || null;
-          }
-        } catch (err) {
-          error = err;
-        }
-
-        button.disabled = false;
-        button.textContent = originalText;
-
-        if (error) {
-          setState('სტატუსის შეცვლა ვერ შესრულდა. გადაამოწმე SQL და მოთხოვნის ცხრილი.', 'error');
-          return;
-        }
-
-        await loadRequests();
-        await loadOverviewStats();
-      }
-
-      async function loadRequests() {
-        setState('მოთხოვნები იტვირთება...');
-        listNode.hidden = true;
-        listNode.innerHTML = '';
-
-        const { data, error } = await client
-          .from('club_submission_requests')
-          .select('id, club_name, city, phone, status, requester_email, requester_name, requester_role, created_at, admin_note, public_club_slug')
-          .order('created_at', { ascending: false });
-
-        if (error) {
-          setState('გუნდის მოთხოვნები ვერ მოიძებნა. საჭირო হলে SQL ფაილი თავიდან გაუშვი.', 'error');
-          if (chipNode) chipNode.textContent = 'შეცდომა';
-          return;
-        }
-
-        const rows = Array.isArray(data) ? data : [];
-        const pendingCount = rows.filter((row) => row.status === 'pending').length;
-        if (chipNode) chipNode.textContent = pendingCount ? `${pendingCount} მოლოდინში` : 'ცარიელია';
-
-        if (!rows.length) {
-          setState('ჯერ არცერთი ახალი გუნდის მოთხოვნა არ არის.');
-          return;
-        }
-
-        stateNode.hidden = true;
-        listNode.hidden = false;
-        listNode.innerHTML = rows.map((row) => {
-          const metaItems = [
-            row.requester_name ? `გამომგზავნი: ${escapeHtml(row.requester_name)}` : 'გამომგზავნი: უცნობია',
-            row.requester_role ? `როლი: ${escapeHtml(row.requester_role)}` : 'როლი: უცნობია',
-            row.requester_email ? `ელფოსტა: ${escapeHtml(row.requester_email)}` : 'ელფოსტა: უცნობია',
-            row.phone ? `ტელეფონი: ${escapeHtml(row.phone)}` : 'ტელეფონი: არ არის მითითებული',
-            `გაგზავნილია: ${escapeHtml(formatDate(row.created_at))}`
-          ];
-
-          return `
-            <article class="request-card" data-request-id="${row.id}">
-              <div class="request-card-top">
-                <div>
-                  <h4>${escapeHtml(row.club_name || 'ახალი გუნდი')}</h4>
-                  <div class="request-meta">
-                    <span>${escapeHtml(row.city || 'ქალაქი არ არის მითითებული')}</span>
-                    <span>${escapeHtml(formatStatus(row.status))}</span>
-                  </div>
-                </div>
-                <span class="chip">${escapeHtml(formatStatus(row.status))}</span>
-              </div>
-              <div class="request-meta">
-                ${metaItems.map((item) => `<span>${item}</span>`).join('')}
-              </div>
-              ${row.public_club_slug ? `
-                <div class="request-route">
-                  <a href="../team-dinamo-tbilisi.html?club=${encodeURIComponent(row.public_club_slug)}">საჯარო გუნდის ბმა: ${escapeHtml(row.public_club_slug)}</a>
-                </div>
-              ` : ''}
-              <div class="request-actions">
-                <button type="button" class="btn btn-red" data-request-action="approved" ${row.status === 'approved' ? 'disabled' : ''}>დადასტურება</button>
-                <button type="button" class="btn btn-white" data-request-action="rejected" ${row.status === 'rejected' ? 'disabled' : ''}>უარყოფა</button>
-              </div>
-            </article>
-          `;
-        }).join('');
-
-        listNode.querySelectorAll('[data-request-action]').forEach((button) => {
-          button.addEventListener('click', async function () {
-            const card = button.closest('[data-request-id]');
-            const requestId = card?.getAttribute('data-request-id');
-            const row = rows.find((item) => String(item.id) === String(requestId));
-            if (!row) return;
-            await updateRequestStatus(row, button.getAttribute('data-request-action'), button);
-          });
-        });
-      }
-
-      await loadOverviewStats();
-      await loadRequests();
-    })();
-  </script>
+  <script src="../supabase-domain-shared.js"></script>
+  <script src="admin-dashboard.js"></script>
 </body>
 </html>

@@ -241,9 +241,42 @@
       ? await window.sitePlayerDomain.fetchPublicDirectoryEntries(client)
       : [];
 
-    return Array.isArray(entries)
+    const enriched = Array.isArray(entries)
       ? entries.map(enrichPlayer).filter(Boolean)
       : [];
+
+    if (!client?.from || !enriched.length) {
+      return enriched;
+    }
+
+    try {
+      const ids = enriched.map(function (player) { return player.id; }).filter(Boolean);
+      const { data, error } = await client
+        .from('player_vote_manual_overrides')
+        .select('player_id, manual_votes')
+        .in('player_id', ids);
+
+      if (error || !Array.isArray(data)) {
+        return enriched;
+      }
+
+      const manualMap = new Map();
+      data.forEach(function (row) {
+        manualMap.set(String(row.player_id || ''), Number(row.manual_votes || 0) || 0);
+      });
+
+      return enriched.map(function (player) {
+        const manualVotes = manualMap.get(player.id) || 0;
+        const votesCount = (Number(player.votesCount || 0) || 0) + manualVotes;
+        return {
+          ...player,
+          votesCount: votesCount,
+          rating: buildRating({ ...player, votesCount: votesCount })
+        };
+      });
+    } catch (error) {
+      return enriched;
+    }
   }
 
   async function fetchPlayerById(client, playerId) {
@@ -274,6 +307,16 @@
 
       if (totalsData?.votes_count) {
         votesCount = Number(totalsData.votes_count || 0) || 0;
+      }
+
+      const { data: manualVoteData } = await client
+        .from('player_vote_manual_overrides')
+        .select('manual_votes')
+        .eq('player_id', cleanId)
+        .maybeSingle();
+
+      if (manualVoteData?.manual_votes) {
+        votesCount += Number(manualVoteData.manual_votes || 0) || 0;
       }
 
       const mapped = window.sitePlayerDomain?.mapRegistryEntry
@@ -450,6 +493,52 @@
     });
   }
 
+  async function fetchCurrentMonthlySnapshot(client, players) {
+    if (!client?.rpc) {
+      return null;
+    }
+
+    try {
+      const { data, error } = await client.rpc('get_or_create_monthly_featured_snapshot');
+      if (error || !data) {
+        return null;
+      }
+
+      const playerPool = Array.isArray(players) ? players : await fetchPublicPlayers(client);
+      const playerMap = new Map(
+        playerPool.map(function (player) {
+          return [String(player.id || '').trim(), player];
+        })
+      );
+
+      const featuredPlayerId = String(data.featured_player_id || '').trim();
+      const lineupRows = Array.isArray(data.lineup) ? data.lineup : [];
+      const lineup = lineupRows
+        .map(function (entry) {
+          const player = playerMap.get(String(entry.player_id || '').trim());
+          if (!player) {
+            return null;
+          }
+          return {
+            slot: String(entry.slot || '').trim(),
+            player: player
+          };
+        })
+        .filter(Boolean);
+
+      return {
+        cycleKey: String(data.cycle_key || '').trim(),
+        cycleStart: String(data.cycle_start || '').trim(),
+        cycleEnd: String(data.cycle_end || '').trim(),
+        featuredVotes: Number(data.featured_votes || 0) || 0,
+        featuredPlayer: playerMap.get(featuredPlayerId) || null,
+        lineup: lineup
+      };
+    } catch (error) {
+      return null;
+    }
+  }
+
   window.siteData = {
     buildClubRankings: buildClubRankings,
     buildFeaturedLineup: buildFeaturedLineup,
@@ -458,6 +547,7 @@
     buildAgeGroupLeaders: buildAgeGroupLeaders,
     enrichPlayer: enrichPlayer,
     fetchClubBySlug: fetchClubBySlug,
+    fetchCurrentMonthlySnapshot: fetchCurrentMonthlySnapshot,
     fetchPlayerById: fetchPlayerById,
     fetchPlayersForClub: fetchPlayersForClub,
     fetchPublicClubs: fetchPublicClubs,
