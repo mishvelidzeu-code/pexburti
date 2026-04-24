@@ -60,6 +60,19 @@
       .join(' ');
   }
 
+  function slugify(value) {
+    if (window.sitePlayerDomain?.slugify) {
+      return window.sitePlayerDomain.slugify(value);
+    }
+    return String(value || '')
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9\u10d0-\u10ff\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '');
+  }
+
   function hashString(value) {
     const raw = String(value || '');
     let hash = 0;
@@ -293,7 +306,8 @@
         .maybeSingle();
 
       if (error || !data) {
-        return null;
+        const fallbackEntry = await window.sitePlayerDomain?.fetchManagedEntry?.(client, cleanId);
+        return fallbackEntry ? enrichPlayer(fallbackEntry) : null;
       }
 
       const isVisible = data.visibility_public === null || data.visibility_public === undefined || data.visibility_public === true;
@@ -329,7 +343,8 @@
 
       return enrichPlayer(mapped);
     } catch (error) {
-      return null;
+      const fallbackEntry = await window.sitePlayerDomain?.fetchManagedEntry?.(client, cleanId);
+      return fallbackEntry ? enrichPlayer(fallbackEntry) : null;
     }
   }
 
@@ -367,7 +382,42 @@
         playerVotes.set(slug, (playerVotes.get(slug) || 0) + (Number(player.votesCount || 0) || 0));
       });
 
-      return clubRows.map(function (row) {
+      const enrichedClubs = clubRows.map(function (row) {
+        return enrichClub(row, playerCounts, playerVotes);
+      });
+
+      if (enrichedClubs.length) {
+        return enrichedClubs;
+      }
+
+      const clubMap = new Map();
+      players.forEach(function (player) {
+        const teamName = String(player.team || '').trim();
+        const teamSlug = String(player.teamSlug || '').trim().toLowerCase();
+        if (!teamName && !teamSlug) {
+          return;
+        }
+        const key = teamSlug || titleCaseSlug(teamName);
+        if (!clubMap.has(key)) {
+          clubMap.set(key, {
+            id: key,
+            slug: teamSlug || slugify(teamName),
+            short_code: (teamName || key).slice(0, 2).toUpperCase(),
+            name: teamName || titleCaseSlug(teamSlug),
+            city: '',
+            country: 'Georgia',
+            age_band: 'U8-PRO',
+            coach_name: 'არ არის მითითებული',
+            players_count: 0,
+            logo_path: '',
+            summary: 'ფეხბურთელების ბაზიდან აწყობილი გუნდი.',
+            is_public: true,
+            is_active: true
+          });
+        }
+      });
+
+      return Array.from(clubMap.values()).map(function (row) {
         return enrichClub(row, playerCounts, playerVotes);
       });
     } catch (error) {

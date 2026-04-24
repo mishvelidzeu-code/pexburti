@@ -69,6 +69,31 @@
     return letters || 'FG';
   }
 
+  function mapProfilePlayer(row) {
+    if (!row) return null;
+    const fullName = String(row.display_name || row.full_name || '').trim();
+    if (!fullName) return null;
+    return {
+      id: String(row.user_id || row.id || '').trim(),
+      full_name: fullName,
+      avatar_path: String(row.avatar_path || '').trim(),
+      age_group: String(row.age_group || 'PRO').trim(),
+      primary_position: String(row.primary_position || row.position || '').trim(),
+      position_label: String(row.position_label || row.primary_position || row.position || '').trim(),
+      preferred_foot: String(row.preferred_foot || row.foot || '').trim(),
+      club_name: String(row.club_name || row.current_club || row.team_name || '').trim(),
+      club_slug: String(row.club_slug || slugify(row.club_name || row.current_club || row.team_name || '')).trim().toLowerCase(),
+      club_route: '',
+      club_status: String(row.club_name || row.current_club || row.team_name || '').trim() ? 'registered' : 'free-agent',
+      owner_role: 'player',
+      visibility_public: row.visibility_public === undefined || row.visibility_public === null ? true : Boolean(row.visibility_public),
+      is_active: row.is_active === undefined || row.is_active === null ? true : Boolean(row.is_active),
+      manualVotes: 0,
+      _sourceTable: 'player_profiles',
+      _raw: row
+    };
+  }
+
   function formatDate(value) {
     if (!value) return 'ახლახან';
     try {
@@ -202,17 +227,26 @@
   }
 
   async function loadOverviewStats() {
-    const [playersRes, usersRes, clubsRes, pendingRes] = await Promise.all([
+    const results = await Promise.allSettled([
       state.client.from('player_registry').select('id', { count: 'exact', head: true }).eq('visibility_public', true).eq('is_active', true),
+      state.client.from('player_profiles').select('user_id', { count: 'exact', head: true }),
       state.client.from('profiles').select('id', { count: 'exact', head: true }),
       state.client.from('clubs').select('id', { count: 'exact', head: true }).eq('is_public', true).eq('is_active', true),
+      state.client.from('clubs').select('id', { count: 'exact', head: true }),
       state.client.from('club_submission_requests').select('id', { count: 'exact', head: true }).eq('status', 'pending')
     ]);
 
-    setText('adminPlayersCount', String(playersRes.count || 0));
-    setText('adminUsersCount', String(usersRes.count || 0));
-    setText('adminClubsCount', String(clubsRes.count || 0));
-    setText('adminPendingRequests', String(pendingRes.count || 0));
+    const playersRegistry = results[0].status === 'fulfilled' ? (results[0].value.count || 0) : 0;
+    const playersProfiles = results[1].status === 'fulfilled' ? (results[1].value.count || 0) : 0;
+    const usersCount = results[2].status === 'fulfilled' ? (results[2].value.count || 0) : 0;
+    const clubsPublic = results[3].status === 'fulfilled' ? (results[3].value.count || 0) : 0;
+    const clubsTotal = results[4].status === 'fulfilled' ? (results[4].value.count || 0) : 0;
+    const pendingCount = results[5].status === 'fulfilled' ? (results[5].value.count || 0) : 0;
+
+    setText('adminPlayersCount', String(Math.max(playersRegistry, playersProfiles)));
+    setText('adminUsersCount', String(usersCount));
+    setText('adminClubsCount', String(Math.max(clubsPublic, clubsTotal)));
+    setText('adminPendingRequests', String(pendingCount));
   }
 
   async function loadRequests() {
@@ -528,22 +562,36 @@
   }
 
   async function loadPlayers() {
+    let rows = [];
+    let sourceTable = 'player_registry';
     const { data, error } = await state.client
       .from('player_registry')
       .select(PLAYER_FIELDS)
       .order('updated_at', { ascending: false })
       .limit(200);
 
-    if (error) {
-      byId('playerList').innerHTML = '<div class="state-box error">ფეხბურთელების წამოღება ვერ მოხერხდა.</div>';
-      return;
+    if (!error && Array.isArray(data) && data.length) {
+      rows = data;
+    } else {
+      const fallback = await state.client
+        .from('player_profiles')
+        .select('*')
+        .order('updated_at', { ascending: false })
+        .limit(200);
+
+      if (fallback.error || !Array.isArray(fallback.data) || !fallback.data.length) {
+        byId('playerList').innerHTML = '<div class="state-box error">ფეხბურთელების წამოღება ვერ მოხერხდა.</div>';
+        return;
+      }
+
+      sourceTable = 'player_profiles';
+      rows = fallback.data.map(mapProfilePlayer).filter(Boolean);
     }
 
-    const rows = Array.isArray(data) ? data : [];
     const ids = rows.map((row) => row.id).filter(Boolean);
     const manualVotesMap = new Map();
 
-    if (ids.length) {
+    if (ids.length && sourceTable === 'player_registry') {
       const { data: overrides } = await state.client
         .from('player_vote_manual_overrides')
         .select('player_id, manual_votes')
@@ -559,7 +607,8 @@
     state.players = rows.map(function (row) {
       return {
         ...row,
-        manualVotes: manualVotesMap.get(String(row.id || '')) || 0
+        manualVotes: manualVotesMap.get(String(row.id || '')) || Number(row.manualVotes || 0) || 0,
+        _sourceTable: row._sourceTable || sourceTable
       };
     });
     renderPlayers();
@@ -603,16 +652,17 @@
           <span class="chip">${player.visibility_public ? 'საჯარო' : 'დამალული'}</span>
         </div>
         <div class="player-actions">
-          <button class="btn btn-white" type="button" data-player-action="toggle-public">${player.visibility_public ? 'დამალვა' : 'გაჯაროება'}</button>
-          <button class="btn btn-white" type="button" data-player-action="toggle-active">${player.is_active ? 'გამორთვა' : 'გააქტიურება'}</button>
+          <button class="btn btn-white" type="button" data-player-action="toggle-public" ${player._sourceTable !== 'player_registry' ? 'disabled' : ''}>${player.visibility_public ? 'დამალვა' : 'გაჯაროება'}</button>
+          <button class="btn btn-white" type="button" data-player-action="toggle-active" ${player._sourceTable !== 'player_registry' ? 'disabled' : ''}>${player.is_active ? 'გამორთვა' : 'გააქტიურება'}</button>
           <select class="inline-select" data-player-club>
             ${clubOptions}
           </select>
-          <input class="inline-select" type="number" min="0" step="1" value="${escapeHtml(String(player.manualVotes || 0))}" data-player-manual-votes>
-          <button class="btn btn-soft" type="button" data-player-action="save-votes">ხმების შენახვა</button>
+          <input class="inline-select" type="number" min="0" step="1" value="${escapeHtml(String(player.manualVotes || 0))}" data-player-manual-votes ${player._sourceTable !== 'player_registry' ? 'disabled' : ''}>
+          <button class="btn btn-soft" type="button" data-player-action="save-votes" ${player._sourceTable !== 'player_registry' ? 'disabled' : ''}>ხმების შენახვა</button>
           <button class="btn btn-soft" type="button" data-player-action="save-club">გუნდის შენახვა</button>
           <a class="btn btn-red" href="../player-profile.html?player=${encodeURIComponent(player.id)}">პროფილი</a>
         </div>
+        ${player._sourceTable !== 'player_registry' ? '<div class="meta" style="margin-top:10px"><span>ეს ჩანაწერი დროებით მოდის player_profiles-დან. სრული moderation registry სინქრონიზაციის შემდეგ ჩაირთვება.</span></div>' : ''}
       </article>
     `).join('');
 
@@ -654,15 +704,41 @@
 
   async function updatePlayer(playerId, patch, button) {
     const original = button?.textContent || '';
+    const player = state.players.find((item) => String(item.id) === String(playerId));
     if (button) {
       button.disabled = true;
       button.textContent = 'მუშავდება...';
     }
 
-    const { error } = await state.client
-      .from('player_registry')
-      .update(patch)
-      .eq('id', playerId);
+    let error = null;
+    if (player?._sourceTable === 'player_profiles') {
+      const profilePatch = {};
+      if (Object.prototype.hasOwnProperty.call(player._raw || {}, 'club_name')) {
+        profilePatch.club_name = patch.club_name || null;
+      }
+      if (Object.prototype.hasOwnProperty.call(player._raw || {}, 'current_club')) {
+        profilePatch.current_club = patch.club_name || null;
+      }
+      if (Object.prototype.hasOwnProperty.call(player._raw || {}, 'team_name')) {
+        profilePatch.team_name = patch.club_name || null;
+      }
+
+      if (!Object.keys(profilePatch).length) {
+        error = { message: 'ამ ჩანაწერზე გუნდის ველის შეცვლა ვერ მოიძებნა.' };
+      } else {
+        const result = await state.client
+          .from('player_profiles')
+          .update(profilePatch)
+          .eq('user_id', playerId);
+        error = result.error || null;
+      }
+    } else {
+      const result = await state.client
+        .from('player_registry')
+        .update(patch)
+        .eq('id', playerId);
+      error = result.error || null;
+    }
 
     if (button) {
       button.disabled = false;
@@ -679,7 +755,13 @@
 
   async function saveManualVotes(playerId, rawValue, button) {
     const original = button?.textContent || '';
+    const player = state.players.find((item) => String(item.id) === String(playerId));
     const manualVotes = Math.max(0, parseInt(rawValue, 10) || 0);
+
+    if (player?._sourceTable !== 'player_registry') {
+      byId('playerList').insertAdjacentHTML('afterbegin', '<div class="state-box error">ხელით ხმების ჩაწერა მუშაობს მხოლოდ player_registry-ში არსებულ ფეხბურთელებზე.</div>');
+      return;
+    }
 
     if (button) {
       button.disabled = true;
@@ -810,8 +892,14 @@
       return;
     }
 
-    const publicPlayers = await window.siteData.fetchPublicPlayers(state.client);
-    const snapshot = await window.siteData.fetchCurrentMonthlySnapshot(state.client, publicPlayers);
+    let publicPlayers = [];
+    let snapshot = null;
+    try {
+      publicPlayers = await window.siteData.fetchPublicPlayers(state.client);
+      snapshot = await window.siteData.fetchCurrentMonthlySnapshot(state.client, publicPlayers);
+    } catch (error) {
+      snapshot = null;
+    }
     state.monthlySnapshot = snapshot;
 
     if (!snapshot) {
@@ -1009,7 +1097,7 @@
 
     bindEvents();
     resetClubForm();
-    await Promise.all([
+    await Promise.allSettled([
       loadOverviewStats(),
       loadRequests(),
       loadClubs(),

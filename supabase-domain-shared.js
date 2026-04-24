@@ -36,6 +36,16 @@
       .replace(/\s+/g, ' ');
   }
 
+  function slugify(value) {
+    return String(value || '')
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9\u10d0-\u10ff\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '');
+  }
+
   function resolveTeamRoute(entry) {
     if (entry?.club_route) {
       return entry.club_route;
@@ -103,6 +113,92 @@
     };
   }
 
+  function mapProfileFallbackEntry(entry) {
+    if (!entry) {
+      return null;
+    }
+
+    const fullName = String(
+      entry.display_name ||
+      entry.full_name ||
+      entry.name ||
+      ''
+    ).trim();
+
+    if (!fullName) {
+      return null;
+    }
+
+    const parts = fullName.split(/\s+/).filter(Boolean);
+    const teamName = String(
+      entry.club_name ||
+      entry.current_club ||
+      entry.team_name ||
+      entry.club ||
+      ''
+    ).trim();
+    const teamSlug = String(entry.club_slug || slugify(teamName)).trim().toLowerCase();
+    const positionRaw = String(
+      entry.position_label ||
+      entry.primary_position ||
+      entry.position ||
+      ''
+    ).trim();
+    const ageGroupKey = String(entry.age_group || 'pro').trim().toLowerCase() || 'pro';
+    const ageGroupLabel = window.siteAgeGroups?.getAgeGroupLabel
+      ? window.siteAgeGroups.getAgeGroupLabel(ageGroupKey)
+      : ageGroupKey.toUpperCase();
+
+    return {
+      id: String(entry.user_id || entry.id || '').trim(),
+      sourceKey: 'profile:' + String(entry.user_id || entry.id || '').trim(),
+      authUserId: String(entry.user_id || '').trim(),
+      ownerUserId: String(entry.user_id || '').trim(),
+      ownerRole: 'player',
+      fullName: fullName,
+      firstName: parts[0] || '',
+      lastName: parts.slice(1).join(' '),
+      photo: String(entry.avatar_path || '').trim(),
+      birthDate: String(entry.birth_date || '').trim(),
+      age: Number.isFinite(Number(entry.age)) ? Number(entry.age) : null,
+      ageGroup: ageGroupKey,
+      ageLabel: ageGroupLabel,
+      position: positionRaw,
+      positionLabel: positionRaw,
+      foot: String(entry.preferred_foot || entry.foot || '').trim(),
+      team: teamName,
+      teamSlug: teamSlug,
+      teamRoute: resolveTeamRoute({ club_slug: teamSlug, club_name: teamName }),
+      teamStatus: teamName ? 'registered' : 'free-agent',
+      visibilityPublic: true,
+      votesCount: 0,
+      createdAt: String(entry.created_at || '').trim(),
+      updatedAt: String(entry.updated_at || '').trim(),
+      sourceTable: 'player_profiles'
+    };
+  }
+
+  async function fetchPlayerProfilesFallback(client) {
+    if (!client?.from) {
+      return [];
+    }
+
+    try {
+      const { data, error } = await client
+        .from('player_profiles')
+        .select('*')
+        .order('updated_at', { ascending: false });
+
+      if (error || !Array.isArray(data) || !data.length) {
+        return [];
+      }
+
+      return data.map(mapProfileFallbackEntry).filter(Boolean);
+    } catch (error) {
+      return [];
+    }
+  }
+
   async function syncMyAccountDomain(client) {
     if (!client?.rpc) {
       return { ok: false, reason: 'missing-client' };
@@ -131,7 +227,7 @@
         .order('updated_at', { ascending: false });
 
       if (error || !Array.isArray(data) || !data.length) {
-        return [];
+        return await fetchPlayerProfilesFallback(client);
       }
 
       const publicRows = data.filter(function (entry) {
@@ -141,7 +237,14 @@
       });
 
       if (!publicRows.length) {
-        return [];
+        return data
+          .map(function (entry) {
+            return mapRegistryEntry({
+              ...entry,
+              votes_count: 0
+            });
+          })
+          .filter(Boolean);
       }
 
       const ids = publicRows.map(function (entry) {
@@ -171,7 +274,7 @@
         })
         .filter(Boolean);
     } catch (error) {
-      return [];
+      return await fetchPlayerProfilesFallback(client);
     }
   }
 
@@ -189,7 +292,10 @@
         .limit(5);
 
       if (error || !Array.isArray(data) || !data.length) {
-        return null;
+        const fallbacks = await fetchPlayerProfilesFallback(client);
+        return fallbacks.find(function (entry) {
+          return String(entry.authUserId || '') === String(userId);
+        }) || null;
       }
 
       const preferred = data.find(function (entry) {
@@ -198,7 +304,10 @@
 
       return mapRegistryEntry(preferred);
     } catch (error) {
-      return null;
+      const fallbacks = await fetchPlayerProfilesFallback(client);
+      return fallbacks.find(function (entry) {
+        return String(entry.authUserId || '') === String(userId);
+      }) || null;
     }
   }
 
@@ -259,8 +368,10 @@
     fetchManagedEntry: fetchManagedEntry,
     fetchPublicDirectoryEntries: fetchPublicDirectoryEntries,
     mapRegistryEntry: mapRegistryEntry,
+    mapProfileFallbackEntry: mapProfileFallbackEntry,
     normalizeText: normalizeText,
     resolveTeamRoute: resolveTeamRoute,
+    slugify: slugify,
     syncMyAccountDomain: syncMyAccountDomain,
     voteForPlayer: voteForPlayer
   };
