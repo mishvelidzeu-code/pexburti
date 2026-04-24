@@ -560,7 +560,7 @@
     if (!average) {
       return 0;
     }
-    return Math.max(0, Math.min(99, Math.round(average * 10)));
+    return Math.max(0, Math.min(109, Math.round((average / 10) * 109)));
   }
 
   function resolveComputedMetricNumber(key, store, context = {}) {
@@ -588,7 +588,7 @@
 
   function formatOverallPoints(store, context = {}) {
     const points = computeOverallPoints(context.role, context.profile, store, context.config);
-    return `${points} / 99`;
+    return `${points} / 109`;
   }
 
   function formatDiscipline(store) {
@@ -2425,7 +2425,7 @@
     const discipline = formatDiscipline(store);
     const metricContext = { role, profile, config };
     const coreCards = [
-      { label: 'საერთო ქულა', value: formatOverallPoints(store, metricContext), copy: 'არსებული ქულა / მაქსიმუმი • 99' },
+            { label: 'საერთო ქულა', value: formatOverallPoints(store, metricContext), copy: 'არსებული ქულა / მაქსიმუმი • 109' },
       { label: 'თამაშები', value: formatMetricValue('matchesPlayed', store, metricContext), copy: 'ოფიციალურად დაფიქსირებული მატჩები' },
       { label: 'წუთები / 90', value: formatMetricValue('matches90', store, metricContext), copy: 'რეალური 90-წუთიანები' },
       { label: 'დისციპლინა', value: discipline.value, copy: `ბარათები • ${discipline.copy}` },
