@@ -1796,9 +1796,9 @@
       return true;
     }
 
-    function redirectToTarget(user, fallbackHash = '') {
+    async function redirectToTarget(user, fallbackHash = '') {
       const target = window.siteAuth?.resolvePostAuthTarget
-        ? window.siteAuth.resolvePostAuthTarget(user, sanitizeRedirect())
+        ? await window.siteAuth.resolvePostAuthTarget(user, sanitizeRedirect())
         : (
           sanitizeRedirect() || (
             window.siteAuth?.getProfileRouteForUser

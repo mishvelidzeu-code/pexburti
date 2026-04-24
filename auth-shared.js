@@ -162,8 +162,12 @@
     return base + separator + 'from=' + encodeURIComponent(safeFromPath) + hash;
   }
 
-  function resolvePostAuthTarget(user, preferredRedirect) {
+  async function resolvePostAuthTarget(user, preferredRedirect) {
     const explicitTarget = stripAuthHash(preferredRedirect || getRedirectParam());
+    const client = getClient();
+    if (user && !user.__resolvedRole) {
+      user.__resolvedRole = await resolveProfileRole(client, user);
+    }
     const profileTarget = getProfileRouteForUser(user);
 
     if (!explicitTarget) {
@@ -590,6 +594,8 @@
       ].join('');
       return;
     }
+
+    user.__resolvedRole = await resolveProfileRole(client, user);
 
     const profileHref = buildProfileHref(
       getProfileRouteForUser(user),
