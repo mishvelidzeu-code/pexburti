@@ -69,6 +69,22 @@ as $$
     end;
 $$;
 
+-- Safe text-to-preferred_foot cast: returns NULL instead of raising on unknown values
+create or replace function public.safe_cast_preferred_foot(raw_value text)
+returns public.preferred_foot
+language plpgsql
+immutable
+as $$
+begin
+  if raw_value is null or btrim(raw_value) = '' then
+    return null;
+  end if;
+  return btrim(lower(raw_value))::public.preferred_foot;
+exception when invalid_text_representation then
+  return null;
+end;
+$$;
+
 update public.player_registry
 set
   age_group = public.normalize_public_age_group(age_group),
@@ -161,7 +177,7 @@ begin
         end,
         primary_position = public.normalize_public_position(coalesce(profile ->> 'playerPosition', 'midfielder')),
         position_label = coalesce(nullif(profile ->> 'playerPosition', ''), 'midfielder'),
-        preferred_foot = coalesce(nullif(btrim(profile ->> 'playerFoot'), ''), preferred_foot),
+        preferred_foot = coalesce(public.safe_cast_preferred_foot(profile ->> 'playerFoot'), preferred_foot),
         club_name = player_team,
         club_slug = nullif(player_team_slug, ''),
         club_route = case
@@ -224,7 +240,7 @@ begin
         end,
         public.normalize_public_position(coalesce(profile ->> 'playerPosition', 'midfielder')),
         coalesce(nullif(profile ->> 'playerPosition', ''), 'midfielder'),
-        nullif(btrim(profile ->> 'playerFoot'), ''),
+        public.safe_cast_preferred_foot(profile ->> 'playerFoot'),
         player_team,
         nullif(player_team_slug, ''),
         case
@@ -277,7 +293,7 @@ begin
           end,
           primary_position = public.normalize_public_position(coalesce(profile ->> 'childPosition', 'midfielder')),
           position_label = coalesce(nullif(profile ->> 'childPosition', ''), 'midfielder'),
-          preferred_foot = coalesce(nullif(btrim(profile ->> 'childFoot'), ''), preferred_foot),
+          preferred_foot = coalesce(public.safe_cast_preferred_foot(profile ->> 'childFoot'), preferred_foot),
           club_name = child_team,
           club_slug = nullif(child_team_slug, ''),
           club_route = case
@@ -340,7 +356,7 @@ begin
           end,
           public.normalize_public_position(coalesce(profile ->> 'childPosition', 'midfielder')),
           coalesce(nullif(profile ->> 'childPosition', ''), 'midfielder'),
-          nullif(btrim(profile ->> 'childFoot'), ''),
+          public.safe_cast_preferred_foot(profile ->> 'childFoot'),
           child_team,
           nullif(child_team_slug, ''),
           case
