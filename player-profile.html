@@ -299,9 +299,13 @@
       font-size:.84rem;
       font-weight:900;
       white-space:nowrap;
+      flex-wrap:nowrap;
     }
     .score-current{font-weight:900}
-    .score-max{color:#475467}
+    .score-max{
+      color:#475467;
+      white-space:nowrap;
+    }
     .stat-meter{
       position:relative;
       height:9px;
@@ -358,13 +362,22 @@
       font-weight:800;
       border:1px solid rgba(15,23,42,.06);
     }
-    .radar-caption strong{color:var(--text)}
+    .radar-caption strong{
+      color:var(--text);
+      display:inline-flex;
+      align-items:center;
+      gap:2px;
+      white-space:nowrap;
+      flex-wrap:nowrap;
+    }
     .radar-caption .score-current{font-weight:900}
     .rating-inline{
       display:inline-flex;
       align-items:center;
       gap:2px;
       font-weight:900;
+      white-space:nowrap;
+      flex-wrap:nowrap;
     }
     .fallback{
       max-width:720px;
@@ -506,7 +519,7 @@
       const secondaryLink = document.querySelector('.action-row a.btn.btn-red');
 
       function clampMetric(value) {
-        return Math.max(0, Math.min(99, Math.round(Number(value) || 0)));
+        return Math.max(0, Math.min(109, Math.round(Number(value) || 0)));
       }
 
       function formatMetric(value) {
@@ -625,6 +638,10 @@
       }
 
       function buildRadarSvg(metrics) {
+        const averageScore = metrics.length
+          ? metrics.reduce(function (sum, item) { return sum + clampMetric(item.value); }, 0) / metrics.length
+          : 0;
+        const radarPalette = scorePalette(averageScore);
         const size = 270;
         const center = 135;
         const radius = 86;
@@ -664,10 +681,10 @@
           <svg viewBox="0 0 ${size} ${size}" width="${size}" height="${size}" role="img" aria-label="პოზიციური რადარი">
             ${rings}
             ${axes}
-            <polygon points="${area}" fill="rgba(201,31,31,.18)" stroke="#c91f1f" stroke-width="3"></polygon>
+            <polygon points="${area}" fill="${radarPalette.accent}22" stroke="${radarPalette.accent}" stroke-width="3"></polygon>
             ${metrics.map(function (item, index) {
               const current = point((item.value || 0) / 109, index);
-              return `<circle cx="${current.x.toFixed(1)}" cy="${current.y.toFixed(1)}" r="4.5" fill="#c91f1f"></circle>`;
+              return `<circle cx="${current.x.toFixed(1)}" cy="${current.y.toFixed(1)}" r="4.5" fill="${scorePalette(item.value).accent}"></circle>`;
             }).join('')}
             ${labels}
           </svg>
