@@ -733,6 +733,66 @@
         }
       }
 
+      function slugify(value) {
+        return String(value || '')
+          .trim()
+          .toLowerCase()
+          .replace(/[^a-z0-9\u10d0-\u10ff\s-]/g, '')
+          .replace(/\s+/g, '-')
+          .replace(/-+/g, '-')
+          .replace(/^-|-$/g, '');
+      }
+
+      function buildShortCode(name, requestId) {
+        const parts = String(name || '').trim().split(/\s+/).filter(Boolean);
+        const letters = (parts.map(function (part) { return part.charAt(0); }).join('') || String(name || '').replace(/\s+/g, '').slice(0, 3) || 'FG')
+          .toUpperCase()
+          .replace(/[^A-Z0-9]/g, '')
+          .slice(0, 3);
+        const suffix = String(requestId || '').replace(/[^A-Za-z0-9]/g, '').slice(-2).toUpperCase();
+        return (letters + suffix).slice(0, 5) || 'FG01';
+      }
+
+      async function approveClubRequest(row) {
+        const slugBase = row.public_club_slug || slugify((row.club_name || '') + ' ' + (row.city || ''));
+        const slug = slugBase || slugify(row.club_name || 'club');
+        const shortCode = buildShortCode(row.club_name, row.id);
+
+        const { error: clubError } = await client
+          .from('clubs')
+          .upsert({
+            slug: slug,
+            short_code: shortCode,
+            name: row.club_name,
+            city: row.city,
+            country: 'Georgia',
+            age_band: 'U8-PRO',
+            coach_name: 'ადმინის მიერ დადასტურებული გუნდი',
+            players_count: 0,
+            summary: 'ადმინის მიერ დადასტურებული საჯარო გუნდი.',
+            is_public: true,
+            is_active: true
+          }, { onConflict: 'slug' });
+
+        if (clubError) {
+          throw clubError;
+        }
+
+        const { error: requestError } = await client
+          .from('club_submission_requests')
+          .update({
+            status: 'approved',
+            public_club_slug: slug,
+            approved_at: new Date().toISOString(),
+            approved_by: user.id
+          })
+          .eq('id', row.id);
+
+        if (requestError) {
+          throw requestError;
+        }
+      }
+
       if (!window.siteAuth?.requireAuth) {
         setState('ავტორიზაციის მოდული ვერ ჩაიტვირთა.');
         return;
@@ -752,7 +812,7 @@
         return;
       }
 
-      async function updateRequestStatus(requestId, status, button) {
+      async function updateRequestStatus(row, status, button) {
         if (!client?.from) {
           return;
         }
@@ -761,10 +821,20 @@
         button.disabled = true;
         button.textContent = 'იგზავნება...';
 
-        const { error } = await client
-          .from('club_submission_requests')
-          .update({ status: status })
-          .eq('id', requestId);
+        let error = null;
+        try {
+          if (status === 'approved') {
+            await approveClubRequest(row);
+          } else {
+            const result = await client
+              .from('club_submission_requests')
+              .update({ status: status })
+              .eq('id', row.id);
+            error = result.error || null;
+          }
+        } catch (approveError) {
+          error = approveError;
+        }
 
         button.disabled = false;
         button.textContent = originalText;
@@ -784,7 +854,7 @@
 
         const { data, error } = await client
           .from('club_submission_requests')
-          .select('id, club_name, city, phone, status, requester_email, created_at, admin_note')
+          .select('id, club_name, city, phone, status, requester_email, created_at, admin_note, public_club_slug')
           .order('created_at', { ascending: false })
           .limit(20);
 
@@ -826,7 +896,7 @@
           ];
 
           return `
-            <article class="request-item" data-request-id="${escapeHtml(row.id)}">
+            <article class="request-item" data-request-id="${escapeHtml(row.id)}" data-request-payload="${escapeHtml(encodeURIComponent(JSON.stringify(row)))}">
               <div class="request-main">
                 <div>
                   <h4>${escapeHtml(row.club_name)}</h4>
@@ -854,10 +924,11 @@
             const card = button.closest('[data-request-id]');
             const requestId = card?.dataset?.requestId;
             const nextStatus = button.dataset.requestAction;
-            if (!requestId || !nextStatus) {
+            const payload = card?.dataset?.requestPayload ? JSON.parse(decodeURIComponent(card.dataset.requestPayload)) : null;
+            if (!requestId || !nextStatus || !payload) {
               return;
             }
-            updateRequestStatus(requestId, nextStatus, button);
+            updateRequestStatus(payload, nextStatus, button);
           });
         });
       }

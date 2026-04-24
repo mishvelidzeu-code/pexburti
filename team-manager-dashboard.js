@@ -13,6 +13,7 @@
   const uniq = (v) => Array.from(new Set((Array.isArray(v) ? v : []).filter(Boolean).map(String)));
   const fmt = (v) => { const d = new Date(v); return Number.isNaN(d.getTime()) ? 'არ არის მითითებული' : d.toLocaleDateString('ka-GE', { year: 'numeric', month: '2-digit', day: '2-digit' }); };
   const initials = (n) => { const p = String(n || '').trim().split(/\s+/).filter(Boolean); return p.length ? p.slice(0, 2).map((x) => x[0].toUpperCase()).join('') : 'DM'; };
+  const slugify = (v) => String(v || '').trim().toLowerCase().replace(/[^a-z0-9\u10d0-\u10ff\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
 
   function setStatus(id, msg, type = 'info') {
     const n = $(id);
@@ -56,6 +57,19 @@
       || null;
   }
 
+  function getLatestRequest() {
+    return Array.isArray(state.requests) && state.requests.length
+      ? state.requests.slice().sort((a, b) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime())[0]
+      : null;
+  }
+
+  function getApprovedRequestClub() {
+    const approved = (state.requests || []).find((item) => item.status === 'approved' && String(item.public_club_slug || '').trim());
+    return approved
+      ? state.clubs.find((club) => norm(club.slug) === norm(approved.public_club_slug)) || null
+      : null;
+  }
+
   function managedPlayers() {
     const roster = new Set(state.profile.roster);
     const slug = norm(state.selectedClub?.slug);
@@ -94,7 +108,7 @@
 
   async function loadRequests() {
     try {
-      const r = await state.client.from('club_submission_requests').select('id,club_name,city,phone,status,admin_note,created_at').eq('requested_by', state.user.id).order('created_at', { ascending: false });
+      const r = await state.client.from('club_submission_requests').select('id,club_name,city,phone,status,admin_note,public_club_slug,created_at').eq('requested_by', state.user.id).order('created_at', { ascending: false });
       return !r.error && Array.isArray(r.data) ? r.data : [];
     } catch {
       return [];
@@ -111,7 +125,7 @@
     state.clubs = Array.isArray(clubs) ? clubs : [];
     state.players = Array.isArray(players) ? players : [];
     state.requests = requests;
-    state.selectedClub = getSelectedClub();
+    state.selectedClub = getSelectedClub() || getApprovedRequestClub();
   }
 
   function paintLogo(src, name) {
@@ -140,22 +154,31 @@
 
   function render() {
     const manager = state.profile.full || state.user?.email || 'გუნდის მენეჯერი';
-    const club = safe(state.profile.clubName, 'გუნდი ჯერ არ არის არჩეული');
-    const city = safe(state.profile.clubCity, 'მდებარეობა ჯერ არ არის მითითებული');
+    const latestRequest = getLatestRequest();
+    const activeClub = state.selectedClub || getApprovedRequestClub();
+    const club = safe(activeClub?.name || state.profile.clubName || latestRequest?.club_name, 'გუნდი ჯერ არ არის არჩეული');
+    const city = safe(activeClub?.city || state.profile.clubCity || latestRequest?.city, 'მდებარეობა ჯერ არ არის მითითებული');
     const squad = managedPlayers();
-    const publicCount = state.selectedClub ? state.players.filter((p) => norm(p.teamSlug) === norm(state.selectedClub.slug)).length : 0;
+    const publicCount = activeClub ? state.players.filter((p) => norm(p.teamSlug) === norm(activeClub.slug)).length : 0;
     const pending = state.requests.filter((x) => x.status === 'pending').length;
+    const requestStateLabel = latestRequest
+      ? (latestRequest.status === 'approved' ? 'დადასტურებული' : latestRequest.status === 'rejected' ? 'უარყოფილი' : 'მოლოდინში')
+      : 'მოთხოვნა არ არის';
 
     $('heroTitle').textContent = manager + ' · გუნდის მენეჯერი';
-    $('heroCopy').textContent = 'აქედან მართავ "' + club + '"-ს, უცვლი ლოგოს, აწყობ roster-ს და მუშაობ ფეხბურთელების ბაზასთან.';
+    $('heroCopy').textContent = activeClub
+      ? 'აქედან მართავ "' + club + '"-ს, უცვლი ლოგოს, აწყობ roster-ს და მუშაობ ფეხბურთელების ბაზასთან.'
+      : latestRequest
+        ? '"' + club + '" ჯერ ' + requestStateLabel.toLowerCase() + ' სტატუსშია. დამტკიცების შემდეგ ის საჯაროდ გამოჩნდება გუნდების გვერდზე და club profile-ზე.'
+        : 'აქედან აირჩევ არსებულ გუნდს ან გაგზავნი ახალ მოთხოვნას, რომ დამტკიცების შემდეგ გუნდი საჯაროდ გამოჩნდეს გუნდების გვერდზე.';
     $('heroChips').innerHTML = '<span class="chip red">გუნდის მენეჯერი</span> <span class="chip">' + esc(state.profile.roleTitle) + '</span> <span class="chip green">' + esc(state.profile.focus) + '</span>';
     $('heroStats').innerHTML = [['აქტიური გუნდი', club], ['ჩემი ფეხბურთელები', String(squad.length)], ['საჯარო მოთამაშეები', String(publicCount)], ['მოლოდინში მოთხოვნა', String(pending)]].map((x) => '<div class="stat"><strong>' + esc(x[1]) + '</strong><span>' + esc(x[0]) + '</span></div>').join('');
 
     $('clubSummary').innerHTML = [
       ['გუნდის სახელი', club],
       ['მდებარეობა', city],
-      ['საჯარო სტატუსი', state.selectedClub ? 'საჯარო ბაზაში ჩანს' : 'ჯერ საჯარო სიაში არ არის'],
-      ['გუნდის გვერდი', state.selectedClub?.route ? '<a style="color:#b91c1c" href="' + esc(state.selectedClub.route) + '">გახსენი გუნდის გვერდი</a>' : 'ჯერ არ არის ხელმისაწვდომი', true]
+        ['საჯარო სტატუსი', activeClub ? 'საჯარო ბაზაში ჩანს' : requestStateLabel],
+        ['გუნდის გვერდი', activeClub?.route ? '<a style="color:#b91c1c" href="' + esc(activeClub.route) + '">გახსენი გუნდის გვერდი</a>' : 'ჯერ არ არის ხელმისაწვდომი', true]
     ].map((x) => '<div class="tile"><span class="k">' + esc(x[0]) + '</span><div class="v">' + (x[2] ? x[1] : esc(x[1])) + '</div></div>').join('');
 
     $('tabs').innerHTML = SECTIONS.map((x) => '<button class="tab ' + (state.section === x[0] ? 'active' : '') + '" data-sec="' + x[0] + '">' + x[1] + '</button>').join('');
@@ -171,7 +194,7 @@
     ].map((x) => '<div class="tile"><span class="k">' + esc(x[0]) + '</span><div class="v">' + esc(x[1]) + '</div><div class="copy" style="margin-top:8px">' + esc(x[2]) + '</div></div>').join('');
 
     $('clubOptions').innerHTML = state.clubs.map((c) => '<option value="' + esc(c.name + (c.city ? ' · ' + c.city : '')) + '"></option>').join('');
-    $('clubSelect').value = state.selectedClub ? (state.selectedClub.name + (state.selectedClub.city ? ' · ' + state.selectedClub.city : '')) : '';
+    $('clubSelect').value = activeClub ? (activeClub.name + (activeClub.city ? ' · ' + activeClub.city : '')) : '';
     $('managerFirst').value = state.profile.first;
     $('managerLast').value = state.profile.last;
     $('managerPhone').value = state.profile.phone;
@@ -203,7 +226,10 @@
     $('favoritesList').innerHTML = collect('favorites');
     $('watchList').innerHTML = collect('watchlist');
     $('noteList').innerHTML = state.profile.notes.length ? state.profile.notes.map((n) => '<article class="note"><strong>' + esc(n.text || '') + '</strong><span>' + esc(fmt(n.createdAt)) + '</span></article>').join('') : '<div class="empty">ჩანაწერები ჯერ არ გაქვს დამატებული.</div>';
-    $('requestList').innerHTML = state.requests.length ? state.requests.map((r) => '<article class="request"><div class="panel-top" style="margin-bottom:10px"><div><strong>' + esc(r.club_name) + '</strong><div class="muted" style="font-size:.84rem;line-height:1.6">' + esc(r.city || 'ქალაქი უცნობია') + '<br>ტელეფონი: ' + esc(r.phone || 'არ არის მითითებული') + '<br>გაგზავნილია: ' + esc(fmt(r.created_at)) + '</div></div><span class="chip ' + (r.status === 'approved' ? 'green' : r.status === 'rejected' ? 'red' : '') + '">' + esc(r.status === 'approved' ? 'დადასტურებული' : r.status === 'rejected' ? 'უარყოფილი' : 'მოლოდინში') + '</span></div>' + (r.admin_note ? '<div class="copy">ადმინის შენიშვნა: ' + esc(r.admin_note) + '</div>' : '') + '</article>').join('') : '<div class="empty">შენგან გაგზავნილი გუნდის მოთხოვნები ჯერ არ არის.</div>';
+    $('requestList').innerHTML = state.requests.length ? state.requests.map((r) => {
+      const route = r.public_club_slug ? (window.siteData?.buildTeamHref ? window.siteData.buildTeamHref(r.public_club_slug) : 'team-dinamo-tbilisi.html?club=' + encodeURIComponent(r.public_club_slug)) : '';
+      return '<article class="request"><div class="panel-top" style="margin-bottom:10px"><div><strong>' + esc(r.club_name) + '</strong><div class="muted" style="font-size:.84rem;line-height:1.6">' + esc(r.city || 'ქალაქი უცნობია') + '<br>ტელეფონი: ' + esc(r.phone || 'არ არის მითითებული') + '<br>გაგზავნილია: ' + esc(fmt(r.created_at)) + '</div></div><span class="chip ' + (r.status === 'approved' ? 'green' : r.status === 'rejected' ? 'red' : '') + '">' + esc(r.status === 'approved' ? 'დადასტურებული' : r.status === 'rejected' ? 'უარყოფილი' : 'მოლოდინში') + '</span></div>' + (r.admin_note ? '<div class="copy">ადმინის შენიშვნა: ' + esc(r.admin_note) + '</div>' : '') + (route ? '<div class="copy" style="margin-top:8px"><a style="color:#b91c1c;font-weight:800" href="' + esc(route) + '">გუნდი public-ად გახსნილია</a></div>' : '') + '</article>';
+    }).join('') : '<div class="empty">შენგან გაგზავნილი გუნდის მოთხოვნები ჯერ არ არის.</div>';
   }
 
   function readFile(file) {
@@ -285,8 +311,13 @@
     const club_name = $('requestClubName').value.trim();
     const city = $('requestCity').value.trim();
     const phone = $('requestPhone').value.trim();
+    const duplicatePending = (state.requests || []).some((item) => item.status === 'pending' && norm(item.club_name) === norm(club_name) && norm(item.city) === norm(city));
     if (!club_name || !city || !phone) {
       setStatus('requestStatus', 'გუნდის სახელი, მდებარეობა და ტელეფონი სავალდებულოა.', 'error');
+      return;
+    }
+    if (duplicatePending) {
+      setStatus('requestStatus', 'ამ გუნდის დამატების მოთხოვნა უკვე გაგზავნილია და მოლოდინშია.', 'info');
       return;
     }
     try {
@@ -295,7 +326,8 @@
         requester_email: state.user.email || null,
         club_name,
         city,
-        phone
+        phone,
+        public_club_slug: slugify(club_name + ' ' + city)
       });
       if (r.error) throw r.error;
       state.requests = await loadRequests();
