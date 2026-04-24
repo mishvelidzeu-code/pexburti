@@ -305,9 +305,17 @@
       display:inline-flex;
       line-height:1;
     }
-    .score-current{font-weight:900}
+    .score-current{
+      display:inline-block;
+      font-weight:900;
+      line-height:1;
+      white-space:nowrap;
+    }
     .score-max{
+      display:inline-block;
       color:#475467;
+      margin-left:2px;
+      line-height:1;
       white-space:nowrap;
     }
     .stat-meter{
@@ -380,13 +388,17 @@
       align-items:center;
       gap:2px;
       font-weight:900;
+      line-height:1;
       white-space:nowrap;
       flex-wrap:nowrap;
     }
     .info-card strong.rating-inline{
       display:inline-flex;
       align-items:center;
+      gap:2px;
       line-height:1;
+      white-space:nowrap;
+      flex-wrap:nowrap;
     }
     .fallback{
       max-width:720px;
@@ -561,8 +573,8 @@
         }
         if (safeValue < 80) {
           return {
-            accent: '#65a30d',
-            fill: 'linear-gradient(90deg,#d9f99d 0%,#a3e635 55%,#65a30d 100%)'
+            accent: '#84cc16',
+            fill: 'linear-gradient(90deg,#d9f99d 0%,#bef264 55%,#84cc16 100%)'
           };
         }
         if (safeValue < 95) {
