@@ -2,7 +2,7 @@
   const SUPABASE_URL = 'https://exbakxkfbglnsdescimj.supabase.co';
   const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_EGyaVD9bOtD5PHJbT5qPpw_9P4MHhwE';
   const DEFAULT_PROFILE_ROUTE = 'user-profile.html';
-  const DEFAULT_ADMIN_ROUTE = 'admin-deshboard.html';
+  const DEFAULT_ADMIN_ROUTE = 'admin/';
   const DEFAULT_MANAGER_ROUTE = 'team-manager-dashboard.html';
 
   function getClient() {
@@ -103,7 +103,7 @@
       return fallback;
     }
 
-    if (!value.includes('.html') && !value.startsWith('#')) {
+    if (!value.includes('.html') && !value.startsWith('#') && !value.endsWith('/')) {
       return fallback;
     }
 

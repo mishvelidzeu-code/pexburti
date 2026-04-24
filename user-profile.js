@@ -92,7 +92,7 @@
     if (base === 'gundebi.html') return 'გუნდების გვერდზე დაბრუნება';
     if (base === 'pexburtelebi.html') return 'ფეხბურთელების გვერდზე დაბრუნება';
     if (base === 'team-dinamo-tbilisi.html') return 'გუნდის გვერდზე დაბრუნება';
-    if (base === 'admin-deshboard.html') return 'ადმინ პანელზე დაბრუნება';
+    if (base === 'admin-deshboard.html' || base === 'admin/' || base === 'admin') return 'ადმინ პანელზე დაბრუნება';
     return 'მთავარ გვერდზე დაბრუნება';
   };
 
@@ -2842,7 +2842,7 @@
 
     const role = auth.getUserRole ? auth.getUserRole(user) : 'player';
     if (role === 'admin') {
-      location.href = 'admin-deshboard.html';
+      location.href = 'admin/';
       return;
     }
     if (role === 'academy') {
