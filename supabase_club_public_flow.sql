@@ -1,5 +1,7 @@
 alter table if exists public.club_submission_requests
   add column if not exists public_club_slug text,
+  add column if not exists requester_name text,
+  add column if not exists requester_role text,
   add column if not exists approved_at timestamptz,
   add column if not exists approved_by uuid references auth.users(id) on delete set null;
 

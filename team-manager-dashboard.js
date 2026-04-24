@@ -108,7 +108,7 @@
 
   async function loadRequests() {
     try {
-      const r = await state.client.from('club_submission_requests').select('id,club_name,city,phone,status,admin_note,public_club_slug,created_at').eq('requested_by', state.user.id).order('created_at', { ascending: false });
+      const r = await state.client.from('club_submission_requests').select('id,club_name,city,phone,status,admin_note,public_club_slug,requester_name,requester_role,created_at').eq('requested_by', state.user.id).order('created_at', { ascending: false });
       return !r.error && Array.isArray(r.data) ? r.data : [];
     } catch {
       return [];
@@ -228,7 +228,7 @@
     $('noteList').innerHTML = state.profile.notes.length ? state.profile.notes.map((n) => '<article class="note"><strong>' + esc(n.text || '') + '</strong><span>' + esc(fmt(n.createdAt)) + '</span></article>').join('') : '<div class="empty">ჩანაწერები ჯერ არ გაქვს დამატებული.</div>';
     $('requestList').innerHTML = state.requests.length ? state.requests.map((r) => {
       const route = r.public_club_slug ? (window.siteData?.buildTeamHref ? window.siteData.buildTeamHref(r.public_club_slug) : 'team-dinamo-tbilisi.html?club=' + encodeURIComponent(r.public_club_slug)) : '';
-      return '<article class="request"><div class="panel-top" style="margin-bottom:10px"><div><strong>' + esc(r.club_name) + '</strong><div class="muted" style="font-size:.84rem;line-height:1.6">' + esc(r.city || 'ქალაქი უცნობია') + '<br>ტელეფონი: ' + esc(r.phone || 'არ არის მითითებული') + '<br>გაგზავნილია: ' + esc(fmt(r.created_at)) + '</div></div><span class="chip ' + (r.status === 'approved' ? 'green' : r.status === 'rejected' ? 'red' : '') + '">' + esc(r.status === 'approved' ? 'დადასტურებული' : r.status === 'rejected' ? 'უარყოფილი' : 'მოლოდინში') + '</span></div>' + (r.admin_note ? '<div class="copy">ადმინის შენიშვნა: ' + esc(r.admin_note) + '</div>' : '') + (route ? '<div class="copy" style="margin-top:8px"><a style="color:#b91c1c;font-weight:800" href="' + esc(route) + '">გუნდი public-ად გახსნილია</a></div>' : '') + '</article>';
+      return '<article class="request"><div class="panel-top" style="margin-bottom:10px"><div><strong>' + esc(r.club_name) + '</strong><div class="muted" style="font-size:.84rem;line-height:1.6">გამომგზავნი: ' + esc(r.requester_name || 'უცნობი') + ' · ' + esc(r.requester_role || 'მომხმარებელი') + '<br>' + esc(r.city || 'ქალაქი უცნობია') + '<br>ტელეფონი: ' + esc(r.phone || 'არ არის მითითებული') + '<br>გაგზავნილია: ' + esc(fmt(r.created_at)) + '</div></div><span class="chip ' + (r.status === 'approved' ? 'green' : r.status === 'rejected' ? 'red' : '') + '">' + esc(r.status === 'approved' ? 'დადასტურებული' : r.status === 'rejected' ? 'უარყოფილი' : 'მოლოდინში') + '</span></div>' + (r.admin_note ? '<div class="copy">ადმინის შენიშვნა: ' + esc(r.admin_note) + '</div>' : '') + (route ? '<div class="copy" style="margin-top:8px"><a style="color:#b91c1c;font-weight:800" href="' + esc(route) + '">გუნდი public-ად გახსნილია</a></div>' : '') + '</article>';
     }).join('') : '<div class="empty">შენგან გაგზავნილი გუნდის მოთხოვნები ჯერ არ არის.</div>';
   }
 
@@ -324,6 +324,8 @@
       const r = await state.client.from('club_submission_requests').insert({
         requested_by: state.user.id,
         requester_email: state.user.email || null,
+        requester_name: [state.profile.first, state.profile.last].filter(Boolean).join(' ').trim() || state.profile.full || null,
+        requester_role: state.profile.roleTitle || 'გუნდის მენეჯერი',
         club_name,
         city,
         phone,

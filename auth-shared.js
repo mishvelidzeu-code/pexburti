@@ -36,10 +36,33 @@
     }
 
     return normalizeRole(
+      user.__resolvedRole ||
       user.user_metadata?.role ||
       user.app_metadata?.role ||
       user.role
     );
+  }
+
+  async function resolveProfileRole(client, user) {
+    if (!client || !user?.id) {
+      return getUserRole(user);
+    }
+
+    try {
+      const { data, error } = await client
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .maybeSingle();
+
+      if (error) {
+        return getUserRole(user);
+      }
+
+      return normalizeRole(data?.role || getUserRole(user));
+    } catch (error) {
+      return getUserRole(user);
+    }
   }
 
   function getProfileRouteForRole(role) {
@@ -639,7 +662,9 @@
   }
 
   async function requireAuth(options) {
-    const settings = options || {};
+    const settings = typeof options === 'string'
+      ? { redirect: options }
+      : (options || {});
     const redirectPath = settings.redirect || DEFAULT_PROFILE_ROUTE;
     const client = getClient();
 
@@ -656,6 +681,8 @@
       return { client: client, user: null };
     }
 
+    user.__resolvedRole = await resolveProfileRole(client, user);
+
     return { client: client, user: user };
   }
 
@@ -670,6 +697,7 @@
     getRedirectParam: getRedirectParam,
     getUserDisplayName: getUserDisplayName,
     getUserRole: getUserRole,
+    resolveProfileRole: resolveProfileRole,
     renderAuthNav: renderAuthNav,
     initMobileMenu: initMobileMenu,
     requireAuth: requireAuth,

@@ -545,7 +545,7 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
           </div>
           <div>
-            <div class="stat-value">124</div>
+            <div class="stat-value" id="adminPlayersCount">0</div>
             <div class="stat-label">აქტიური მოთამაშე</div>
           </div>
         </div>
@@ -555,8 +555,8 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
           </div>
           <div>
-            <div class="stat-value">86%</div>
-            <div class="stat-label">ვარჯიშებზე დასწრება</div>
+            <div class="stat-value" id="adminUsersCount">0</div>
+            <div class="stat-label">რეგისტრირებული მომხმარებელი</div>
           </div>
         </div>
 
@@ -565,8 +565,18 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
           </div>
           <div>
-            <div class="stat-value">4.8</div>
-            <div class="stat-label">გუნდის საშუალო შეფასება</div>
+            <div class="stat-value" id="adminClubsCount">0</div>
+            <div class="stat-label">საჯარო გუნდი</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon" style="color: #2563eb; background: rgba(37,99,235,.1);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24"><path d="M12 20h9"/><path d="M12 4h9"/><path d="M4 9h16"/><path d="M4 15h16"/><path d="M8 4v16"/></svg>
+          </div>
+          <div>
+            <div class="stat-value" id="adminPendingRequests">0</div>
+            <div class="stat-label">მოლოდინში მოთხოვნა</div>
           </div>
         </div>
       </div>
@@ -812,6 +822,32 @@
         return;
       }
 
+      async function loadOverviewStats() {
+        const playersNode = document.getElementById('adminPlayersCount');
+        const usersNode = document.getElementById('adminUsersCount');
+        const clubsNode = document.getElementById('adminClubsCount');
+        const pendingNode = document.getElementById('adminPendingRequests');
+
+        try {
+          const [playersRes, usersRes, clubsRes, pendingRes] = await Promise.all([
+            client.from('player_registry').select('id', { count: 'exact', head: true }).eq('visibility_public', true).eq('is_active', true),
+            client.from('profiles').select('id', { count: 'exact', head: true }),
+            client.from('clubs').select('id', { count: 'exact', head: true }).eq('is_public', true).eq('is_active', true),
+            client.from('club_submission_requests').select('id', { count: 'exact', head: true }).eq('status', 'pending')
+          ]);
+
+          if (playersNode) playersNode.textContent = String(playersRes.count || 0);
+          if (usersNode) usersNode.textContent = String(usersRes.count || 0);
+          if (clubsNode) clubsNode.textContent = String(clubsRes.count || 0);
+          if (pendingNode) pendingNode.textContent = String(pendingRes.count || 0);
+        } catch (error) {
+          if (playersNode) playersNode.textContent = '—';
+          if (usersNode) usersNode.textContent = '—';
+          if (clubsNode) clubsNode.textContent = '—';
+          if (pendingNode) pendingNode.textContent = '—';
+        }
+      }
+
       async function updateRequestStatus(row, status, button) {
         if (!client?.from) {
           return;
@@ -854,7 +890,7 @@
 
         const { data, error } = await client
           .from('club_submission_requests')
-          .select('id, club_name, city, phone, status, requester_email, created_at, admin_note, public_club_slug')
+          .select('id, club_name, city, phone, status, requester_email, requester_name, requester_role, created_at, admin_note, public_club_slug')
           .order('created_at', { ascending: false })
           .limit(20);
 
@@ -890,7 +926,9 @@
         listNode.hidden = false;
         listNode.innerHTML = rows.map(function (row) {
           const infoBits = [
-            row.requester_email ? `მომხმარებელი: ${escapeHtml(row.requester_email)}` : 'მომხმარებელი: უცნობია',
+            row.requester_name ? `გამომგზავნი: ${escapeHtml(row.requester_name)}` : 'გამომგზავნი: უცნობია',
+            row.requester_role ? `როლი: ${escapeHtml(row.requester_role)}` : 'როლი: უცნობია',
+            row.requester_email ? `ელფოსტა: ${escapeHtml(row.requester_email)}` : 'ელფოსტა: უცნობია',
             row.phone ? `ტელეფონი: ${escapeHtml(row.phone)}` : 'ტელეფონი: არ არის მითითებული',
             `გამოგზავნილია: ${escapeHtml(formatDate(row.created_at))}`
           ];
@@ -933,6 +971,7 @@
         });
       }
 
+      await loadOverviewStats();
       await loadRequests();
     })();
   </script>
