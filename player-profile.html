@@ -269,6 +269,60 @@
       font-size:1.08rem;
       line-height:1.1;
     }
+    .stat-top{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom:12px;
+    }
+    .stat-top span{
+      margin-bottom:0;
+      max-width:120px;
+      line-height:1.35;
+    }
+    .stat-score{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-width:78px;
+      min-height:32px;
+      padding:0 10px;
+      border-radius:999px;
+      background:linear-gradient(135deg,#fff 0%,#fff5f5 100%);
+      border:1px solid rgba(185,28,28,.12);
+      color:var(--red-2);
+      font-size:.84rem;
+      font-weight:900;
+      white-space:nowrap;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.8);
+    }
+    .stat-meter{
+      position:relative;
+      height:9px;
+      border-radius:999px;
+      background:linear-gradient(90deg,rgba(226,232,240,.95) 0%,rgba(241,245,249,.95) 100%);
+      overflow:hidden;
+      border:1px solid rgba(15,23,42,.05);
+    }
+    .stat-meter-fill{
+      position:absolute;
+      inset:0 auto 0 0;
+      width:0;
+      border-radius:999px;
+      background:linear-gradient(90deg,#f87171 0%,#c91f1f 55%,#991b1b 100%);
+      box-shadow:0 0 0 1px rgba(255,255,255,.18) inset;
+    }
+    .stat-foot{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:8px;
+      margin-top:9px;
+      font-size:.72rem;
+      font-weight:800;
+      color:var(--muted);
+    }
     .radar-wrap{
       display:grid;
       place-items:center;
@@ -444,7 +498,7 @@
       }
 
       function formatMetric(value) {
-        return `${clampMetric(value)} / 99`;
+        return `${clampMetric(value)} / 109`;
       }
 
       function buildPublicMetricSet(playerData) {
@@ -543,7 +597,7 @@
         }).join('');
 
         const area = metrics.map(function (item, index) {
-          const current = point((item.value || 0) / 99, index);
+          const current = point((item.value || 0) / 109, index);
           return `${current.x.toFixed(1)},${current.y.toFixed(1)}`;
         }).join(' ');
 
@@ -553,7 +607,7 @@
             ${axes}
             <polygon points="${area}" fill="rgba(201,31,31,.18)" stroke="#c91f1f" stroke-width="3"></polygon>
             ${metrics.map(function (item, index) {
-              const current = point((item.value || 0) / 99, index);
+              const current = point((item.value || 0) / 109, index);
               return `<circle cx="${current.x.toFixed(1)}" cy="${current.y.toFixed(1)}" r="4.5" fill="#c91f1f"></circle>`;
             }).join('')}
             ${labels}
@@ -600,8 +654,17 @@
       document.getElementById('playerStats').innerHTML = compactMetrics.map(function (item) {
         return `
           <div class="stat">
-            <span>${item.label}</span>
-            <strong>${formatMetric(item.value)}</strong>
+            <div class="stat-top">
+              <span>${item.label}</span>
+              <strong class="stat-score">${formatMetric(item.value)}</strong>
+            </div>
+            <div class="stat-meter">
+              <div class="stat-meter-fill" style="width:${Math.max(6, Math.min(100, item.value))}%;"></div>
+            </div>
+            <div class="stat-foot">
+              <em style="font-style:normal;">მიმდინარე დონე</em>
+              <em style="font-style:normal;">მაქს. 109</em>
+            </div>
           </div>
         `;
       }).join('');
