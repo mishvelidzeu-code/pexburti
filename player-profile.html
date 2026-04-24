@@ -648,7 +648,7 @@
         { label: 'ასაკი', value: `${player.age ?? '-'} წლის` },
         { label: 'პოზიცია', value: player.positionLabel || 'არ არის მითითებული' },
         { label: 'ფეხი', value: player.foot || 'არ არის მითითებული' },
-        { label: 'ხმები', value: String(player.votesCount || 0) }
+        { label: 'ზოგადი შეფასება', value: formatMetric((Number(player.rating || 0) * 10) || 0) }
       ].map(function (item) {
         return `
           <div class="info-card">
