@@ -358,16 +358,14 @@
         client
           .from('clubs')
           .select('id, slug, short_code, name, city, country, age_band, coach_name, players_count, logo_path, summary, is_public, is_active')
+          .eq('is_public', true)
+          .eq('is_active', true)
           .order('name', { ascending: true }),
         fetchPublicPlayers(client)
       ]);
 
       const clubRows = Array.isArray(clubResponse.data) && !clubResponse.error
-        ? clubResponse.data.filter(function (row) {
-            const isPublic = row.is_public === null || row.is_public === undefined || row.is_public === true;
-            const isActive = row.is_active === null || row.is_active === undefined || row.is_active === true;
-            return isPublic && isActive;
-          })
+        ? clubResponse.data
         : [];
 
       const playerCounts = new Map();

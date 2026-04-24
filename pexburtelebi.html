@@ -22,7 +22,7 @@
       --shadow: 0 12px 32px rgba(15,23,42,.08);
       --shadow-hover: 0 20px 48px rgba(185,28,28,.12);
       --radius: 20px;
-      --container: 1280px; /* ოდნავ გავზარდეთ კონტეინერი 7 ბარათისთვის */
+      --container: 1280px;
     }
 
     * { box-sizing: border-box; }
@@ -30,7 +30,7 @@
     body {
       margin: 0;
       font-family: "Segoe UI", "Sylfaen", "Noto Sans Georgian", "DejaVu Sans", sans-serif;
-      background: var(--panel-2); /* ოდნავ ნაცრისფერი ფონი ბარათების გამოსაყოფად */
+      background: var(--panel-2);
       color: var(--text);
       font-size: 14px;
       line-height: 1.55;
@@ -41,7 +41,6 @@
     [hidden] { display: none !important; }
     .container { width: min(var(--container), calc(100% - 36px)); margin-inline: auto; }
 
-    /* ნავიგაცია */
     .header {
       position: sticky;
       top: 0;
@@ -141,7 +140,6 @@
     .btn-white { background: #fff; color: var(--text); border: 1px solid var(--line); }
     .btn-white:hover { background: #eef2f6; transform: translateY(-2px); }
 
-    /* ჰერო (სათაურის) სექცია */
     .hero {
       background: #fff;
       padding: 26px 0 20px;
@@ -160,16 +158,15 @@
       max-width: 600px;
     }
 
-    /* ფილტრების სექცია */
     .filter-section {
       background: #fff;
       padding: 16px 0;
       border-bottom: 1px solid var(--line);
       position: sticky;
-      top: 74px; /* ჰედერის ქვემოთ დაფიქსირება */
+      top: 74px;
       z-index: 990;
     }
-    
+
     .search-row {
       display: flex;
       align-items: center;
@@ -202,7 +199,6 @@
       font-size: .95rem;
     }
 
-    /* ფილტრების ჯგუფები */
     .filter-group {
       display: flex;
       align-items: center;
@@ -219,7 +215,7 @@
       text-transform: uppercase;
       letter-spacing: .05em;
     }
-    
+
     .chip-btn {
       padding: 6px 14px;
       border-radius: 999px;
@@ -238,16 +234,13 @@
       color: #fff;
     }
 
-    /* მოთამაშეების ბადე (6-7 თითო ხაზში) */
     .players-section { padding: 24px 0 64px; }
     .players-grid {
       display: grid;
-      /* მინიმალური სიგანე 160px უზრუნველყოფს 6-7 ბარათს დიდ ეკრანზე */
       grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
       gap: 14px;
     }
 
-    /* ბარათის დიზაინი (დიდი სურათი, პატარა ტექსტი) */
     .player-card {
       background: #fff;
       border: 1px solid var(--line);
@@ -336,7 +329,6 @@
       font-weight: 800;
     }
 
-    /* პატარა შესვლის ღილაკი */
     .btn-enter {
       width: 100%;
       margin-top: auto;
@@ -398,13 +390,13 @@
 
   <div class="filter-section">
     <div class="container">
-      
+
       <div class="search-row">
         <label class="search-wrap">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
           <input id="searchInput" class="search-input" type="text" placeholder="მოძებნე სახელით...">
         </label>
-        <div class="result-count" id="resultCount">ნაპოვნია: 30</div>
+        <div class="result-count" id="resultCount">ნაპოვნია: 0</div>
       </div>
 
       <div class="filter-group" id="posFilters">
@@ -445,276 +437,27 @@
   <script src="supabase-domain-shared.js"></script>
   <script src="auth-shared.js"></script>
   <script>
-    const players = [];
-    let extraPlayer = null;
-
-    const playersGrid = document.getElementById('playersGrid');
-    const searchInput = document.getElementById('searchInput');
-    const resultCount = document.getElementById('resultCount');
-    
-    // ფილტრების სტატუსი
-    let activePos = 'all';
-    let activeAge = 'all';
-
-    function calculateAgeFromBirthDate(value) {
-      const raw = String(value || '').trim();
-      const match = raw.match(/^(\d{2})\.(\d{2})\.(\d{4})$/);
-      if (!match) {
-        return null;
-      }
-      const birthDate = new Date(Number(match[3]), Number(match[2]) - 1, Number(match[1]));
-      if (Number.isNaN(birthDate.getTime())) {
-        return null;
-      }
-      const today = new Date();
-      let age = today.getFullYear() - birthDate.getFullYear();
-      const monthDiff = today.getMonth() - birthDate.getMonth();
-      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-        age -= 1;
-      }
-      return age;
-    }
-
-    function getPositionCode(position) {
-      const normalized = String(position || '').toLowerCase();
-      if (normalized.includes('მეკარე')) return 'gk';
-      if (normalized.includes('დამცველი')) return 'df';
-      if (normalized.includes('თავდამსხმ')) return 'fw';
-      return 'mf';
-    }
-
-    function getInitials(name) {
-      return String(name || 'MF')
-        .split(/\s+/)
-        .filter(Boolean)
-        .slice(0, 2)
-        .map((part) => part[0]?.toUpperCase() || '')
-        .join('') || 'MF';
-    }
-
-    function createPlayerCard(player) {
-      const fullName = player.name || `${player.first || ''} ${player.last || ''}`.trim();
-      const firstName = player.first || fullName.split(' ')[0] || 'მოთამაშე';
-      const lastName = player.last || fullName.split(' ').slice(1).join(' ');
-      const ageCat = String(player.ageCat || '').toLowerCase();
-      const searchText = [firstName, lastName, fullName].filter(Boolean).join(' ').toLowerCase();
-      const photo = player.img
-        ? `<img src="${player.img}" alt="${firstName}" class="player-photo" loading="lazy">`
-        : `<div class="player-photo player-photo--fallback">${getInitials(fullName)}</div>`;
-      const actionHref = player.actionHref || `player-profile.html?player=${player.id}&from=pexburtelebi.html`;
-
-      return `
-        <article class="player-card" data-pos="${player.pos}" data-age="${ageCat}" data-search="${searchText}">
-          ${photo}
-          <div class="pos-indicator">${player.pos}</div>
-          
-          <div class="player-info">
-            <h3 class="player-name">${fullName}</h3>
-            
-            <div class="meta-grid">
-              <div class="meta-item">
-                <span>კატეგორია</span>
-                <strong>${ageCat.toUpperCase()} (${player.age} წ.)</strong>
-              </div>
-              <div class="meta-item">
-                <span>ფეხი</span>
-                <strong>${player.foot}</strong>
-              </div>
-            </div>
-            
-            <a href="${actionHref}" class="btn-enter">${player.actionLabel || 'პროფილი'}</a>
-          </div>
-        </article>
-      `;
-    }
-
-    function renderPlayers() {
-      const list = extraPlayer ? [extraPlayer, ...players] : players;
-      playersGrid.innerHTML = list.map(createPlayerCard).join('');
-    }
-
-    function applyFilters() {
-      const term = searchInput.value.trim().toLowerCase();
-      const cards = playersGrid.querySelectorAll('.player-card');
-      let visible = 0;
-
-      cards.forEach((card) => {
-        const matchesSearch = card.dataset.search.includes(term);
-        const matchesPos = activePos === 'all' || card.dataset.pos === activePos;
-        const matchesAge = activeAge === 'all' || card.dataset.age === activeAge;
-        
-        const show = matchesSearch && matchesPos && matchesAge;
-        card.style.display = show ? 'flex' : 'none';
-        if (show) visible++;
-      });
-
-      resultCount.textContent = `ნაპოვნია: ${visible}`;
-    }
-
-    // პოზიციის ღილაკებზე ლისენერი
-    document.querySelectorAll('#posFilters .chip-btn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        document.querySelectorAll('#posFilters .chip-btn').forEach(b => b.classList.remove('active'));
-        e.target.classList.add('active');
-        activePos = e.target.dataset.pos;
-        applyFilters();
-      });
-    });
-
-    // ასაკის ღილაკებზე ლისენერი
-    document.querySelectorAll('#ageFilters .chip-btn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        document.querySelectorAll('#ageFilters .chip-btn').forEach(b => b.classList.remove('active'));
-        e.target.classList.add('active');
-        activeAge = e.target.dataset.age;
-        applyFilters();
-      });
-    });
-
-    searchInput.addEventListener('input', applyFilters);
-
-    // გაშვება
-    renderPlayers();
-    applyFilters();
-
-    if (window.siteAuth?.renderAuthNav) {
-      window.siteAuth.renderAuthNav('#playersAuthNav', {
-        currentPath: 'pexburtelebi.html',
-        loginClass: 'btn btn-white',
-        registerClass: 'btn btn-red',
-        profileClass: 'btn btn-red',
-        afterLogout: 'pexburtelebi.html'
-      });
-    }
-
-    async function hydrateOwnPlayerCard() {
-      const client = window.siteAuth?.getClient ? window.siteAuth.getClient() : null;
-      if (!client) {
-        return;
-      }
-
-      const { data } = await client.auth.getSession();
-      const user = data?.session?.user || null;
-      if (!user) {
-        return;
-      }
-
-      const role = window.siteAuth?.getUserRole ? window.siteAuth.getUserRole(user) : 'player';
-      if (role !== 'player' && role !== 'parent') {
-        return;
-      }
-
-      if (window.sitePlayerDomain?.syncMyAccountDomain) {
-        await window.sitePlayerDomain.syncMyAccountDomain(client);
-      }
-
-      const managedEntry = window.sitePlayerDomain?.fetchManagedEntry
-        ? await window.sitePlayerDomain.fetchManagedEntry(client, user.id)
-        : null;
-
-      if (managedEntry) {
-        const parts = managedEntry.fullName.split(/\s+/).filter(Boolean);
-        extraPlayer = {
-          id: managedEntry.id || 'self',
-          first: parts[0] || managedEntry.fullName,
-          last: parts.slice(1).join(' '),
-          name: managedEntry.fullName,
-          pos: getPositionCode(managedEntry.positionLabel || managedEntry.position),
-          ageCat: String(managedEntry.ageGroup || 'pro').toLowerCase() || 'pro',
-          age: managedEntry.age ?? '-',
-          foot: managedEntry.foot || 'áƒáƒ  áƒáƒ áƒ˜áƒ¡ áƒ›áƒ˜áƒ—áƒ˜áƒ—áƒ”áƒ‘áƒ£áƒšáƒ˜',
-          img: managedEntry.photo || '',
-          actionHref: 'user-profile.html?view=overview&from=pexburtelebi.html',
-          actionLabel: 'áƒ©áƒ”áƒ›áƒ˜ áƒžáƒ áƒáƒ¤áƒ˜áƒšáƒ˜'
-        };
-
-        renderPlayers();
-        applyFilters();
-        return;
-      }
-
-      const profile = user.user_metadata?.profile || {};
-      const displayName = role === 'parent'
-        ? (String(profile.childName || '').trim() || 'შენი ბავშვი')
-        : (window.siteAuth?.getUserDisplayName ? window.siteAuth.getUserDisplayName(user) : (user.email || 'შენი პროფილი'));
-      const parts = displayName.split(/\s+/).filter(Boolean);
-      extraPlayer = {
-        id: 'self',
-        first: parts[0] || displayName,
-        last: parts.slice(1).join(' '),
-        name: displayName,
-        pos: getPositionCode(role === 'parent' ? profile.childPosition : profile.playerPosition),
-        ageCat: String(role === 'parent' ? profile.childAgeCategory : profile.playerAgeCategory || 'pro').toLowerCase() || 'pro',
-        age: role === 'parent'
-          ? (calculateAgeFromBirthDate(profile.childBirthDate) ?? profile.childAge ?? '-')
-          : (calculateAgeFromBirthDate(profile.playerBirthDate) ?? profile.playerAge ?? '-'),
-        foot: role === 'parent'
-          ? (profile.childFoot || 'არ არის მითითებული')
-          : (profile.playerFoot || 'არ არის მითითებული'),
-        img: role === 'parent'
-          ? (profile.childPhoto || profile.profilePhoto || '')
-          : (profile.playerPhoto || profile.profilePhoto || ''),
-        actionHref: 'user-profile.html?view=overview&from=pexburtelebi.html',
-        actionLabel: 'ჩემი პროფილი'
-      };
-
-      renderPlayers();
-      applyFilters();
-    }
-
-    hydrateOwnPlayerCard();
-  </script>
-  <script>
     (async function () {
-      const client = window.siteAuth?.getClient ? window.siteAuth.getClient() : null;
-      if (!client || !window.siteData?.fetchPublicPlayers) {
-        return;
+      // Auth nav - always renders regardless of Supabase state
+      if (window.siteAuth && window.siteAuth.renderAuthNav) {
+        window.siteAuth.renderAuthNav('#playersAuthNav', {
+          currentPath: 'pexburtelebi.html',
+          loginClass: 'btn btn-white',
+          registerClass: 'btn btn-red',
+          profileClass: 'btn btn-red',
+          afterLogout: 'pexburtelebi.html'
+        });
       }
 
-      const playersGridNode = document.getElementById('playersGrid');
-      const resultCountNode = document.getElementById('resultCount');
-      const searchNode = document.getElementById('searchInput');
-      const positionFilters = document.querySelectorAll('#posFilters .chip-btn');
-      const ageFilters = document.querySelectorAll('#ageFilters .chip-btn');
+      var client = window.siteAuth && window.siteAuth.getClient ? window.siteAuth.getClient() : null;
+      var playersGridNode = document.getElementById('playersGrid');
+      var resultCountNode = document.getElementById('resultCount');
+      var searchNode = document.getElementById('searchInput');
+      var positionFilters = document.querySelectorAll('#posFilters .chip-btn');
+      var ageFilters = document.querySelectorAll('#ageFilters .chip-btn');
 
-      let pagePlayers = [];
-      try {
-        pagePlayers = await window.siteData.fetchPublicPlayers(client);
-      } catch (error) {
-        pagePlayers = [];
-      }
-      let managedPlayerId = '';
-
-      const { data } = await client.auth.getSession();
-      const user = data?.session?.user || null;
-
-      if (user && window.sitePlayerDomain?.syncMyAccountDomain) {
-        await window.sitePlayerDomain.syncMyAccountDomain(client);
-      }
-
-      if (user && window.sitePlayerDomain?.fetchManagedEntry && window.siteData?.enrichPlayer) {
-        const managedEntry = await window.sitePlayerDomain.fetchManagedEntry(client, user.id);
-        const managedPlayer = managedEntry ? window.siteData.enrichPlayer(managedEntry) : null;
-        if (managedPlayer?.id) {
-          managedPlayerId = managedPlayer.id;
-          const existingIndex = pagePlayers.findIndex(function (player) {
-            return String(player.id) === String(managedPlayer.id);
-          });
-
-          if (existingIndex >= 0) {
-            pagePlayers[existingIndex] = { ...pagePlayers[existingIndex], ...managedPlayer };
-          } else {
-            pagePlayers.unshift(managedPlayer);
-          }
-        }
-      }
-
-      pagePlayers.sort(function (a, b) {
-        if ((b.votesCount || 0) !== (a.votesCount || 0)) {
-          return (b.votesCount || 0) - (a.votesCount || 0);
-        }
-        return String(a.fullName || '').localeCompare(String(b.fullName || ''), 'ka');
-      });
+      var pagePlayers = [];
+      var managedPlayerId = '';
 
       function escapeHtml(value) {
         return String(value || '')
@@ -734,100 +477,163 @@
           .join('') || 'MF';
       }
 
-      function renderDynamicPlayers() {
+      function renderPlayers() {
+        if (!playersGridNode) { return; }
+
         if (!pagePlayers.length) {
-          playersGridNode.innerHTML = `
-            <article class="player-card" style="grid-column:1 / -1; min-height:auto; align-items:flex-start;">
-              <div class="player-info" style="width:100%;">
-                <h3 class="player-name">ფეხბურთელები ჯერ არ ჩანს</h3>
-                <div class="meta-grid" style="margin-top:10px;">
-                  <div class="meta-item" style="grid-column:1 / -1;">
-                    <span>მდგომარეობა</span>
-                    <strong>როცა საჯარო ფეხბურთელები ჩაიწერება ბაზაში, აქ ავტომატურად გამოჩნდება.</strong>
-                  </div>
-                </div>
-              </div>
-            </article>
-          `;
+          playersGridNode.innerHTML = [
+            '<article class="player-card" style="grid-column:1 / -1; min-height:auto; align-items:flex-start;">',
+            '<div class="player-info" style="width:100%;">',
+            '<h3 class="player-name">ფეხბურთელები ჯერ არ ჩანს</h3>',
+            '<div class="meta-grid" style="margin-top:10px;">',
+            '<div class="meta-item" style="grid-column:1 / -1;">',
+            '<span>მდგომარეობა</span>',
+            '<strong>როცა საჯარო ფეხბურთელები ჩაიწერება ბაზაში, აქ ავტომატურად გამოჩნდება.</strong>',
+            '</div></div></div></article>'
+          ].join('');
+          if (resultCountNode) { resultCountNode.textContent = 'ნაპოვნია: 0'; }
           return;
         }
 
         playersGridNode.innerHTML = pagePlayers.map(function (player) {
-          const fullName = String(player.fullName || '').trim();
-          const ageGroup = String(player.ageGroup || 'pro').toLowerCase();
-          const searchText = [fullName, player.team || '', player.positionLabel || ''].join(' ').toLowerCase();
-          const positionCode = player.positionCode || 'MF';
-          const isManaged = managedPlayerId && String(player.id) === String(managedPlayerId);
-          const actionHref = isManaged
+          var fullName = String(player.fullName || '').trim();
+          var ageGroup = String(player.ageGroup || 'pro').toLowerCase();
+          var positionCode = player.positionCode || 'MF';
+          var isManaged = Boolean(managedPlayerId && String(player.id) === String(managedPlayerId));
+          var actionHref = isManaged
             ? 'user-profile.html?view=overview&from=pexburtelebi.html'
-            : window.siteData.buildPlayerHref(player.id, 'pexburtelebi.html');
-          const photoMarkup = player.photo
-            ? `<img src="${escapeHtml(player.photo)}" alt="${escapeHtml(fullName)}" class="player-photo" loading="lazy">`
-            : `<div class="player-photo player-photo--fallback">${initials(fullName)}</div>`;
+            : (window.siteData && window.siteData.buildPlayerHref
+                ? window.siteData.buildPlayerHref(player.id, 'pexburtelebi.html')
+                : 'player-profile.html?player=' + encodeURIComponent(String(player.id || '')) + '&from=pexburtelebi.html');
+          var actionLabel = isManaged ? 'ჩემი პროფილი' : 'პროფილი';
+          var searchText = [fullName, player.team || '', player.positionLabel || ''].join(' ').toLowerCase();
+          var photoMarkup = player.photo
+            ? '<img src="' + escapeHtml(player.photo) + '" alt="' + escapeHtml(fullName) + '" class="player-photo" loading="lazy">'
+            : '<div class="player-photo player-photo--fallback">' + initials(fullName) + '</div>';
 
-          return `
-            <article class="player-card" data-pos="${escapeHtml(positionCode.toLowerCase())}" data-age="${escapeHtml(ageGroup)}" data-search="${escapeHtml(searchText)}">
-              ${photoMarkup}
-              <div class="pos-indicator">${escapeHtml(positionCode)}</div>
-              <div class="player-info">
-                <h3 class="player-name">${escapeHtml(fullName)}</h3>
-                <div class="meta-grid">
-                  <div class="meta-item">
-                    <span>კატეგორია</span>
-                    <strong>${escapeHtml(player.ageLabel || ageGroup.toUpperCase())} (${escapeHtml(String(player.age ?? '-'))} წ.)</strong>
-                  </div>
-                  <div class="meta-item">
-                    <span>ფეხი</span>
-                    <strong>${escapeHtml(player.foot || 'არ არის მითითებული')}</strong>
-                  </div>
-                </div>
-                <a href="${actionHref}" class="btn-enter">${isManaged ? 'ჩემი პროფილი' : 'პროფილი'}</a>
-              </div>
-            </article>
-          `;
+          return (
+            '<article class="player-card"' +
+            ' data-pos="' + escapeHtml(positionCode.toLowerCase()) + '"' +
+            ' data-age="' + escapeHtml(ageGroup) + '"' +
+            ' data-search="' + escapeHtml(searchText) + '">' +
+            photoMarkup +
+            '<div class="pos-indicator">' + escapeHtml(positionCode) + '</div>' +
+            '<div class="player-info">' +
+            '<h3 class="player-name">' + escapeHtml(fullName) + '</h3>' +
+            '<div class="meta-grid">' +
+            '<div class="meta-item"><span>კატეგორია</span>' +
+            '<strong>' + escapeHtml(player.ageLabel || ageGroup.toUpperCase()) +
+            ' (' + escapeHtml(String(player.age != null ? player.age : '-')) + ' წ.)</strong></div>' +
+            '<div class="meta-item"><span>ფეხი</span>' +
+            '<strong>' + escapeHtml(player.foot || 'არ არის მითითებული') + '</strong></div>' +
+            '</div>' +
+            '<a href="' + actionHref + '" class="btn-enter">' + actionLabel + '</a>' +
+            '</div></article>'
+          );
         }).join('');
       }
 
-      function activeValue(nodes) {
-        const activeNode = Array.from(nodes).find(function (button) {
+      function activeFilterValue(nodes) {
+        var activeNode = Array.from(nodes).find(function (button) {
           return button.classList.contains('active');
         });
         return activeNode ? String(activeNode.dataset.pos || activeNode.dataset.age || 'all') : 'all';
       }
 
-      function updateVisibleCount() {
-        const term = String(searchNode?.value || '').trim().toLowerCase();
-        const currentPos = activeValue(positionFilters);
-        const currentAge = activeValue(ageFilters);
-        const cards = playersGridNode.querySelectorAll('.player-card');
-        let visible = 0;
+      function applyFilters() {
+        var term = String(searchNode && searchNode.value || '').trim().toLowerCase();
+        var currentPos = activeFilterValue(positionFilters);
+        var currentAge = activeFilterValue(ageFilters);
+        var cards = playersGridNode ? Array.from(playersGridNode.querySelectorAll('.player-card')) : [];
+        var visible = 0;
 
         cards.forEach(function (card) {
-          const matchesSearch = card.dataset.search.includes(term);
-          const matchesPos = currentPos === 'all' || card.dataset.pos === currentPos;
-          const matchesAge = currentAge === 'all' || card.dataset.age === currentAge;
-          const show = matchesSearch && matchesPos && matchesAge;
+          var matchesSearch = String(card.dataset.search || '').includes(term);
+          var matchesPos = currentPos === 'all' || card.dataset.pos === currentPos;
+          var matchesAge = currentAge === 'all' || card.dataset.age === currentAge;
+          var show = matchesSearch && matchesPos && matchesAge;
           card.style.display = show ? 'flex' : 'none';
-          if (show) {
-            visible += 1;
-          }
+          if (show) { visible += 1; }
         });
 
-        resultCountNode.textContent = `ნაპოვნია: ${visible}`;
+        if (resultCountNode) {
+          resultCountNode.textContent = 'ნაპოვნია: ' + visible;
+        }
       }
 
-      renderDynamicPlayers();
-      updateVisibleCount();
-
-      if (searchNode) {
-        searchNode.addEventListener('input', updateVisibleCount);
-      }
+      // Event listeners - single set, no duplicates
+      if (searchNode) { searchNode.addEventListener('input', applyFilters); }
       positionFilters.forEach(function (button) {
-        button.addEventListener('click', updateVisibleCount);
+        button.addEventListener('click', function () {
+          positionFilters.forEach(function (b) { b.classList.remove('active'); });
+          button.classList.add('active');
+          applyFilters();
+        });
       });
       ageFilters.forEach(function (button) {
-        button.addEventListener('click', updateVisibleCount);
+        button.addEventListener('click', function () {
+          ageFilters.forEach(function (b) { b.classList.remove('active'); });
+          button.classList.add('active');
+          applyFilters();
+        });
       });
+
+      // If no Supabase client available, show empty state and stop
+      if (!client || !window.siteData || !window.siteData.fetchPublicPlayers) {
+        renderPlayers();
+        applyFilters();
+        return;
+      }
+
+      // Fetch public players from Supabase
+      try {
+        pagePlayers = await window.siteData.fetchPublicPlayers(client);
+        if (!Array.isArray(pagePlayers)) { pagePlayers = []; }
+      } catch (fetchErr) {
+        pagePlayers = [];
+      }
+
+      // Get current user session
+      var sessionResult = await client.auth.getSession();
+      var user = sessionResult && sessionResult.data && sessionResult.data.session
+        ? sessionResult.data.session.user
+        : null;
+
+      // Sync logged-in user's data to registry
+      if (user && window.sitePlayerDomain && window.sitePlayerDomain.syncMyAccountDomain) {
+        try { await window.sitePlayerDomain.syncMyAccountDomain(client); } catch (e) {}
+      }
+
+      // Merge logged-in user's own player card at top (or update existing)
+      if (user && window.sitePlayerDomain && window.sitePlayerDomain.fetchManagedEntry &&
+          window.siteData && window.siteData.enrichPlayer) {
+        try {
+          var managedEntry = await window.sitePlayerDomain.fetchManagedEntry(client, user.id);
+          var managedPlayer = managedEntry ? window.siteData.enrichPlayer(managedEntry) : null;
+          if (managedPlayer && managedPlayer.id) {
+            managedPlayerId = managedPlayer.id;
+            var existingIndex = pagePlayers.findIndex(function (p) {
+              return String(p.id) === String(managedPlayer.id);
+            });
+            if (existingIndex >= 0) {
+              pagePlayers[existingIndex] = Object.assign({}, pagePlayers[existingIndex], managedPlayer);
+            } else {
+              pagePlayers.unshift(managedPlayer);
+            }
+          }
+        } catch (e) {}
+      }
+
+      // Sort by votes then name
+      pagePlayers.sort(function (a, b) {
+        var av = Number(a.votesCount || 0) || 0;
+        var bv = Number(b.votesCount || 0) || 0;
+        if (bv !== av) { return bv - av; }
+        return String(a.fullName || '').localeCompare(String(b.fullName || ''), 'ka');
+      });
+
+      renderPlayers();
+      applyFilters();
     })();
   </script>
 </body>

@@ -118,7 +118,14 @@ begin
   profile_role := coalesce(profile_role, meta ->> 'role', 'player');
 
   if profile_role = 'player' then
-    player_name := trim(coalesce(meta ->> 'full_name', ((meta ->> 'first_name') || ' ' || (meta ->> 'last_name'))));
+    -- Safe name construction: concat_ws skips NULLs, nullif converts empty strings to NULL
+    player_name := btrim(coalesce(
+      nullif(btrim(meta ->> 'full_name'), ''),
+      nullif(concat_ws(' ',
+        nullif(btrim(meta ->> 'first_name'), ''),
+        nullif(btrim(meta ->> 'last_name'), '')
+      ), '')
+    ));
     player_team := nullif(coalesce(profile ->> 'playerTeam', ''), '');
     player_team_slug := public.slugify_public_text(coalesce(profile ->> 'playerTeamSlug', player_team));
 
@@ -154,6 +161,7 @@ begin
         end,
         primary_position = public.normalize_public_position(coalesce(profile ->> 'playerPosition', 'midfielder')),
         position_label = coalesce(nullif(profile ->> 'playerPosition', ''), 'midfielder'),
+        preferred_foot = coalesce(nullif(btrim(profile ->> 'playerFoot'), ''), preferred_foot),
         club_name = player_team,
         club_slug = nullif(player_team_slug, ''),
         club_route = case
@@ -185,6 +193,7 @@ begin
         age_group_override,
         primary_position,
         position_label,
+        preferred_foot,
         club_name,
         club_slug,
         club_route,
@@ -215,6 +224,7 @@ begin
         end,
         public.normalize_public_position(coalesce(profile ->> 'playerPosition', 'midfielder')),
         coalesce(nullif(profile ->> 'playerPosition', ''), 'midfielder'),
+        nullif(btrim(profile ->> 'playerFoot'), ''),
         player_team,
         nullif(player_team_slug, ''),
         case
@@ -231,7 +241,7 @@ begin
     end if;
 
   elsif profile_role = 'parent' then
-    child_name := trim(coalesce(profile ->> 'childName', ''));
+    child_name := btrim(coalesce(nullif(btrim(profile ->> 'childName'), ''), ''));
     child_team := nullif(coalesce(profile ->> 'childTeam', ''), '');
     child_team_slug := public.slugify_public_text(coalesce(profile ->> 'childTeamSlug', child_team));
 
@@ -267,6 +277,7 @@ begin
           end,
           primary_position = public.normalize_public_position(coalesce(profile ->> 'childPosition', 'midfielder')),
           position_label = coalesce(nullif(profile ->> 'childPosition', ''), 'midfielder'),
+          preferred_foot = coalesce(nullif(btrim(profile ->> 'childFoot'), ''), preferred_foot),
           club_name = child_team,
           club_slug = nullif(child_team_slug, ''),
           club_route = case
@@ -298,6 +309,7 @@ begin
           age_group_override,
           primary_position,
           position_label,
+          preferred_foot,
           club_name,
           club_slug,
           club_route,
@@ -328,6 +340,7 @@ begin
           end,
           public.normalize_public_position(coalesce(profile ->> 'childPosition', 'midfielder')),
           coalesce(nullif(profile ->> 'childPosition', ''), 'midfielder'),
+          nullif(btrim(profile ->> 'childFoot'), ''),
           child_team,
           nullif(child_team_slug, ''),
           case
@@ -359,6 +372,7 @@ begin
 end;
 $$;
 
+-- Batch sync all player and parent users from auth into player_registry
 do $$
 declare
   auth_row record;
@@ -374,6 +388,8 @@ begin
 end;
 $$;
 
+-- Migrate player_profiles rows that have no corresponding registry entry yet
+-- Uses WHERE NOT EXISTS to avoid ON CONFLICT on auth_user_id (which can be NULL)
 insert into public.player_registry (
   source_key,
   auth_user_id,
@@ -430,25 +446,86 @@ select
   timezone('utc', now()) as updated_at
 from public.player_profiles pp
 cross join lateral to_jsonb(pp) as j
-on conflict (auth_user_id) do update
-set
-  source_key = excluded.source_key,
-  owner_user_id = excluded.owner_user_id,
-  owner_role = excluded.owner_role,
-  full_name = excluded.full_name,
-  first_name = excluded.first_name,
-  last_name = excluded.last_name,
-  avatar_path = coalesce(excluded.avatar_path, public.player_registry.avatar_path),
-  birth_date = coalesce(excluded.birth_date, public.player_registry.birth_date),
-  current_age = coalesce(excluded.current_age, public.player_registry.current_age),
-  season_year = excluded.season_year,
-  age_group = excluded.age_group,
-  primary_position = excluded.primary_position,
-  position_label = excluded.position_label,
-  club_name = coalesce(excluded.club_name, public.player_registry.club_name),
-  club_slug = coalesce(excluded.club_slug, public.player_registry.club_slug),
-  club_route = coalesce(excluded.club_route, public.player_registry.club_route),
-  club_status = excluded.club_status,
-  visibility_public = true,
-  is_active = true,
-  updated_at = timezone('utc', now());
+where not exists (
+  select 1
+  from public.player_registry pr
+  where pr.source_key = 'profile:' || pp.user_id::text
+     or pr.auth_user_id = pp.user_id
+);
+
+-- ============================================================
+-- RLS POLICIES
+-- Ensures anon visitors can read public data and owners can
+-- manage their own entries. Enable RLS first, then add policies.
+-- ============================================================
+
+-- player_registry
+alter table public.player_registry enable row level security;
+
+drop policy if exists "anon_read_public_players" on public.player_registry;
+create policy "anon_read_public_players"
+  on public.player_registry
+  for select
+  to anon, authenticated
+  using (visibility_public = true and is_active = true);
+
+drop policy if exists "owner_manage_own_player" on public.player_registry;
+create policy "owner_manage_own_player"
+  on public.player_registry
+  for all
+  to authenticated
+  using (
+    owner_user_id = auth.uid()
+    or auth_user_id = auth.uid()
+  )
+  with check (
+    owner_user_id = auth.uid()
+    or auth_user_id = auth.uid()
+  );
+
+-- clubs
+alter table public.clubs enable row level security;
+
+drop policy if exists "anon_read_public_clubs" on public.clubs;
+create policy "anon_read_public_clubs"
+  on public.clubs
+  for select
+  to anon, authenticated
+  using (is_public = true and is_active = true);
+
+-- player_vote_totals (read-only for everyone)
+alter table public.player_vote_totals enable row level security;
+
+drop policy if exists "anon_read_vote_totals" on public.player_vote_totals;
+create policy "anon_read_vote_totals"
+  on public.player_vote_totals
+  for select
+  to anon, authenticated
+  using (true);
+
+-- player_vote_manual_overrides (read-only for everyone)
+alter table public.player_vote_manual_overrides enable row level security;
+
+drop policy if exists "anon_read_vote_overrides" on public.player_vote_manual_overrides;
+create policy "anon_read_vote_overrides"
+  on public.player_vote_manual_overrides
+  for select
+  to anon, authenticated
+  using (true);
+
+-- player_votes (authenticated users can insert and read own votes)
+alter table public.player_votes enable row level security;
+
+drop policy if exists "authenticated_insert_own_vote" on public.player_votes;
+create policy "authenticated_insert_own_vote"
+  on public.player_votes
+  for insert
+  to authenticated
+  with check (voter_user_id = auth.uid());
+
+drop policy if exists "authenticated_read_own_votes" on public.player_votes;
+create policy "authenticated_read_own_votes"
+  on public.player_votes
+  for select
+  to authenticated
+  using (voter_user_id = auth.uid());
