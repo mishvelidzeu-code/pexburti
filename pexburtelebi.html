@@ -677,7 +677,12 @@
       const positionFilters = document.querySelectorAll('#posFilters .chip-btn');
       const ageFilters = document.querySelectorAll('#ageFilters .chip-btn');
 
-      let pagePlayers = await window.siteData.fetchPublicPlayers(client);
+      let pagePlayers = [];
+      try {
+        pagePlayers = await window.siteData.fetchPublicPlayers(client);
+      } catch (error) {
+        pagePlayers = [];
+      }
       let managedPlayerId = '';
 
       const { data } = await client.auth.getSession();
@@ -730,6 +735,23 @@
       }
 
       function renderDynamicPlayers() {
+        if (!pagePlayers.length) {
+          playersGridNode.innerHTML = `
+            <article class="player-card" style="grid-column:1 / -1; min-height:auto; align-items:flex-start;">
+              <div class="player-info" style="width:100%;">
+                <h3 class="player-name">ფეხბურთელები ჯერ არ ჩანს</h3>
+                <div class="meta-grid" style="margin-top:10px;">
+                  <div class="meta-item" style="grid-column:1 / -1;">
+                    <span>მდგომარეობა</span>
+                    <strong>როცა საჯარო ფეხბურთელები ჩაიწერება ბაზაში, აქ ავტომატურად გამოჩნდება.</strong>
+                  </div>
+                </div>
+              </div>
+            </article>
+          `;
+          return;
+        }
+
         playersGridNode.innerHTML = pagePlayers.map(function (player) {
           const fullName = String(player.fullName || '').trim();
           const ageGroup = String(player.ageGroup || 'pro').toLowerCase();

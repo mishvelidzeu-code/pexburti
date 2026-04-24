@@ -290,11 +290,15 @@
         .from('player_registry')
         .select(window.sitePlayerDomain?.DIRECTORY_FIELDS || '*')
         .eq('id', cleanId)
-        .eq('visibility_public', true)
-        .eq('is_active', true)
         .maybeSingle();
 
       if (error || !data) {
+        return null;
+      }
+
+      const isVisible = data.visibility_public === null || data.visibility_public === undefined || data.visibility_public === true;
+      const isActive = data.is_active === null || data.is_active === undefined || data.is_active === true;
+      if (!isVisible || !isActive) {
         return null;
       }
 
@@ -339,14 +343,16 @@
         client
           .from('clubs')
           .select('id, slug, short_code, name, city, country, age_band, coach_name, players_count, logo_path, summary, is_public, is_active')
-          .eq('is_public', true)
-          .eq('is_active', true)
           .order('name', { ascending: true }),
         fetchPublicPlayers(client)
       ]);
 
       const clubRows = Array.isArray(clubResponse.data) && !clubResponse.error
-        ? clubResponse.data
+        ? clubResponse.data.filter(function (row) {
+            const isPublic = row.is_public === null || row.is_public === undefined || row.is_public === true;
+            const isActive = row.is_active === null || row.is_active === undefined || row.is_active === true;
+            return isPublic && isActive;
+          })
         : [];
 
       const playerCounts = new Map();

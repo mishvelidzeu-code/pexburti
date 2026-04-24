@@ -128,15 +128,23 @@
       const { data, error } = await client
         .from('player_registry')
         .select(DIRECTORY_FIELDS)
-        .eq('visibility_public', true)
-        .eq('is_active', true)
         .order('updated_at', { ascending: false });
 
       if (error || !Array.isArray(data) || !data.length) {
         return [];
       }
 
-      const ids = data.map(function (entry) {
+      const publicRows = data.filter(function (entry) {
+        const isVisible = entry.visibility_public === null || entry.visibility_public === undefined || entry.visibility_public === true;
+        const isActive = entry.is_active === null || entry.is_active === undefined || entry.is_active === true;
+        return isVisible && isActive;
+      });
+
+      if (!publicRows.length) {
+        return [];
+      }
+
+      const ids = publicRows.map(function (entry) {
         return entry.id;
       }).filter(Boolean);
 
@@ -154,7 +162,7 @@
         }
       }
 
-      return data
+      return publicRows
         .map(function (entry) {
           return mapRegistryEntry({
             ...entry,

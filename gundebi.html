@@ -1061,8 +1061,12 @@
         return;
       }
 
-      clubs = await window.siteData.fetchPublicClubs(client);
-      if (!Array.isArray(clubs)) {
+      try {
+        clubs = await window.siteData.fetchPublicClubs(client);
+        if (!Array.isArray(clubs)) {
+          clubs = [];
+        }
+      } catch (error) {
         clubs = [];
       }
 
