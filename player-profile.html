@@ -301,6 +301,10 @@
       white-space:nowrap;
       flex-wrap:nowrap;
     }
+    .stat strong.stat-score{
+      display:inline-flex;
+      line-height:1;
+    }
     .score-current{font-weight:900}
     .score-max{
       color:#475467;
@@ -378,6 +382,11 @@
       font-weight:900;
       white-space:nowrap;
       flex-wrap:nowrap;
+    }
+    .info-card strong.rating-inline{
+      display:inline-flex;
+      align-items:center;
+      line-height:1;
     }
     .fallback{
       max-width:720px;
@@ -638,10 +647,6 @@
       }
 
       function buildRadarSvg(metrics) {
-        const averageScore = metrics.length
-          ? metrics.reduce(function (sum, item) { return sum + clampMetric(item.value); }, 0) / metrics.length
-          : 0;
-        const radarPalette = scorePalette(averageScore);
         const size = 270;
         const center = 135;
         const radius = 86;
@@ -681,10 +686,10 @@
           <svg viewBox="0 0 ${size} ${size}" width="${size}" height="${size}" role="img" aria-label="პოზიციური რადარი">
             ${rings}
             ${axes}
-            <polygon points="${area}" fill="${radarPalette.accent}22" stroke="${radarPalette.accent}" stroke-width="3"></polygon>
+            <polygon points="${area}" fill="rgba(201,31,31,.18)" stroke="#c91f1f" stroke-width="3"></polygon>
             ${metrics.map(function (item, index) {
               const current = point((item.value || 0) / 109, index);
-              return `<circle cx="${current.x.toFixed(1)}" cy="${current.y.toFixed(1)}" r="4.5" fill="${scorePalette(item.value).accent}"></circle>`;
+              return `<circle cx="${current.x.toFixed(1)}" cy="${current.y.toFixed(1)}" r="4.5" fill="#c91f1f"></circle>`;
             }).join('')}
             ${labels}
           </svg>
