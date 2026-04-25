@@ -2,7 +2,13 @@
   "permissions": {
     "allow": [
       "Bash(git add *)",
-      "Bash(git commit -m ' *)"
+      "Bash(git commit -m ' *)",
+      "Bash(git commit -m 'Add seed: 5 parent accounts with child player registry entries *)",
+      "Bash(git commit -m 'Add seed: 1 agent + 1 academy \\(team manager\\) test accounts *)",
+      "Bash(git commit -m 'Fix seed idempotency: add ON CONFLICT DO NOTHING to all auth.users inserts *)",
+      "Bash(git commit -m 'Add seed: admin@gmail.com account with admin role *)",
+      "Bash(git commit -m 'Fix login: add auth.identities to all seed files + one-time fix script *)",
+      "Bash(python3 *)"
     ]
   }
 }
