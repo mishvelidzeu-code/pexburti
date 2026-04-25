@@ -2,6 +2,7 @@
   const ROLES = ['გუნდის მენეჯერი', 'აკადემიის მენეჯერი', 'ოპერაციული მენეჯერი', 'კოორდინატორი'];
   const FOCUS = ['სრული გუნდის მართვა', 'აკადემიის განვითარება', 'რეკრუტინგი', 'ტურნირები და ლოჯისტიკა'];
   const AGE_GROUPS = ['u8', 'u9', 'u10', 'u11', 'u12', 'u13', 'u14', 'u15', 'u16', 'u17', 'u19', 'pro'];
+  const AGE_FILTERS = ['all', ...AGE_GROUPS];
   const POSITIONS = ['all', 'goalkeeper', 'defender', 'midfielder', 'forward'];
   const SECTIONS = [
     ['overview', 'მთავარი'],
@@ -568,7 +569,7 @@
   async function init() {
     fill('managerRole', ROLES);
     fill('managerFocus', FOCUS);
-    fill('ageFilter', AGES, (v) => v === 'all' ? 'ყველა ასაკი' : v === 'pro' ? 'პროფესიონალები' : v.toUpperCase());
+    fill('ageFilter', AGE_FILTERS, (v) => v === 'all' ? 'ყველა ასაკი' : v === 'pro' ? 'პროფესიონალები' : v.toUpperCase());
     fill('positionFilter', POSITIONS, (v) => v === 'all' ? 'ყველა პოზიცია' : v === 'goalkeeper' ? 'მეკარე' : v === 'defender' ? 'მცველი' : v === 'midfielder' ? 'ნახევარმცველი' : 'თავდამსხმელი');
     const auth = window.siteAuth || {};
     const res = await auth.requireAuth({ redirect: 'team-manager-dashboard.html' });

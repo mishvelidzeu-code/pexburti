@@ -43,6 +43,17 @@
     );
   }
 
+  function getRoleLabel(role) {
+    const normalizedRole = normalizeRole(role);
+    if (normalizedRole === 'player') return 'მოთამაშე';
+    if (normalizedRole === 'parent') return 'მშობელი';
+    if (normalizedRole === 'agent') return 'აგენტი';
+    if (normalizedRole === 'scout') return 'სკაუტი';
+    if (normalizedRole === 'academy') return 'გუნდის მენეჯერი';
+    if (normalizedRole === 'admin') return 'ადმინი';
+    return 'მომხმარებელი';
+  }
+
   async function resolveProfileRole(client, user) {
     if (!client || !user?.id) {
       return getUserRole(user);
@@ -220,7 +231,10 @@
     style.id = 'siteAuthProfileMenuStyles';
     style.textContent = [
       '.site-auth-profile-menu{position:relative}',
-      '.site-auth-profile-trigger{gap:10px}',
+      '.site-auth-profile-trigger{gap:10px;display:inline-flex;align-items:center}',
+      '.site-auth-profile-trigger-text{display:flex;flex-direction:column;align-items:flex-start;line-height:1.05}',
+      '.site-auth-profile-trigger-text strong{font-size:.9rem;font-weight:800}',
+      '.site-auth-profile-trigger-text span{font-size:.68rem;font-weight:700;opacity:.76}',
       '.site-auth-profile-trigger::after{content:"";width:8px;height:8px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg) translateY(-1px);opacity:.82}',
       '.site-auth-profile-panel{position:absolute;top:calc(100% + 10px);right:0;width:min(236px,calc(100vw - 32px));padding:10px;border-radius:20px;border:1px solid rgba(15,23,42,.12);background:rgba(255,255,255,.985);box-shadow:0 24px 48px rgba(15,23,42,.14);display:grid;gap:6px;opacity:0;visibility:hidden;transform:translateY(10px);transition:opacity .22s ease,transform .22s ease,visibility .22s ease;z-index:120}',
       '.site-auth-profile-menu:hover .site-auth-profile-panel,.site-auth-profile-menu:focus-within .site-auth-profile-panel,.site-auth-profile-menu.open .site-auth-profile-panel{opacity:1;visibility:visible;transform:translateY(0)}',
@@ -349,12 +363,14 @@
       if (actionsContainer) {
         if (actionsContainer.querySelector('.site-auth-profile-menu')) {
           const profileLabel = actionsContainer.querySelector('.site-auth-profile-label strong')?.textContent || 'პროფილი';
+          const profileRole = actionsContainer.querySelector('.site-auth-profile-label span')?.textContent || '';
           const profileLinks = Array.from(actionsContainer.querySelectorAll('.site-auth-profile-link')).map(function (anchor) {
             return '<a class="site-mobile-link" href="' + (anchor.getAttribute('href') || '#') + '">' + escapeHtml(anchor.textContent || '') + '</a>';
           }).join('');
           const logoutButton = actionsContainer.querySelector('[data-auth-logout]');
           actionMarkup = [
             '<div class="site-mobile-section-label">', escapeHtml(profileLabel), '</div>',
+            profileRole ? '<div class="site-mobile-section-label" style="margin-top:-8px;font-size:.76rem;opacity:.7;">' + escapeHtml(profileRole) + '</div>' : '',
             profileLinks,
             logoutButton
               ? '<button type="button" class="site-auth-profile-logout site-mobile-logout" data-mobile-auth-logout>გასვლა</button>'
@@ -602,6 +618,7 @@
       currentPath
     );
     const displayName = getUserDisplayName(user);
+    const roleLabel = getRoleLabel(getUserRole(user));
     if (typeof settings.renderLoggedIn === 'function') {
       const handled = await settings.renderLoggedIn({
         currentPath: currentPath,
@@ -622,10 +639,13 @@
     const menuItems = buildProfileMenuItems(user, currentPath);
     target.innerHTML = [
       '<div class="site-auth-profile-menu">',
-        '<button type="button" class="', profileClass, ' site-auth-profile-trigger" aria-haspopup="true" aria-expanded="false" title="', escapeHtml(displayName), '">პროფილი</button>',
+        '<button type="button" class="', profileClass, ' site-auth-profile-trigger" aria-haspopup="true" aria-expanded="false" title="', escapeHtml(displayName), '">',
+          '<span class="site-auth-profile-trigger-text"><strong>პროფილი</strong><span>', escapeHtml(roleLabel), '</span></span>',
+        '</button>',
         '<div class="site-auth-profile-panel">',
           '<div class="site-auth-profile-label">',
             '<strong>', escapeHtml(displayName), '</strong>',
+            '<span>', escapeHtml(roleLabel), '</span>',
           '</div>',
           menuItems.map(function (item) {
             return [
