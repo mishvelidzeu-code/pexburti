@@ -18,6 +18,17 @@ insert into auth.users (
 )
 on conflict (id) do nothing;
 
+insert into auth.identities (id, user_id, identity_data, provider, provider_id, last_sign_in_at, created_at, updated_at)
+values (
+  'a0000000-0000-0000-0000-000000000010'::uuid,
+  'a0000000-0000-0000-0000-000000000010'::uuid,
+  '{"sub":"a0000000-0000-0000-0000-000000000010","email":"admin@gmail.com"}'::jsonb,
+  'email',
+  'admin@gmail.com',
+  now(), now(), now()
+)
+on conflict (provider, provider_id) do nothing;
+
 insert into public.profiles (id, email, role) values (
   'a0000000-0000-0000-0000-000000000010'::uuid,
   'admin@gmail.com',
