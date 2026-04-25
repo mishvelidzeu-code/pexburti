@@ -729,6 +729,106 @@
     </main>
   </div>
 
+  <!-- ── Admin Password Gate ─────────────────────────────── -->
+  <div id="adminGate" style="
+    position:fixed;inset:0;z-index:9999;
+    background:#0b1220;
+    display:flex;align-items:center;justify-content:center;
+  ">
+    <div style="
+      background:#1e293b;border-radius:22px;
+      padding:44px 40px;width:min(400px,90vw);
+      box-shadow:0 32px 80px rgba(0,0,0,.55);
+    ">
+      <div style="text-align:center;margin-bottom:30px;">
+        <div style="
+          width:58px;height:58px;background:#b91c1c;border-radius:16px;
+          display:grid;place-items:center;margin:0 auto 16px;
+          font-size:1.1rem;font-weight:900;color:#fff;letter-spacing:-.03em;
+        ">FG</div>
+        <h2 style="margin:0;color:#f1f5f9;font-size:1.15rem;font-weight:800;">ადმინ პანელი</h2>
+        <p style="margin:8px 0 0;color:#94a3b8;font-size:.85rem;">წვდომისთვის პაროლი შეიყვანე</p>
+      </div>
+      <form id="adminGateForm">
+        <input id="adminGateInput" type="password" placeholder="პაროლი"
+          autocomplete="current-password" style="
+            width:100%;padding:14px 16px;
+            border:1.5px solid #334155;border-radius:12px;
+            background:#0f172a;color:#f1f5f9;font-size:1rem;
+            outline:none;box-sizing:border-box;margin-bottom:10px;
+            transition:border-color .15s;
+        ">
+        <div id="adminGateError" style="
+          color:#f87171;font-size:.82rem;min-height:22px;margin-bottom:10px;
+        "></div>
+        <button type="submit" id="adminGateBtn" style="
+          width:100%;padding:14px;
+          background:#b91c1c;color:#fff;
+          border:none;border-radius:12px;
+          font-size:1rem;font-weight:700;cursor:pointer;
+          transition:background .15s;
+        ">შესვლა</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const KEY  = 'fg_admin_gate';
+      const HASH = '25aa6dd3d8f7c3cb09998712261e7ca0c60127b1c0ae345bad44581732e903af';
+
+      async function sha256(str) {
+        const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+        return Array.from(new Uint8Array(buf)).map(function (b) {
+          return b.toString(16).padStart(2, '0');
+        }).join('');
+      }
+
+      const gate  = document.getElementById('adminGate');
+      const form  = document.getElementById('adminGateForm');
+      const input = document.getElementById('adminGateInput');
+      const err   = document.getElementById('adminGateError');
+      const btn   = document.getElementById('adminGateBtn');
+
+      if (sessionStorage.getItem(KEY) === '1') {
+        gate.remove();
+        return;
+      }
+
+      input.focus();
+
+      input.addEventListener('focus', function () {
+        input.style.borderColor = '#b91c1c';
+      });
+      input.addEventListener('blur', function () {
+        input.style.borderColor = '#334155';
+      });
+
+      form.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        btn.disabled = true;
+        btn.textContent = '...';
+        err.textContent = '';
+
+        const hash = await sha256(input.value);
+
+        if (hash === HASH) {
+          sessionStorage.setItem(KEY, '1');
+          gate.style.transition = 'opacity .25s';
+          gate.style.opacity = '0';
+          setTimeout(function () { gate.remove(); }, 260);
+        } else {
+          err.textContent = 'პაროლი არასწორია. სცადე თავიდან.';
+          input.value = '';
+          input.focus();
+        }
+
+        btn.disabled = false;
+        btn.textContent = 'შესვლა';
+      });
+    })();
+  </script>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="../auth-shared.js"></script>
   <script src="../supabase-domain-shared.js"></script>
