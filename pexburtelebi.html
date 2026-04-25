@@ -349,6 +349,28 @@
       border-color: var(--red);
     }
 
+    .btn-prospect {
+      width: 100%;
+      margin-top: 6px;
+      padding: 7px;
+      background: #1d4ed8;
+      border: none;
+      border-radius: 12px;
+      color: #fff;
+      font-size: .78rem;
+      font-weight: 800;
+      text-align: center;
+      cursor: pointer;
+      transition: .2s ease;
+    }
+    .btn-prospect:hover { background: #1e40af; transform: translateY(-1px); }
+    .btn-prospect.is-prospect {
+      background: #eff6ff;
+      color: #1d4ed8;
+      border: 1px solid #bfdbfe;
+    }
+    .btn-prospect.is-prospect:hover { background: #dbeafe; }
+
     @media (max-width: 768px) {
       .players-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
       .search-row { flex-direction: column; align-items: stretch; }
@@ -455,6 +477,8 @@
 
       var pagePlayers = [];
       var managedPlayerId = '';
+      var agentProspects = [];
+      var isAgent = false;
 
       function escapeHtml(value) {
         return String(value || '')
@@ -508,6 +532,13 @@
             ? '<img src="' + escapeHtml(player.photo) + '" alt="' + escapeHtml(fullName) + '" class="player-photo" loading="lazy">'
             : '<div class="player-photo player-photo--fallback">' + initials(fullName) + '</div>';
 
+          var playerId = String(player.id || '');
+          var inProspects = isAgent && agentProspects.includes(playerId);
+          var agentBtnMarkup = isAgent
+            ? '<button class="btn-prospect' + (inProspects ? ' is-prospect' : '') + '" data-prospect-id="' + escapeHtml(playerId) + '">' +
+              (inProspects ? '✓ სამიზნეში' : '+ სამიზნეში') + '</button>'
+            : '';
+
           return (
             '<article class="player-card"' +
             ' data-pos="' + escapeHtml(positionCode.toLowerCase()) + '"' +
@@ -525,6 +556,7 @@
             '<strong>' + escapeHtml(player.foot || 'არ არის მითითებული') + '</strong></div>' +
             '</div>' +
             '<a href="' + actionHref + '" class="btn-enter">' + actionLabel + '</a>' +
+            agentBtnMarkup +
             '</div></article>'
           );
         }).join('');
@@ -634,8 +666,66 @@
         return String(a.fullName || '').localeCompare(String(b.fullName || ''), 'ka');
       });
 
+      // Detect agent and load their prospects
+      if (user && window.siteAuth && window.siteAuth.resolveProfileRole) {
+        try {
+          var resolvedRole = await window.siteAuth.resolveProfileRole(client, user);
+          if (resolvedRole === 'agent') {
+            isAgent = true;
+            var profileMeta = (user.user_metadata && user.user_metadata.profile) || {};
+            agentProspects = Array.isArray(profileMeta.agentProspects)
+              ? profileMeta.agentProspects.map(String) : [];
+          }
+        } catch (e) {}
+      }
+
       renderPlayers();
       applyFilters();
+
+      // Agent prospect button handler
+      if (isAgent && playersGridNode) {
+        playersGridNode.addEventListener('click', async function (e) {
+          var btn = e.target.closest('[data-prospect-id]');
+          if (!btn) return;
+          e.preventDefault();
+          var pid = String(btn.dataset.prospectId || '');
+          if (!pid) return;
+
+          btn.disabled = true;
+          var wasIn = agentProspects.includes(pid);
+          var nextProspects = wasIn
+            ? agentProspects.filter(function (id) { return id !== pid; })
+            : agentProspects.concat(pid);
+
+          try {
+            var profileMeta = (user.user_metadata && user.user_metadata.profile) || {};
+            var res = await client.auth.updateUser({
+              data: Object.assign({}, user.user_metadata || {}, {
+                profile: Object.assign({}, profileMeta, { agentProspects: nextProspects })
+              })
+            });
+            if (res.error) throw res.error;
+
+            agentProspects = nextProspects;
+            user.user_metadata = res.data && res.data.user
+              ? res.data.user.user_metadata : user.user_metadata;
+
+            if (!wasIn) {
+              btn.textContent = '✓ სამიზნეში';
+              btn.classList.add('is-prospect');
+              setTimeout(function () {
+                window.location.href = 'agent-dashboard.html';
+              }, 700);
+            } else {
+              btn.textContent = '+ სამიზნეში';
+              btn.classList.remove('is-prospect');
+              btn.disabled = false;
+            }
+          } catch (err) {
+            btn.disabled = false;
+          }
+        });
+      }
     })();
   </script>
 </body>

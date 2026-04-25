@@ -107,6 +107,20 @@
       border-color:var(--line);
     }
     .btn-white:hover{background:#eef2f6}
+    .btn-agent{
+      background:#1d4ed8;
+      color:#fff;
+      border-color:#1d4ed8;
+      box-shadow:0 12px 28px rgba(29,78,216,.24);
+    }
+    .btn-agent:hover{background:#1e40af}
+    .btn-agent.is-prospect{
+      background:#fff;
+      color:#1d4ed8;
+      border-color:#1d4ed8;
+      box-shadow:none;
+    }
+    .btn-agent.is-prospect:hover{background:#eff6ff}
     .page{padding:28px 0 56px}
     .eyebrow{
       display:inline-flex;
@@ -472,9 +486,11 @@
             <div class="action-row">
               <a id="backLink" href="pexburtelebi.html" class="btn btn-white">დაბრუნება</a>
               <button id="managerWatchBtn" type="button" class="btn btn-white" hidden>დაამატე ფეხბურთელი დასაკვირვებელში</button>
+              <button id="agentProspectBtn" type="button" class="btn btn-agent" hidden>სამიზნეში დამატება</button>
               <a href="gundebi.html" class="btn btn-red">გუნდის გვერდი</a>
             </div>
             <div id="managerWatchStatus" style="margin-top:12px;color:#667085;font-weight:700;" hidden></div>
+            <div id="agentProspectStatus" style="margin-top:12px;font-weight:700;" hidden></div>
           </div>
         </section>
 
@@ -850,6 +866,73 @@
       }
 
       await mountManagerWatchAction();
+
+      async function mountAgentProspectAction() {
+        if (!user || !window.siteAuth?.resolveProfileRole) return;
+        const resolvedRole = await window.siteAuth.resolveProfileRole(client, user);
+        if (resolvedRole !== 'agent') return;
+
+        const agentProspectBtn = document.getElementById('agentProspectBtn');
+        const agentProspectStatus = document.getElementById('agentProspectStatus');
+        if (!agentProspectBtn || !agentProspectStatus) return;
+
+        const profileMeta = user.user_metadata?.profile || {};
+        const currentProspects = Array.isArray(profileMeta.agentProspects)
+          ? profileMeta.agentProspects.map(String) : [];
+        const playerKey = String(player.id);
+
+        function syncBtn() {
+          const inProspects = currentProspects.includes(playerKey);
+          agentProspectBtn.hidden = false;
+          agentProspectBtn.textContent = inProspects ? 'სამიზნიდან ამოშლა' : 'სამიზნეში დამატება';
+          agentProspectBtn.className = inProspects ? 'btn btn-agent is-prospect' : 'btn btn-agent';
+        }
+
+        syncBtn();
+
+        agentProspectBtn.addEventListener('click', async function () {
+          agentProspectBtn.disabled = true;
+          agentProspectStatus.hidden = false;
+          agentProspectStatus.style.color = '#1d4ed8';
+          agentProspectStatus.textContent = 'მიმდინარეობს...';
+
+          const wasInProspects = currentProspects.includes(playerKey);
+          const nextProspects = wasInProspects
+            ? currentProspects.filter((id) => id !== playerKey)
+            : currentProspects.concat(playerKey);
+
+          try {
+            const { error } = await client.auth.updateUser({
+              data: {
+                ...(user.user_metadata || {}),
+                profile: { ...(profileMeta || {}), agentProspects: nextProspects }
+              }
+            });
+            if (error) throw error;
+
+            currentProspects.length = 0;
+            nextProspects.forEach((id) => currentProspects.push(String(id)));
+
+            if (!wasInProspects) {
+              agentProspectStatus.textContent = '✓ სამიზნეებში გადავიდა — გადადი დაფაზე...';
+              setTimeout(() => {
+                window.location.href = 'agent-dashboard.html';
+              }, 900);
+            } else {
+              agentProspectStatus.style.color = '#667085';
+              agentProspectStatus.textContent = 'ამოიშალა სამიზნეებიდან.';
+              syncBtn();
+              agentProspectBtn.disabled = false;
+            }
+          } catch (err) {
+            agentProspectStatus.style.color = '#991b1b';
+            agentProspectStatus.textContent = err?.message || 'ოპერაცია ვერ შესრულდა.';
+            agentProspectBtn.disabled = false;
+          }
+        });
+      }
+
+      await mountAgentProspectAction();
     })();
   </script>
 </body>
