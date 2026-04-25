@@ -415,6 +415,9 @@ button,input,select,textarea{font:inherit}
   grid-template-columns:minmax(0,1.5fr) repeat(2,minmax(180px,.5fr));
   gap:12px;
 }
+.search-grid.two-col{
+  grid-template-columns:minmax(0,1.5fr) minmax(180px,.5fr);
+}
 .player{
   padding:10px 12px;
   display:grid;

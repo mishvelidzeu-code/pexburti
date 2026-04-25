@@ -13,6 +13,7 @@
     ['profile', 'ჩემი პროფილი'],
     ['add-player', 'ფეხბურთელის დამატება'],
     ['my-players', 'ჩემი ფეხბურთელები'],
+    ['browse', 'ბაზა'],
     ['prospects', 'სამიზნეები'],
     ['deals', 'გარიგებები'],
     ['notes', 'ჩანაწერები']
@@ -28,6 +29,9 @@
     myPlayersSearch: '',
     myPlayersAge: 'all',
     myPlayersPosition: 'all',
+    browseSearch: '',
+    browseAge: 'all',
+    browsePosition: 'all',
     prospectsSearch: '',
     prospectsAge: 'all',
     notesSearch: '',
@@ -213,6 +217,15 @@
     );
   }
 
+  function filteredBrowse() {
+    const q = norm(state.browseSearch);
+    return state.players.filter((p) =>
+      (state.browseAge === 'all' || norm(p.ageGroup) === state.browseAge) &&
+      (state.browsePosition === 'all' || norm(p.positionKey || p.position) === state.browsePosition) &&
+      (!q || [p.fullName, p.team, p.positionLabel, p.ageLabel, p.ageGroup].join(' ').toLowerCase().includes(q))
+    );
+  }
+
   function filteredNotes() {
     const q = norm(state.notesSearch);
     return state.profile.notes.filter((n) => !q || [n.text, fmt(n.createdAt)].join(' ').toLowerCase().includes(q));
@@ -323,7 +336,16 @@
     $('clubOptionsAdd').innerHTML = state.clubs.map((c) => `<option value="${esc(c.name)}"></option>`).join('');
 
     $('myPlayersList').innerHTML = renderGroups(filteredMyPlayers(), 'ჩემი კლიენტები ამ ფილტრებით ვერ მოიძებნა.', 'roster');
-    $('prospectsList').innerHTML = renderGroups(filteredProspects(), 'სამიზნეები ამ ძებნით ვერ მოიძებნა.', 'prospects');
+
+    const browsePlayers = filteredBrowse();
+    $('browseList').innerHTML = browsePlayers.length
+      ? renderGroups(browsePlayers, 'ამ ფილტრებით ფეხბურთელი ვერ მოიძებნა.', 'browse')
+      : '<div class="empty">ბაზაში ფეხბურთელი ვერ მოიძებნა.</div>';
+
+    const prospectsPlayers = filteredProspects();
+    $('prospectsList').innerHTML = prospectsPlayers.length
+      ? renderGroups(prospectsPlayers, 'სამიზნეები ამ ძებნით ვერ მოიძებნა.', 'prospects')
+      : '<div class="empty">სამიზნეებში ჯერ ფეხბურთელი არ გაქვს დამატებული. გადადი „ბაზაზე" და დააჭირე „სამიზნეში".</div>';
 
     const visibleNotes = filteredNotes();
     $('noteList').innerHTML = visibleNotes.length
@@ -556,6 +578,9 @@
     $('myPlayersSearch').addEventListener('input', (e) => { state.myPlayersSearch = e.target.value || ''; render(); });
     $('myPlayersAgeFilter').addEventListener('change', (e) => { state.myPlayersAge = e.target.value || 'all'; render(); });
     $('myPlayersPositionFilter').addEventListener('change', (e) => { state.myPlayersPosition = e.target.value || 'all'; render(); });
+    $('browseSearch').addEventListener('input', (e) => { state.browseSearch = e.target.value || ''; render(); });
+    $('browseAgeFilter').addEventListener('change', (e) => { state.browseAge = e.target.value || 'all'; render(); });
+    $('browsePositionFilter').addEventListener('change', (e) => { state.browsePosition = e.target.value || 'all'; render(); });
     $('prospectsSearch').addEventListener('input', (e) => { state.prospectsSearch = e.target.value || ''; render(); });
     $('prospectsAgeFilter').addEventListener('change', (e) => { state.prospectsAge = e.target.value || 'all'; render(); });
     $('notesSearch').addEventListener('input', (e) => { state.notesSearch = e.target.value || ''; render(); });
@@ -586,6 +611,8 @@
     fill('agentSpec', SPECIALIZATIONS);
     fill('agentRegion', REGIONS);
     fill('myPlayersAgeFilter', AGE_FILTERS, (v) => v === 'all' ? 'ყველა ასაკი' : v === 'pro' ? 'პროფესიონალები' : v.toUpperCase());
+    fill('browseAgeFilter', AGE_FILTERS, (v) => v === 'all' ? 'ყველა ასაკი' : v === 'pro' ? 'პროფესიონალები' : v.toUpperCase());
+    fill('browsePositionFilter', POSITIONS, (v) => v === 'all' ? 'ყველა პოზიცია' : POSITION_LABELS[v] || v);
     fill('prospectsAgeFilter', AGE_FILTERS, (v) => v === 'all' ? 'ყველა ასაკი' : v === 'pro' ? 'პროფესიონალები' : v.toUpperCase());
     fill('newPlayerAgeGroup', AGE_GROUPS, (v) => v === 'pro' ? 'პრო' : v.toUpperCase());
     fill('newPlayerPosition', POSITIONS.filter((p) => p !== 'all'), (v) => POSITION_LABELS[v] || v);
