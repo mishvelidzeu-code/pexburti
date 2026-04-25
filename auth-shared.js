@@ -4,6 +4,7 @@
   const DEFAULT_PROFILE_ROUTE = 'user-profile.html';
   const DEFAULT_ADMIN_ROUTE = 'admin/';
   const DEFAULT_MANAGER_ROUTE = 'team-manager-dashboard.html';
+  const DEFAULT_AGENT_ROUTE = 'agent-dashboard.html';
 
   function getClient() {
     if (window.__mfgSupabaseClient) {
@@ -117,6 +118,9 @@
     }
     if (normalizedRole === 'academy') {
       return DEFAULT_MANAGER_ROUTE;
+    }
+    if (normalizedRole === 'agent') {
+      return DEFAULT_AGENT_ROUTE;
     }
     return DEFAULT_PROFILE_ROUTE;
   }
@@ -506,6 +510,21 @@
           href: buildProfileHref(`${DEFAULT_PROFILE_ROUTE}?view=data`, fromPath),
           title: 'მონაცემები',
           copy: 'საკუთარი მონაცემების და ანგარიშის პარამეტრების ნახვა.'
+        }
+      ];
+    }
+
+    if (role === 'agent') {
+      return [
+        {
+          href: buildProfileHref(`${DEFAULT_AGENT_ROUTE}`, fromPath),
+          title: 'აგენტის დაფა',
+          copy: 'კლიენტები, სამიზნეები, გარიგებები და ფეხბურთელების დამატება.'
+        },
+        {
+          href: buildProfileHref(`${DEFAULT_AGENT_ROUTE}`, fromPath),
+          title: 'ჩემი კლიენტები',
+          copy: 'ჩემი წარმომადგენლობის ქვეშ მყოფი ფეხბურთელები.'
         }
       ];
     }

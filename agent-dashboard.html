@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>აგენტის დაფა | Football Georgia</title>
+  <link rel="stylesheet" href="agent-dashboard.css">
+</head>
+<body>
+  <div id="loading" class="loading">
+    <div class="loading-card">
+      <h1>აგენტის დაფა იტვირთება</h1>
+      <p>ვამოწმებ შენს სესიას და ვამზადებ აგენტის სამუშაო სივრცეს.</p>
+    </div>
+  </div>
+
+  <div id="app" hidden>
+    <div class="shell">
+      <aside class="sidebar">
+        <a class="sidebar-brand" href="index.html">
+          <span class="sidebar-logo">AG</span>
+          <span>Football Georgia</span>
+        </a>
+
+        <nav class="sidebar-nav">
+          <div class="nav-group-label">აგენტის სივრცე</div>
+          <div id="tabs"></div>
+          <div class="nav-group-label">სწრაფი ბმულები</div>
+          <a class="nav-link" href="pexburtelebi.html">ფეხბურთელები</a>
+          <a class="nav-link" href="gundebi.html">გუნდები</a>
+          <a class="nav-link" href="cxrilebi.html">ცხრილები</a>
+        </nav>
+
+        <div class="sidebar-footer">
+          <div class="sidebar-note">
+            აქედან მართავ შენს ფეხბურთელებს, სამიზნეებს, გარიგებებს და ამატებ ახალ მოთამაშეებს ბაზაში.
+          </div>
+        </div>
+      </aside>
+
+      <main class="main">
+        <header class="topbar">
+          <div>
+            <div class="topbar-title">აგენტის პანელი</div>
+            <div class="topbar-subtitle">ფეხბურთელების წარმომადგენლობის ერთიანი სამუშაო გარემო</div>
+          </div>
+          <div class="topbar-actions" id="agentHeaderAuth"></div>
+        </header>
+
+        <div class="content">
+          <section class="hero-card">
+            <div class="hero-head">
+              <div>
+                <span class="eyebrow">აგენტის ერთიანი დაფა</span>
+                <h1 id="heroTitle">აგენტის სამუშაო სივრცე</h1>
+                <p class="hero-copy" id="heroCopy"></p>
+              </div>
+              <div class="hero-chips" id="heroChips"></div>
+            </div>
+            <div class="stats" id="heroStats"></div>
+          </section>
+
+          <!-- OVERVIEW -->
+          <section class="section active" id="section-overview">
+            <div class="panel">
+              <div class="panel-head">
+                <div>
+                  <h2>მთავარი კონტროლი</h2>
+                  <p class="muted">მოკლე სურათი შენს ფეხბურთელებზე, გარიგებებზე და სამიზნეებზე.</p>
+                </div>
+              </div>
+              <div class="overview-grid" id="overviewGrid"></div>
+            </div>
+
+            <div class="panel">
+              <div class="panel-head">
+                <div>
+                  <h2>ბოლო გარიგებები</h2>
+                  <p class="muted">მიმდინარე და ბოლო დასრულებული გარიგებები.</p>
+                </div>
+              </div>
+              <div id="recentDeals"></div>
+            </div>
+          </section>
+
+          <!-- AGENT PROFILE -->
+          <section class="section" id="section-profile">
+            <div class="panel">
+              <div class="panel-head">
+                <div>
+                  <h2>აგენტის პროფილი</h2>
+                  <p class="muted">შენი კონტაქტური ინფორმაცია, სააგენტო და სპეციალიზაცია.</p>
+                </div>
+              </div>
+              <form id="agentForm">
+                <div class="form-grid">
+                  <div class="form-group"><label class="label" for="agentFirst">სახელი</label><input id="agentFirst" class="input" required></div>
+                  <div class="form-group"><label class="label" for="agentLast">გვარი</label><input id="agentLast" class="input" required></div>
+                  <div class="form-group"><label class="label" for="agentPhone">ტელეფონი</label><input id="agentPhone" class="input" required></div>
+                  <div class="form-group"><label class="label" for="agentEmail">ელ-ფოსტა</label><input id="agentEmail" class="input" disabled></div>
+                  <div class="form-group"><label class="label" for="agentAgency">სააგენტოს სახელი</label><input id="agentAgency" class="input" placeholder="მაგ: Georgia Sports Agency"></div>
+                  <div class="form-group"><label class="label" for="agentLicense">ლიცენზიის ნომერი</label><input id="agentLicense" class="input" placeholder="FA-XXXX"></div>
+                  <div class="form-group"><label class="label" for="agentSpec">სპეციალიზაცია</label><select id="agentSpec" class="input"></select></div>
+                  <div class="form-group"><label class="label" for="agentRegion">სამუშაო რეგიონი</label><select id="agentRegion" class="input"></select></div>
+                </div>
+                <div class="form-actions">
+                  <button class="btn btn-red" type="submit">შენახვა</button>
+                </div>
+                <div id="agentFormStatus" class="status info" hidden></div>
+              </form>
+            </div>
+          </section>
+
+          <!-- ADD PLAYER -->
+          <section class="section" id="section-add-player">
+            <div class="panel">
+              <div class="panel-head">
+                <div>
+                  <h2>ფეხბურთელის დამატება</h2>
+                  <p class="muted">დაამატე ახალი ფეხბურთელი ბაზაში — ის გამოჩნდება საჯარო ბაზაში და შენი წარმომადგენლობის სიაში.</p>
+                </div>
+              </div>
+              <form id="addPlayerForm">
+                <div class="add-player-layout">
+                  <div class="logo-panel">
+                    <div class="logo-box">
+                      <div class="logo-fallback" id="playerPhotoFallback">ფოტო</div>
+                      <img id="playerPhotoPreview" alt="ფეხბურთელის ფოტო" hidden>
+                    </div>
+                    <div class="logo-actions">
+                      <label class="btn btn-white file-btn">ფოტოს ატვირთვა<input id="playerPhotoFile" type="file" accept="image/png,image/jpeg,image/webp"></label>
+                      <button id="clearPlayerPhoto" class="btn btn-white" type="button">წაშლა</button>
+                    </div>
+                    <div class="form-group" style="margin-top:8px;">
+                      <label class="label" for="playerPhotoUrl">ფოტოს ბმული</label>
+                      <input id="playerPhotoUrl" class="input" type="url" placeholder="https://...">
+                    </div>
+                  </div>
+
+                  <div class="form-grid">
+                    <div class="form-group full">
+                      <label class="label" for="newPlayerName">სახელი და გვარი</label>
+                      <input id="newPlayerName" class="input" placeholder="მაგ: გიორგი კვარაცხელია" required>
+                    </div>
+                    <div class="form-group">
+                      <label class="label" for="newPlayerPosition">პოზიცია</label>
+                      <select id="newPlayerPosition" class="input"></select>
+                    </div>
+                    <div class="form-group">
+                      <label class="label" for="newPlayerAgeGroup">ასაკობრივი ჯგუფი</label>
+                      <select id="newPlayerAgeGroup" class="input"></select>
+                    </div>
+                    <div class="form-group">
+                      <label class="label" for="newPlayerBirthYear">დაბადების წელი</label>
+                      <input id="newPlayerBirthYear" class="input" type="number" min="1980" max="2020" placeholder="მაგ: 2005">
+                    </div>
+                    <div class="form-group">
+                      <label class="label" for="newPlayerFoot">სამუშაო ფეხი</label>
+                      <select id="newPlayerFoot" class="input">
+                        <option value="">— არჩევა —</option>
+                        <option value="right">მარჯვენა</option>
+                        <option value="left">მარცხენა</option>
+                        <option value="both">ორივე</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label class="label" for="newPlayerClub">გუნდი</label>
+                      <input id="newPlayerClub" class="input" list="clubOptionsAdd" placeholder="გუნდის სახელი">
+                      <datalist id="clubOptionsAdd"></datalist>
+                    </div>
+                    <div class="form-group full">
+                      <label class="label visibility-label">
+                        <input id="newPlayerPublic" type="checkbox" checked>
+                        საჯარო ბაზაში გამოჩენა
+                      </label>
+                    </div>
+                  </div>
+                </div>
+                <div class="form-actions">
+                  <button class="btn btn-red" type="submit">ფეხბურთელის დამატება</button>
+                </div>
+                <div id="addPlayerStatus" class="status info" hidden></div>
+              </form>
+
+              <div class="panel-head" style="margin-top:18px;">
+                <div>
+                  <h2>ჩემ მიერ დამატებული</h2>
+                  <p class="muted">ბაზაში ჩემ მიერ დამატებული ფეხბურთელები.</p>
+                </div>
+              </div>
+              <div id="addedPlayersList"></div>
+            </div>
+          </section>
+
+          <!-- MY PLAYERS -->
+          <section class="section" id="section-my-players">
+            <div class="panel">
+              <div class="panel-head">
+                <div>
+                  <h2>ჩემი ფეხბურთელები</h2>
+                  <p class="muted">შენი წარმომადგენლობის ქვეშ მყოფი მოთამაშეები, კომენტარებით.</p>
+                </div>
+              </div>
+              <div class="search-grid">
+                <input id="myPlayersSearch" class="input" type="search" placeholder="მოძებნე სახელი, გუნდი ან პოზიცია">
+                <select id="myPlayersAgeFilter" class="input"></select>
+                <select id="myPlayersPositionFilter" class="input"></select>
+              </div>
+              <div id="myPlayersStatus" class="status info" hidden></div>
+              <div id="myPlayersList"></div>
+            </div>
+          </section>
+
+          <!-- PROSPECTS -->
+          <section class="section" id="section-prospects">
+            <div class="panel">
+              <div class="panel-head">
+                <div>
+                  <h2>სამიზნეები</h2>
+                  <p class="muted">ფეხბურთელები, რომლებზეც თვალს ადევნებ — პოტენციური კლიენტები ან ტრანსფერის სამიზნეები.</p>
+                </div>
+              </div>
+              <div class="search-grid">
+                <input id="prospectsSearch" class="input" type="search" placeholder="მოძებნე სახელი, გუნდი">
+                <select id="prospectsAgeFilter" class="input"></select>
+              </div>
+              <div id="prospectsList" class="players-grid"></div>
+            </div>
+          </section>
+
+          <!-- DEALS -->
+          <section class="section" id="section-deals">
+            <div class="panel">
+              <div class="panel-head">
+                <div>
+                  <h2>გარიგებები</h2>
+                  <p class="muted">ტრანსფერები, სესხები და კონტრაქტები — სრული სტატუსით.</p>
+                </div>
+              </div>
+
+              <div class="request-form">
+                <div class="panel-head compact">
+                  <div>
+                    <strong>ახალი გარიგება</strong>
+                    <div class="muted small">დაამატე ტრანსფერი, სესხი ან კონტრაქტის მოლაპარაკება.</div>
+                  </div>
+                </div>
+                <div class="deal-form">
+                  <input id="dealPlayerName" class="input" placeholder="ფეხბურთელის სახელი" list="dealPlayerOptions">
+                  <datalist id="dealPlayerOptions"></datalist>
+                  <select id="dealType" class="input">
+                    <option value="transfer">ტრანსფერი</option>
+                    <option value="loan">სესხი</option>
+                    <option value="contract">კონტრაქტი</option>
+                    <option value="extension">გახანგრძლივება</option>
+                  </select>
+                  <select id="dealStatusSelect" class="input">
+                    <option value="negotiation">მოლაპარაკება</option>
+                    <option value="agreed">შეთანხმებული</option>
+                    <option value="completed">დასრულებული</option>
+                    <option value="failed">ჩაიშალა</option>
+                  </select>
+                  <input id="dealDate" class="input" type="date">
+                </div>
+                <div class="deal-form" style="grid-template-columns:1fr 1fr;">
+                  <input id="dealFromClub" class="input" placeholder="გამყიდველი/მიმღები გუნდი (საიდან)">
+                  <input id="dealToClub" class="input" placeholder="მიმღები გუნდი (სად)">
+                </div>
+                <div class="deal-form" style="grid-template-columns:1fr 160px auto;">
+                  <input id="dealNote" class="input" placeholder="კომენტარი ან დამატებითი ინფო">
+                  <input id="dealAmount" class="input" type="number" min="0" placeholder="თანხა ₾">
+                  <button id="saveDeal" class="btn btn-red" type="button">დამატება</button>
+                </div>
+                <div id="dealFormStatus" class="status info" hidden></div>
+              </div>
+
+              <div class="search-grid" style="margin-top:14px;">
+                <input id="dealsSearch" class="input" type="search" placeholder="მოძებნე ფეხბურთელი, გუნდი ან სტატუსი">
+                <select id="dealsTypeFilter" class="input">
+                  <option value="all">ყველა ტიპი</option>
+                  <option value="transfer">ტრანსფერი</option>
+                  <option value="loan">სესხი</option>
+                  <option value="contract">კონტრაქტი</option>
+                  <option value="extension">გახანგრძლივება</option>
+                </select>
+                <select id="dealsStatusFilter" class="input">
+                  <option value="all">ყველა სტატუსი</option>
+                  <option value="negotiation">მოლაპარაკება</option>
+                  <option value="agreed">შეთანხმებული</option>
+                  <option value="completed">დასრულებული</option>
+                  <option value="failed">ჩაიშალა</option>
+                </select>
+              </div>
+              <div id="dealsList" class="deals-grid"></div>
+            </div>
+          </section>
+
+          <!-- NOTES -->
+          <section class="section" id="section-notes">
+            <div class="panel">
+              <div class="panel-head">
+                <div>
+                  <h2>ჩანაწერები</h2>
+                  <p class="muted">სკაუტინგის ანგარიშები, კლიენტებთან შეხვედრების შენიშვნები და სამუშაო ჩანაწერები.</p>
+                </div>
+              </div>
+              <div class="notes-layout">
+                <div class="note-editor">
+                  <div class="form-group">
+                    <label class="label" for="notesSearch">ჩანაწერების ძებნა</label>
+                    <input id="notesSearch" class="input" type="search" placeholder="მოძებნე ჩანაწერის ტექსტი">
+                  </div>
+                  <div class="form-group">
+                    <label class="label" for="noteInput">ახალი ჩანაწერი</label>
+                    <textarea id="noteInput" class="textarea" placeholder="მაგ: კვარაცხელია — მაღალი პოტენციალი, U17, თბილისი..."></textarea>
+                  </div>
+                  <div class="form-actions">
+                    <button id="saveNote" class="btn btn-red" type="button">ჩანაწერის შენახვა</button>
+                  </div>
+                  <div id="noteStatus" class="status info" hidden></div>
+                </div>
+                <div id="noteList" class="notes-grid"></div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="auth-shared.js"></script>
+  <script src="supabase-domain-shared.js"></script>
+  <script src="supabase-site-data.js"></script>
+  <script src="agent-dashboard.js"></script>
+</body>
+</html>
