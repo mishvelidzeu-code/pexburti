@@ -166,6 +166,10 @@
                   <p class="muted">ყველაზე საინტერესო სამიზნეები და ახლო დაკვირვების მოთამაშეები.</p>
                 </div>
               </div>
+              <div class="search-grid">
+                <input id="favoritesSearch" class="input" type="search" placeholder="მოძებნე სახელი ან გვარი">
+                <select id="favoritesAgeFilter" class="input"></select>
+              </div>
               <div id="favoritesList" class="players-grid"></div>
             </div>
           </section>
@@ -178,7 +182,33 @@
                   <p class="muted">ნებისმიერი გუნდის ფეხბურთელი, რომელიც შენს შიდა დაკვირვების ბაზაში გადმოგაქვს.</p>
                 </div>
               </div>
+              <div class="search-grid">
+                <input id="watchSearch" class="input" type="search" placeholder="მოძებნე სახელი ან გვარი">
+                <select id="watchAgeFilter" class="input"></select>
+              </div>
               <div id="watchList" class="players-grid"></div>
+            </div>
+          </section>
+
+          <section class="section" id="section-finance">
+            <div class="panel">
+              <div class="panel-head">
+                <div>
+                  <h2>ფინანსები</h2>
+                  <p class="muted">დააფიქსირე თითო ფეხბურთელზე ხარჯი ან შემოსავალი, აკონტროლე ბალანსი და ნახე სრული ფინანსური სურათი ერთ გვერდზე.</p>
+                </div>
+              </div>
+              <div class="search-grid">
+                <input id="financeSearch" class="input" type="search" placeholder="მოძებნე ფეხბურთელი სახელით ან გვარით">
+                <select id="financeAgeFilter" class="input"></select>
+                <select id="financeTypeFilter" class="input">
+                  <option value="all">ყველა ოპერაცია</option>
+                  <option value="income">შემოსავალი</option>
+                  <option value="expense">ხარჯი</option>
+                </select>
+              </div>
+              <div id="financeSummary" class="overview-grid"></div>
+              <div id="financeList" class="finance-grid"></div>
             </div>
           </section>
 
@@ -192,6 +222,10 @@
               </div>
               <div class="notes-layout">
                 <div class="note-editor">
+                  <div class="form-group">
+                    <label class="label" for="notesSearch">ჩანაწერების ძებნა</label>
+                    <input id="notesSearch" class="input" type="search" placeholder="მოძებნე ჩანაწერის ტექსტი">
+                  </div>
                   <div class="form-group">
                     <label class="label" for="noteInput">ახალი ჩანაწერი</label>
                     <textarea id="noteInput" class="textarea" placeholder="მაგალითად: U13 მცველი საინტერესოა მაღალი ბლოკისთვის."></textarea>
@@ -215,6 +249,10 @@
                 </div>
               </div>
               <div class="request-form">
+                <div class="form-group full">
+                  <label class="label" for="requestsSearch">მოთხოვნების ძებნა</label>
+                  <input id="requestsSearch" class="input" type="search" placeholder="მოძებნე გუნდი, ქალაქი, სტატუსი ან გამომგზავნი">
+                </div>
                 <div class="form-grid">
                   <div class="form-group"><label class="label" for="requestClubName">გუნდის სახელი</label><input id="requestClubName" class="input"></div>
                   <div class="form-group"><label class="label" for="requestCity">მდებარეობა</label><input id="requestCity" class="input"></div>

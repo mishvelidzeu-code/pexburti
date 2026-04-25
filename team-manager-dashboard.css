@@ -328,7 +328,8 @@ button,input,select,textarea{font:inherit}
 .summary-grid,
 .players-grid,
 .notes-grid,
-.requests-grid{
+.requests-grid,
+.finance-grid{
   display:grid;
   gap:14px;
 }
@@ -372,13 +373,15 @@ button,input,select,textarea{font:inherit}
   grid-template-columns:repeat(2,minmax(0,1fr));
 }
 .notes-grid,
-.requests-grid{
+.requests-grid,
+.finance-grid{
   grid-template-columns:1fr;
 }
 .tile,
 .player,
 .note,
-.request{
+.request,
+.finance-card{
   border-radius:18px;
   border:1px solid var(--line);
   background:linear-gradient(180deg,#fff 0%,#f8fafc 100%);
@@ -691,6 +694,61 @@ button,input,select,textarea{font:inherit}
   background:linear-gradient(180deg,#fff 0%,#f8fafc 100%);
   padding:16px;
 }
+.finance-card{
+  padding:16px;
+  display:grid;
+  gap:14px;
+}
+.finance-head{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  align-items:flex-start;
+}
+.finance-totals{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:10px;
+}
+.finance-tile{
+  border:1px solid var(--line);
+  border-radius:16px;
+  background:#fff;
+  padding:12px 14px;
+  display:grid;
+  gap:5px;
+}
+.finance-tile span{
+  color:var(--muted);
+  font-size:.76rem;
+  font-weight:800;
+}
+.finance-tile strong{
+  font-size:1.05rem;
+}
+.finance-form{
+  display:grid;
+  grid-template-columns:1.1fr .8fr .8fr 1fr;
+  gap:10px;
+}
+.finance-entry-list{
+  display:grid;
+  gap:8px;
+}
+.finance-entry{
+  display:grid;
+  grid-template-columns:120px 110px 1fr auto;
+  gap:10px;
+  align-items:center;
+  border-top:1px solid rgba(15,23,42,.08);
+  padding-top:8px;
+}
+.finance-entry small{
+  color:var(--muted);
+  font-weight:700;
+}
+.finance-income{color:#15803d}
+.finance-expense{color:#b91c1c}
 .empty{
   padding:18px;
   border-radius:18px;
@@ -735,7 +793,10 @@ button,input,select,textarea{font:inherit}
   .search-grid,
   .overview-grid,
   .summary-grid,
-  .stats{grid-template-columns:1fr}
+  .stats,
+  .finance-form,
+  .finance-totals,
+  .finance-entry{grid-template-columns:1fr}
 }
 
 @media (max-width:640px){

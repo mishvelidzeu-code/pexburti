@@ -4,6 +4,19 @@
   const AGE_GROUPS = ['u8', 'u9', 'u10', 'u11', 'u12', 'u13', 'u14', 'u15', 'u16', 'u17', 'u19', 'pro'];
   const AGE_FILTERS = ['all', ...AGE_GROUPS];
   const POSITIONS = ['all', 'goalkeeper', 'defender', 'midfielder', 'forward'];
+  const FINANCE_CATEGORIES = [
+    'საწევრო გადასახადი',
+    'ტრანსპორტი',
+    'ეკიპირება',
+    'ტურნირი',
+    'მოედანი / ქირა',
+    'სამედიცინო',
+    'კვება',
+    'სპონსორი',
+    'ბონუსი',
+    'ჯარიმა',
+    '__custom__'
+  ];
   const SECTIONS = [
     ['overview', 'მთავარი'],
     ['club', 'გუნდის პროფილი'],
@@ -26,6 +39,15 @@
     search: '',
     age: 'all',
     position: 'all',
+    favoritesSearch: '',
+    favoritesAge: 'all',
+    watchSearch: '',
+    watchAge: 'all',
+    financeSearch: '',
+    financeAge: 'all',
+    financeType: 'all',
+    notesSearch: '',
+    requestsSearch: '',
     requestLogoDraft: '',
     hasShownAccessAlert: false
   };
@@ -85,6 +107,7 @@
       roster: uniq(p.managerRoster),
       favorites: uniq(p.managerFavorites),
       watchlist: uniq(p.managerWatchlist),
+      financeEntries: Array.isArray(p.managerFinanceEntries) ? p.managerFinanceEntries : [],
       notes: Array.isArray(p.managerNotes) ? p.managerNotes : [],
       comments: p.managerPlayerComments && typeof p.managerPlayerComments === 'object' ? p.managerPlayerComments : {},
       requestLogo: safe(p.managerRequestLogo),
@@ -275,6 +298,128 @@
     );
   }
 
+  function filteredCollection(ids, searchValue, ageValue) {
+    const set = new Set((Array.isArray(ids) ? ids : []).map(String));
+    const query = norm(searchValue);
+    return state.players.filter((p) =>
+      set.has(String(p.id)) &&
+      (ageValue === 'all' || norm(p.ageGroup) === ageValue) &&
+      (!query || [p.fullName, p.team, p.positionLabel, p.position, p.ageLabel, p.ageGroup].join(' ').toLowerCase().includes(query))
+    );
+  }
+
+  function filteredNotes() {
+    const query = norm(state.notesSearch);
+    return state.profile.notes.filter((n) => !query || [n.text, fmt(n.createdAt)].join(' ').toLowerCase().includes(query));
+  }
+
+  function filteredRequests() {
+    const query = norm(state.requestsSearch);
+    return state.requests.filter((r) => !query || [
+      r.club_name,
+      r.city,
+      r.phone,
+      r.status,
+      r.requester_name,
+      r.requester_role,
+      r.admin_note,
+      fmt(r.created_at)
+    ].join(' ').toLowerCase().includes(query));
+  }
+
+  function getSectionItems() {
+    return SECTIONS.concat([['finance', 'ფინანსები']]).filter((item, index, arr) => arr.findIndex((x) => x[0] === item[0]) === index);
+  }
+
+  function financePlayerPool() {
+    const rosterMap = new Map();
+    managedPlayers().forEach((player) => rosterMap.set(String(player.id), player));
+    uniq(state.profile.watchlist).forEach((id) => {
+      const found = state.players.find((player) => String(player.id) === String(id));
+      if (found) rosterMap.set(String(found.id), found);
+    });
+    uniq(state.profile.favorites).forEach((id) => {
+      const found = state.players.find((player) => String(player.id) === String(id));
+      if (found) rosterMap.set(String(found.id), found);
+    });
+    return Array.from(rosterMap.values());
+  }
+
+  function financeEntriesFor(playerId) {
+    return (state.profile.financeEntries || []).filter((entry) => String(entry.playerId) === String(playerId));
+  }
+
+  function financeTotals(entries) {
+    return entries.reduce((acc, entry) => {
+      const amount = Math.max(0, Number(entry.amount) || 0);
+      if (entry.type === 'income') acc.income += amount;
+      else acc.expense += amount;
+      return acc;
+    }, { income: 0, expense: 0 });
+  }
+
+  function formatMoney(value) {
+    return `${Math.round(Number(value) || 0).toLocaleString('en-US')} ₾`;
+  }
+
+  function filteredFinancePlayers() {
+    const query = norm(state.financeSearch);
+    return financePlayerPool().filter((player) =>
+      (state.financeAge === 'all' || norm(player.ageGroup) === state.financeAge) &&
+      (!query || [player.fullName, player.team, player.ageLabel, player.ageGroup].join(' ').toLowerCase().includes(query)) &&
+      (state.financeType === 'all' || financeEntriesFor(player.id).some((entry) => entry.type === state.financeType))
+    );
+  }
+
+  function buildFinanceCard(player) {
+    const entries = financeEntriesFor(player.id);
+    const totals = financeTotals(entries);
+    return `
+      <article class="finance-card">
+        <div class="finance-head">
+          <div>
+            <strong>${esc(player.fullName)}</strong>
+            <div class="muted">${esc(player.team || 'უგუნდოდ')} · ${esc(player.ageLabel || player.ageGroup || 'PRO')}</div>
+          </div>
+          <span class="chip ${totals.income - totals.expense >= 0 ? 'green' : 'red'}">ბალანსი ${esc(formatMoney(totals.income - totals.expense))}</span>
+        </div>
+        <div class="finance-totals">
+          <div class="finance-tile"><span>შემოსავალი</span><strong class="finance-income">${esc(formatMoney(totals.income))}</strong></div>
+          <div class="finance-tile"><span>ხარჯი</span><strong class="finance-expense">${esc(formatMoney(totals.expense))}</strong></div>
+          <div class="finance-tile"><span>ჩანაწერები</span><strong>${entries.length}</strong></div>
+        </div>
+        <div class="finance-form">
+          <select id="financeType-${esc(player.id)}" class="input">
+            <option value="income">შემოსავალი</option>
+            <option value="expense">ხარჯი</option>
+          </select>
+          <input id="financeAmount-${esc(player.id)}" class="input" type="number" min="0" step="1" placeholder="თანხა">
+          <select id="financeCategory-${esc(player.id)}" class="input">
+            ${FINANCE_CATEGORIES.map((category) => `<option value="${esc(category)}">${esc(category === '__custom__' ? 'ხარჯის დამატება' : category)}</option>`).join('')}
+          </select>
+          <input id="financeDate-${esc(player.id)}" class="input" type="date" value="${new Date().toISOString().slice(0,10)}">
+        </div>
+        <div class="finance-form" style="grid-template-columns:1fr;">
+          <input id="financeCustomCategory-${esc(player.id)}" class="input" type="text" placeholder="შეიყვანე საკუთარი ხარჯის ან შემოსავლის სახელი" hidden>
+        </div>
+        <div class="finance-form" style="grid-template-columns:1fr auto;">
+          <input id="financeNote-${esc(player.id)}" class="input" type="text" placeholder="კომენტარი ან დანიშნულება">
+          <button class="btn btn-red" type="button" data-a="finance-add" data-id="${esc(player.id)}">დამატება</button>
+        </div>
+        <div class="finance-entry-list">
+          ${entries.length ? entries.slice(0, 8).map((entry) => `
+            <div class="finance-entry">
+              <small>${esc(fmt(entry.date || entry.createdAt))}</small>
+              <strong class="${entry.type === 'income' ? 'finance-income' : 'finance-expense'}">${esc(entry.type === 'income' ? 'შემოსავალი' : 'ხარჯი')}</strong>
+              <div><strong>${esc(formatMoney(entry.amount))}</strong><div class="muted">${esc(entry.category || 'კატეგორია არ არის')} · ${esc(entry.note || 'კომენტარი არ არის')}</div></div>
+              <button class="mini-btn" type="button" data-a="finance-remove" data-entry-id="${esc(entry.id)}">წაშლა</button>
+            </div>
+          `).join('') : '<div class="empty">ფინანსური ჩანაწერები ჯერ არ არის დამატებული.</div>'}
+        </div>
+      </article>
+    `;
+  }
+
   function lockedBox() {
     return `<div class="locked-box"><strong>სრული წვდომა დროებით დაბლოკილია</strong><p>ჯერ მოთხოვნების გვერდზე გადადი და გააგზავნე გუნდის საჯაროობაზე მოთხოვნა. ამის შემდეგ გაიხსნება ფეხბურთელების სრული ბაზა, რჩეულები და დასაკვირვებელი სია.</p></div>`;
   }
@@ -320,7 +465,7 @@
       ['გუნდის გვერდი', activeClub?.route ? `<a class="inline-link" href="${esc(activeClub.route)}">გახსენი გუნდის გვერდი</a>` : 'ჯერ არ არის ხელმისაწვდომი', true]
     ].map((x) => `<div class="tile"><span class="k">${esc(x[0])}</span><div class="v">${x[2] ? x[1] : esc(x[1])}</div></div>`).join('');
 
-    $('tabs').innerHTML = SECTIONS.map(([key, label]) => {
+    $('tabs').innerHTML = getSectionItems().map(([key, label]) => {
       const locked = !unlocked && key !== 'requests';
       const badge = key === 'requests' && !unlocked ? '<span class="nav-badge">1</span>' : '';
       return `<button class="tab ${state.section === key ? 'active' : ''}" data-sec="${key}" data-locked="${locked ? '1' : '0'}">${esc(label)}${badge}</button>`;
@@ -332,6 +477,7 @@
       ['ლოგო და ბრენდი', state.profile.clubLogo ? 'ლოგო მზად არის' : 'ლოგო ჯერ არ არის შერჩეული', 'ატვირთვით ან ბმულით ცვლი ვიზუალს.'],
       ['რჩეულები', String(state.profile.favorites.length), 'ყველაზე საინტერესო ფეხბურთელები.'],
       ['დასაკვირვებელი', String(state.profile.watchlist.length), 'დაკვირვების ეტაპზე მყოფი მოთამაშეები.'],
+      ['ფინანსები', String((state.profile.financeEntries || []).length), 'შემოსავლები, ხარჯები და მთლიანი ბალანსი.'],
       ['ჩანაწერები', String(state.profile.notes.length), 'შიდა შენიშვნები და სამუშაო აზრები.'],
       ['წვდომა', unlocked ? 'სრული' : 'შეზღუდული', 'სრული წვდომა აქტიურდება მოთხოვნის გაგზავნის შემდეგ.']
     ].map((x) => `<div class="tile"><span class="k">${esc(x[0])}</span><div class="v">${esc(x[1])}</div><div class="muted">${esc(x[2])}</div></div>`).join('');
@@ -354,18 +500,32 @@
     paintRequestLogo(state.requestLogoDraft);
 
     $('playersList').innerHTML = unlocked ? renderGroups(filteredPlayers(), 'ამ ფილტრებით მოთამაშე ვერ მოიძებნა.') : lockedBox();
-    $('favoritesList').innerHTML = unlocked ? renderGroups(state.players.filter((p) => new Set(state.profile.favorites).has(String(p.id))), 'რჩეულები ჯერ ცარიელია.') : lockedBox();
-    $('watchList').innerHTML = unlocked ? renderGroups(state.players.filter((p) => new Set(state.profile.watchlist).has(String(p.id))), 'დასაკვირვებელი სია ჯერ ცარიელია.') : lockedBox();
-    $('noteList').innerHTML = state.profile.notes.length
-      ? state.profile.notes.map((n) => `<article class="note"><strong>${esc(n.text || '')}</strong><span>${esc(fmt(n.createdAt))}</span></article>`).join('')
-      : '<div class="empty">ჩანაწერები ჯერ არ გაქვს დამატებული.</div>';
+    $('favoritesList').innerHTML = unlocked ? renderGroups(filteredCollection(state.profile.favorites, state.favoritesSearch, state.favoritesAge), 'რჩეულებში შესაბამისი ფეხბურთელი ვერ მოიძებნა.') : lockedBox();
+    $('watchList').innerHTML = unlocked ? renderGroups(filteredCollection(state.profile.watchlist, state.watchSearch, state.watchAge), 'დასაკვირვებელში შესაბამისი ფეხბურთელი ვერ მოიძებნა.') : lockedBox();
+    const visibleNotes = filteredNotes();
+    $('noteList').innerHTML = visibleNotes.length
+      ? visibleNotes.map((n) => `<article class="note"><strong>${esc(n.text || '')}</strong><span>${esc(fmt(n.createdAt))}</span></article>`).join('')
+      : '<div class="empty">ჩანაწერები ამ ძებნით ვერ მოიძებნა.</div>';
 
-    $('requestList').innerHTML = state.requests.length
-      ? state.requests.map((r) => {
+    const visibleRequests = filteredRequests();
+    $('requestList').innerHTML = visibleRequests.length
+      ? visibleRequests.map((r) => {
         const route = r.public_club_slug ? (window.siteData?.buildTeamHref ? window.siteData.buildTeamHref(r.public_club_slug) : 'team-dinamo-tbilisi.html?club=' + encodeURIComponent(r.public_club_slug)) : '';
         return `<article class="request"><div class="panel-head compact"><div><strong>${esc(r.club_name)}</strong><div class="muted small">გამომგზავნი: ${esc(r.requester_name || 'უცნობი')} · ${esc(r.requester_role || 'მომხმარებელი')}<br>${esc(r.city || 'ქალაქი უცნობია')}<br>ტელეფონი: ${esc(r.phone || 'არ არის მითითებული')}<br>გაგზავნილია: ${esc(fmt(r.created_at))}</div></div><span class="chip ${r.status === 'approved' ? 'green' : r.status === 'rejected' ? 'red' : ''}">${esc(r.status === 'approved' ? 'დადასტურებული' : r.status === 'rejected' ? 'უარყოფილი' : 'მოლოდინში')}</span></div>${r.admin_note ? `<div class="muted">ადმინის შენიშვნა: ${esc(r.admin_note)}</div>` : ''}${route ? `<div class="muted"><a class="inline-link" href="${esc(route)}">გუნდი public-ად გახსნილია</a></div>` : ''}</article>`;
       }).join('')
-      : '<div class="empty">შენგან გაგზავნილი გუნდის მოთხოვნები ჯერ არ არის.</div>';
+      : '<div class="empty">მოთხოვნები ამ ძებნით ვერ მოიძებნა.</div>';
+
+    const financeEntries = state.profile.financeEntries || [];
+    const financeTotalsAll = financeTotals(financeEntries);
+    $('financeSummary').innerHTML = [
+      ['სრული შემოსავალი', formatMoney(financeTotalsAll.income), 'ყველა დაფიქსირებული შემოსავალი ფეხბურთელების მიხედვით.'],
+      ['სრული ხარჯი', formatMoney(financeTotalsAll.expense), 'ყველა დაფიქსირებული ხარჯი ფეხბურთელების მიხედვით.'],
+      ['მთლიანი ბალანსი', formatMoney(financeTotalsAll.income - financeTotalsAll.expense), 'შემოსავალსა და ხარჯს შორის მიმდინარე სხვაობა.']
+    ].map((x) => `<div class="tile"><span class="k">${esc(x[0])}</span><div class="v">${esc(x[1])}</div><div class="muted">${esc(x[2])}</div></div>`).join('');
+    const financePlayers = filteredFinancePlayers();
+    $('financeList').innerHTML = unlocked
+      ? (financePlayers.length ? financePlayers.map(buildFinanceCard).join('') : '<div class="empty">ფინანსებში შესაბამისი ფეხბურთელი ვერ მოიძებნა.</div>')
+      : lockedBox();
 
     $('requestAccessHint').textContent = unlocked
       ? 'მოთხოვნა უკვე გაგზავნილია. აქედან შეგიძლია სტატუსი აკონტროლო.'
@@ -452,6 +612,42 @@
     }
   }
 
+  async function saveFinanceEntry(playerId) {
+    const type = $(`financeType-${playerId}`)?.value || 'expense';
+    const amount = Number($(`financeAmount-${playerId}`)?.value || 0);
+    const selectedCategory = ($(`financeCategory-${playerId}`)?.value || '').trim();
+    const customCategory = ($(`financeCustomCategory-${playerId}`)?.value || '').trim();
+    const category = selectedCategory === '__custom__' ? customCategory : selectedCategory;
+    const date = $(`financeDate-${playerId}`)?.value || new Date().toISOString().slice(0, 10);
+    const note = $(`financeNote-${playerId}`)?.value.trim() || '';
+    if (!amount || amount <= 0) {
+      setStatus('playersStatus', 'ფინანსებში თანხა სწორად შეიყვანე.', 'error');
+      return;
+    }
+    if (!category) {
+      setStatus('playersStatus', 'მიუთითე ხარჯის ან შემოსავლის სახელი.', 'error');
+      return;
+    }
+    const nextEntries = [{
+      id: `f-${Date.now()}-${playerId}`,
+      playerId: String(playerId),
+      type,
+      amount,
+      category,
+      date,
+      note,
+      createdAt: new Date().toISOString()
+    }].concat(state.profile.financeEntries || []).slice(0, 500);
+    const ok = await savePatch({ managerFinanceEntries: nextEntries }, 'playersStatus', 'ფინანსური ჩანაწერი შენახულია.');
+    if (ok) render();
+  }
+
+  async function removeFinanceEntry(entryId) {
+    const nextEntries = (state.profile.financeEntries || []).filter((entry) => String(entry.id) !== String(entryId));
+    const ok = await savePatch({ managerFinanceEntries: nextEntries }, 'playersStatus', 'ფინანსური ჩანაწერი წაიშალა.');
+    if (ok) render();
+  }
+
   async function sendRequest() {
     setStatus('requestStatus', 'მოთხოვნა იგზავნება...', 'info');
     const club_name = $('requestClubName').value.trim();
@@ -507,12 +703,38 @@
       if (a === 'fav') toggleList('favorites', id);
       if (a === 'watch') toggleList('watchlist', id);
       if (a === 'save-comment') savePlayerComment(id);
+      if (a === 'finance-add') saveFinanceEntry(id);
+      if (a === 'finance-remove') removeFinanceEntry(btn.dataset.entryId);
     });
 
     $('clubForm').addEventListener('submit', submitProfile);
     $('playerSearch').addEventListener('input', (e) => { state.search = e.target.value || ''; render(); });
     $('ageFilter').addEventListener('change', (e) => { state.age = e.target.value || 'all'; render(); });
     $('positionFilter').addEventListener('change', (e) => { state.position = e.target.value || 'all'; render(); });
+    $('favoritesSearch').addEventListener('input', (e) => { state.favoritesSearch = e.target.value || ''; render(); });
+    $('favoritesAgeFilter').addEventListener('change', (e) => { state.favoritesAge = e.target.value || 'all'; render(); });
+    $('watchSearch').addEventListener('input', (e) => { state.watchSearch = e.target.value || ''; render(); });
+    $('watchAgeFilter').addEventListener('change', (e) => { state.watchAge = e.target.value || 'all'; render(); });
+    $('financeSearch').addEventListener('input', (e) => { state.financeSearch = e.target.value || ''; render(); });
+    $('financeAgeFilter').addEventListener('change', (e) => { state.financeAge = e.target.value || 'all'; render(); });
+    $('financeTypeFilter').addEventListener('change', (e) => { state.financeType = e.target.value || 'all'; render(); });
+    document.addEventListener('change', (e) => {
+      const target = e.target;
+      if (!(target instanceof HTMLSelectElement)) return;
+      if (!target.id || !target.id.startsWith('financeCategory-')) return;
+      const playerId = target.id.replace('financeCategory-', '');
+      const customInput = $(`financeCustomCategory-${playerId}`);
+      if (!customInput) return;
+      const showCustom = target.value === '__custom__';
+      customInput.hidden = !showCustom;
+      if (showCustom) {
+        customInput.focus();
+      } else {
+        customInput.value = '';
+      }
+    });
+    $('notesSearch').addEventListener('input', (e) => { state.notesSearch = e.target.value || ''; render(); });
+    $('requestsSearch').addEventListener('input', (e) => { state.requestsSearch = e.target.value || ''; render(); });
     $('saveNote').addEventListener('click', saveNote);
     $('sendRequest').addEventListener('click', sendRequest);
     $('openRequests').addEventListener('click', () => { state.section = 'requests'; render(); $('requestClubName').focus(); });
@@ -570,6 +792,9 @@
     fill('managerRole', ROLES);
     fill('managerFocus', FOCUS);
     fill('ageFilter', AGE_FILTERS, (v) => v === 'all' ? 'ყველა ასაკი' : v === 'pro' ? 'პროფესიონალები' : v.toUpperCase());
+    fill('favoritesAgeFilter', AGE_FILTERS, (v) => v === 'all' ? 'ყველა ასაკი' : v === 'pro' ? 'პროფესიონალები' : v.toUpperCase());
+    fill('watchAgeFilter', AGE_FILTERS, (v) => v === 'all' ? 'ყველა ასაკი' : v === 'pro' ? 'პროფესიონალები' : v.toUpperCase());
+    fill('financeAgeFilter', AGE_FILTERS, (v) => v === 'all' ? 'ყველა ასაკი' : v === 'pro' ? 'პროფესიონალები' : v.toUpperCase());
     fill('positionFilter', POSITIONS, (v) => v === 'all' ? 'ყველა პოზიცია' : v === 'goalkeeper' ? 'მეკარე' : v === 'defender' ? 'მცველი' : v === 'midfielder' ? 'ნახევარმცველი' : 'თავდამსხმელი');
     const auth = window.siteAuth || {};
     const res = await auth.requireAuth({ redirect: 'team-manager-dashboard.html' });

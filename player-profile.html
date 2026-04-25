@@ -474,8 +474,10 @@
 
             <div class="action-row">
               <a id="backLink" href="pexburtelebi.html" class="btn btn-white">დაბრუნება</a>
+              <button id="managerWatchBtn" type="button" class="btn btn-white" hidden>დაამატე ფეხბურთელი დასაკვირვებელში</button>
               <a href="gundebi.html" class="btn btn-red">გუნდის გვერდი</a>
             </div>
+            <div id="managerWatchStatus" style="margin-top:12px;color:#667085;font-weight:700;" hidden></div>
           </div>
         </section>
 
@@ -529,6 +531,7 @@
         client.auth.getSession(),
         window.siteData.fetchPlayerById(client, playerId)
       ]);
+      const user = sessionData?.session?.user || null;
 
       if (!player) {
         document.getElementById('playerFallback').hidden = false;
@@ -537,6 +540,8 @@
 
       const playerView = document.getElementById('playerView');
       const backLink = document.getElementById('backLink');
+      const managerWatchBtn = document.getElementById('managerWatchBtn');
+      const managerWatchStatus = document.getElementById('managerWatchStatus');
       const secondaryLink = document.querySelector('.action-row a.btn.btn-red');
 
       function clampMetric(value) {
@@ -770,6 +775,59 @@
         secondaryLink.textContent = player.team ? 'გუნდის გვერდი' : 'ყველა გუნდი';
       }
 
+      async function mountManagerWatchAction() {
+        if (!user || !window.siteAuth?.resolveProfileRole || !managerWatchBtn || !managerWatchStatus) return;
+        const resolvedRole = await window.siteAuth.resolveProfileRole(client, user);
+        if (resolvedRole !== 'academy') return;
+
+        const profileMeta = user.user_metadata?.profile || {};
+        const currentWatchlist = Array.isArray(profileMeta.managerWatchlist) ? profileMeta.managerWatchlist.map(String) : [];
+        const playerKey = String(player.id);
+
+        function syncButton() {
+          const included = currentWatchlist.includes(playerKey);
+          managerWatchBtn.hidden = false;
+          managerWatchBtn.textContent = included ? 'ამოშალე ფეხბურთელი დასაკვირვებლიდან' : 'დაამატე ფეხბურთელი დასაკვირვებელში';
+          managerWatchBtn.className = included ? 'btn btn-red' : 'btn btn-white';
+        }
+
+        syncButton();
+
+        managerWatchBtn.addEventListener('click', async function () {
+          managerWatchBtn.disabled = true;
+          managerWatchStatus.hidden = false;
+          managerWatchStatus.textContent = 'მიმდინარეობს განახლება...';
+          try {
+            const nextWatchlist = currentWatchlist.includes(playerKey)
+              ? currentWatchlist.filter((id) => id !== playerKey)
+              : currentWatchlist.concat(playerKey);
+
+            const { error } = await client.auth.updateUser({
+              data: {
+                ...(user.user_metadata || {}),
+                profile: {
+                  ...(profileMeta || {}),
+                  managerWatchlist: nextWatchlist
+                }
+              }
+            });
+
+            if (error) throw error;
+
+            currentWatchlist.length = 0;
+            nextWatchlist.forEach((id) => currentWatchlist.push(String(id)));
+            managerWatchStatus.textContent = currentWatchlist.includes(playerKey)
+              ? 'ფეხბურთელი დაემატა დასაკვირვებელ სიაში.'
+              : 'ფეხბურთელი ამოიშალა დასაკვირვებელი სიიდან.';
+            syncButton();
+          } catch (error) {
+            managerWatchStatus.textContent = error?.message || 'დასაკვირვებელში დამატება ვერ შესრულდა.';
+          } finally {
+            managerWatchBtn.disabled = false;
+          }
+        });
+      }
+
       if (user && window.siteAuth?.mountProfileMenu) {
         window.siteAuth.mountProfileMenu({
           user,
@@ -777,6 +835,8 @@
           fromPath: window.location.pathname.split('/').pop() || 'player-profile.html'
         });
       }
+
+      await mountManagerWatchAction();
     })();
   </script>
 </body>
