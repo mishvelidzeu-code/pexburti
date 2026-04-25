@@ -527,11 +527,18 @@
         return;
       }
 
-      const [{ data: sessionData }, player] = await Promise.all([
-        client.auth.getSession(),
+      const [authState, player] = await Promise.all([
+        window.siteAuth?.getCurrentAuthState
+          ? window.siteAuth.getCurrentAuthState(client)
+          : client.auth.getSession().then(function (result) {
+              return {
+                session: result?.data?.session || null,
+                user: result?.data?.session?.user || null
+              };
+            }),
         window.siteData.fetchPlayerById(client, playerId)
       ]);
-      const user = sessionData?.session?.user || null;
+      const user = authState?.user || null;
 
       if (!player) {
         document.getElementById('playerFallback').hidden = false;
@@ -813,6 +820,14 @@
             });
 
             if (error) throw error;
+
+            user.user_metadata = {
+              ...(user.user_metadata || {}),
+              profile: {
+                ...(profileMeta || {}),
+                managerWatchlist: nextWatchlist
+              }
+            };
 
             currentWatchlist.length = 0;
             nextWatchlist.forEach((id) => currentWatchlist.push(String(id)));

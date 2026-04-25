@@ -207,7 +207,32 @@
                   <option value="expense">ხარჯი</option>
                 </select>
               </div>
+              <div class="request-form">
+                <div class="panel-head compact">
+                  <div>
+                    <strong>საერთო ფინანსების დამატება</strong>
+                    <div class="muted small">გამოიყენე მაშინ, როცა ჩანაწერი კონკრეტულ ფეხბურთელზე არ არის მიბმული.</div>
+                  </div>
+                </div>
+                <div class="finance-form">
+                  <select id="generalFinanceType" class="input">
+                    <option value="income">შემოსავალი</option>
+                    <option value="expense">ხარჯი</option>
+                  </select>
+                  <input id="generalFinanceAmount" class="input" type="number" min="0" step="1" placeholder="თანხა">
+                  <select id="generalFinanceCategory" class="input"></select>
+                  <input id="generalFinanceDate" class="input" type="date">
+                </div>
+                <div class="finance-form" style="grid-template-columns:1fr;">
+                  <input id="generalFinanceCustomCategory" class="input" type="text" placeholder="შეიყვანე საკუთარი ხარჯის ან შემოსავლის სახელი" hidden>
+                </div>
+                <div class="finance-form" style="grid-template-columns:1fr auto;">
+                  <input id="generalFinanceNote" class="input" type="text" placeholder="კომენტარი ან დანიშნულება">
+                  <button id="saveGeneralFinance" class="btn btn-red" type="button">დამატება</button>
+                </div>
+              </div>
               <div id="financeSummary" class="overview-grid"></div>
+              <div id="generalFinanceList" class="finance-grid"></div>
               <div id="financeList" class="finance-grid"></div>
             </div>
           </section>

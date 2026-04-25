@@ -860,6 +860,11 @@
       }
 
       async function getSessionUser() {
+        if (window.siteAuth?.getCurrentAuthState) {
+          const authState = await window.siteAuth.getCurrentAuthState(client);
+          return authState?.user || null;
+        }
+
         if (!client?.auth?.getSession) {
           return null;
         }

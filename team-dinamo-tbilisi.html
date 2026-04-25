@@ -1053,8 +1053,12 @@
         return;
       }
 
-      const { data } = await client.auth.getSession();
-      const user = data?.session?.user || null;
+      const authState = window.siteAuth?.getCurrentAuthState
+        ? await window.siteAuth.getCurrentAuthState(client)
+        : await client.auth.getSession().then((result) => ({
+            user: result?.data?.session?.user || null
+          }));
+      const user = authState?.user || null;
       if (!user) {
         return;
       }
@@ -1196,8 +1200,12 @@
         });
       }
 
-      const { data } = await client.auth.getSession();
-      if (data?.session?.user && window.sitePlayerDomain?.syncMyAccountDomain) {
+      const authState = window.siteAuth?.getCurrentAuthState
+        ? await window.siteAuth.getCurrentAuthState(client)
+        : await client.auth.getSession().then((result) => ({
+            user: result?.data?.session?.user || null
+          }));
+      if (authState?.user && window.sitePlayerDomain?.syncMyAccountDomain) {
         await window.sitePlayerDomain.syncMyAccountDomain(client);
       }
 

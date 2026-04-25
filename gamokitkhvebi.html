@@ -512,8 +512,13 @@
       const client = window.siteAuth?.getClient ? window.siteAuth.getClient() : null;
       if (!client) { currentUser = null; return; }
 
-      const { data } = await client.auth.getSession();
-      currentUser = data?.session?.user || null;
+      if (window.siteAuth?.getCurrentAuthState) {
+        const authState = await window.siteAuth.getCurrentAuthState(client);
+        currentUser = authState?.user || null;
+      } else {
+        const { data } = await client.auth.getSession();
+        currentUser = data?.session?.user || null;
+      }
 
       if (currentUser && window.sitePlayerDomain?.fetchCurrentUserVotes) {
         currentUserVotes = new Set(await window.sitePlayerDomain.fetchCurrentUserVotes(client, currentUser.id));

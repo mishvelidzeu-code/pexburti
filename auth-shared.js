@@ -76,6 +76,40 @@
     }
   }
 
+  async function getCurrentAuthState(client) {
+    if (!client?.auth) {
+      return { session: null, user: null };
+    }
+
+    let session = null;
+    let user = null;
+
+    try {
+      const { data } = await client.auth.getSession();
+      session = data?.session || null;
+      user = session?.user || null;
+    } catch (error) {
+      session = null;
+      user = null;
+    }
+
+    try {
+      if (client.auth.getUser) {
+        const { data, error } = await client.auth.getUser();
+        if (!error && data?.user) {
+          user = data.user;
+          if (session) {
+            session = { ...session, user };
+          }
+        }
+      }
+    } catch (error) {
+      // Fall back to session user.
+    }
+
+    return { session, user };
+  }
+
   function getProfileRouteForRole(role) {
     const normalizedRole = normalizeRole(role);
     if (normalizedRole === 'admin') {
@@ -600,8 +634,7 @@
       return;
     }
 
-    const { data } = await client.auth.getSession();
-    const user = data?.session?.user || null;
+    const { user } = await getCurrentAuthState(client);
 
     if (!user) {
       target.innerHTML = [
@@ -699,8 +732,7 @@
       return { client: null, user: null };
     }
 
-    const { data } = await client.auth.getSession();
-    const user = data?.session?.user || null;
+    const { session, user } = await getCurrentAuthState(client);
 
     if (!user) {
       window.location.href = buildLoginHref(redirectPath);
@@ -709,7 +741,7 @@
 
     user.__resolvedRole = await resolveProfileRole(client, user);
 
-    return { client: client, user: user };
+    return { client: client, user: user, session: session };
   }
 
   window.siteAuth = {
@@ -720,6 +752,7 @@
     getCurrentPagePath: getCurrentPagePath,
     getProfileRouteForRole: getProfileRouteForRole,
     getProfileRouteForUser: getProfileRouteForUser,
+    getCurrentAuthState: getCurrentAuthState,
     getRedirectParam: getRedirectParam,
     getUserDisplayName: getUserDisplayName,
     getUserRole: getUserRole,

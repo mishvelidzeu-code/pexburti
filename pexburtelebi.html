@@ -594,10 +594,15 @@
       }
 
       // Get current user session
-      var sessionResult = await client.auth.getSession();
-      var user = sessionResult && sessionResult.data && sessionResult.data.session
-        ? sessionResult.data.session.user
-        : null;
+      var authState = window.siteAuth && window.siteAuth.getCurrentAuthState
+        ? await window.siteAuth.getCurrentAuthState(client)
+        : await client.auth.getSession().then(function (result) {
+            return {
+              session: result && result.data ? result.data.session : null,
+              user: result && result.data && result.data.session ? result.data.session.user : null
+            };
+          });
+      var user = authState ? authState.user : null;
 
       // Sync logged-in user's data to registry
       if (user && window.sitePlayerDomain && window.sitePlayerDomain.syncMyAccountDomain) {
