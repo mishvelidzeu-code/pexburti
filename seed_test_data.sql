@@ -212,7 +212,7 @@ insert into public.player_registry (
   visibility_public, is_active, created_at, updated_at
 ) values
 (
-  'r0000000-0000-0000-0000-000000000001'::uuid,
+  'e0000000-0000-0000-0000-000000000001'::uuid,
   'standalone:ბახვა-ცქვიტინიძე',
   null,
   'a0000000-0000-0000-0000-000000000001'::uuid,
@@ -225,7 +225,7 @@ insert into public.player_registry (
   true, true, now(), now()
 ),
 (
-  'r0000000-0000-0000-0000-000000000002'::uuid,
+  'e0000000-0000-0000-0000-000000000002'::uuid,
   'standalone:ლაშა-ჩიქოვანი',
   null,
   'a0000000-0000-0000-0000-000000000001'::uuid,
@@ -238,7 +238,7 @@ insert into public.player_registry (
   true, true, now(), now()
 ),
 (
-  'r0000000-0000-0000-0000-000000000003'::uuid,
+  'e0000000-0000-0000-0000-000000000003'::uuid,
   'standalone:ანი-სამხარაძე',
   null,
   'a0000000-0000-0000-0000-000000000001'::uuid,
