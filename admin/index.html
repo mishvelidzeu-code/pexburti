@@ -438,7 +438,7 @@
     /* ── Cards (request/club/player/user) ──────── */
     .card-list { display: flex; flex-direction: column; gap: 12px; }
 
-    .req-card, .club-card, .player-card, .user-card {
+    .req-card, .request-card, .club-card, .player-card, .user-card {
       border: 1px solid var(--line);
       border-radius: 16px;
       padding: 16px 18px;
@@ -448,7 +448,7 @@
       gap: 10px;
     }
 
-    .card-top {
+    .card-top, .club-top, .player-top, .user-top, .request-top {
       display: flex;
       align-items: flex-start;
       justify-content: space-between;
@@ -456,7 +456,7 @@
       flex-wrap: wrap;
     }
 
-    .card-top h4 { font-size: .95rem; font-weight: 800; margin: 0 0 4px; }
+    .card-top h4, .club-top h4, .player-top h4, .user-top h4, .request-top h4 { font-size: .95rem; font-weight: 800; margin: 0 0 4px; }
 
     .meta {
       display: flex;
@@ -473,7 +473,7 @@
       font-size: .78rem;
     }
 
-    .card-actions {
+    .card-actions, .club-actions, .player-actions, .user-actions, .request-actions {
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
@@ -488,7 +488,7 @@
       align-items: center;
     }
 
-    .logo-preview {
+    .logo-preview, .club-logo-preview {
       width: 80px;
       height: 80px;
       border-radius: 18px;

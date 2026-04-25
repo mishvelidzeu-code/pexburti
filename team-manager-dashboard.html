@@ -10,86 +10,99 @@
   <div id="loading" class="loading">
     <div class="loading-card">
       <h1>გუნდის მენეჯერის დაფა იტვირთება</h1>
-      <p>ვამოწმებ შენს სესიას და ვაწყობ გუნდის მართვის ერთიან გვერდს.</p>
+      <p>ვამოწმებ შენს სესიას და ვამზადებ გუნდის მართვის ერთიან სამუშაო სივრცეს.</p>
     </div>
   </div>
 
   <div id="app" hidden>
-    <header class="header">
-      <div class="container nav">
-        <a href="index.html" class="brand"><span class="logo">DM</span><span>Football Georgia</span></a>
-        <nav class="links">
-          <a href="index.html">მთავარი</a>
-          <a href="gundebi.html">გუნდები</a>
-          <a href="pexburtelebi.html">ფეხბურთელები</a>
-          <a href="coaching.html">ქოუჩინგი</a>
-          <a href="banakebi.html">ბანაკები</a>
-          <a href="cxrilebi.html">ცხრილები</a>
-          <a href="gamokitkhvebi.html">გამოკითხვები</a>
+    <div class="shell">
+      <aside class="sidebar">
+        <a class="sidebar-brand" href="index.html">
+          <span class="sidebar-logo">DM</span>
+          <span>Football Georgia</span>
+        </a>
+
+        <div class="sidebar-user">
+          <div class="sidebar-avatar" id="sidebarAvatar">DM</div>
+          <div class="sidebar-user-info">
+            <div class="sidebar-user-name" id="sidebarUserName">გუნდის მენეჯერი</div>
+            <div class="sidebar-user-role" id="sidebarUserRole">გუნდის მართვა ერთ სივრცეში</div>
+          </div>
+        </div>
+
+        <nav class="sidebar-nav">
+          <div class="nav-group-label">მენეჯერის სივრცე</div>
+          <div id="tabs"></div>
+          <div class="nav-group-label">სწრაფი ბმულები</div>
+          <a class="nav-link" href="gundebi.html">გუნდები</a>
+          <a class="nav-link" href="pexburtelebi.html">ფეხბურთელები</a>
+          <a class="nav-link" href="cxrilebi.html">ცხრილები</a>
+          <a class="nav-link" href="gamokitkhvebi.html">გამოკითხვები</a>
         </nav>
-        <div class="actions" id="managerHeaderAuth"></div>
-      </div>
-    </header>
 
-    <main class="page">
-      <div class="container">
-        <section class="hero">
-          <article class="card hero-main">
-            <div class="hero-top">
-              <span class="eyebrow">გუნდის მენეჯერის ერთიანი დაფა</span>
-              <div id="heroChips"></div>
-            </div>
-            <h1 id="heroTitle">გუნდის მართვა ერთ სივრცეში</h1>
-            <p class="lead" id="heroCopy"></p>
-            <div class="stats" id="heroStats"></div>
-          </article>
+        <div class="sidebar-footer">
+          <div class="sidebar-note">
+            აქედან მართავ გუნდს, ფეხბურთელების შერჩევას, დასაკვირვებელ სიას და გუნდის მოთხოვნებს.
+          </div>
+        </div>
+      </aside>
 
-          <aside>
-            <section class="card">
-              <div class="panel-top">
-                <div>
-                  <h2>გუნდის სტატუსი</h2>
-                  <p class="copy">საჯარო კლუბი, შიდა გუნდი და მოთხოვნები ერთ ბლოკში.</p>
-                </div>
-              </div>
-              <div class="summary" id="clubSummary"></div>
-            </section>
-
-            <section class="card section-card">
-              <div class="panel-top">
-                <div>
-                  <h2>სექციები</h2>
-                  <p class="copy">ყველაფერი ერთ გვერდზე.</p>
-                </div>
-              </div>
-              <div class="tabs" id="tabs"></div>
-            </section>
-          </aside>
-        </section>
-
-        <section class="layout">
+      <main class="main">
+        <header class="topbar">
           <div>
-            <section class="card section active" id="section-overview">
-              <div class="panel-top">
+            <div class="topbar-title">გუნდის მენეჯერის პანელი</div>
+            <div class="topbar-subtitle">ადმინის სტილის სამუშაო გარემო, მენეჯერის ფუნქციებით</div>
+          </div>
+          <div class="topbar-actions" id="managerHeaderAuth"></div>
+        </header>
+
+        <div class="content">
+          <section class="hero-card">
+            <div class="hero-head">
+              <div>
+                <span class="eyebrow">გუნდის მართვის ერთიანი დაფა</span>
+                <h1 id="heroTitle">გუნდის მართვა ერთ სივრცეში</h1>
+                <p class="hero-copy" id="heroCopy"></p>
+              </div>
+              <div class="hero-chips" id="heroChips"></div>
+            </div>
+            <div class="stats" id="heroStats"></div>
+          </section>
+
+          <section class="section active" id="section-overview">
+            <div class="panel">
+              <div class="panel-head">
                 <div>
                   <h2>მთავარი კონტროლი</h2>
-                  <p class="copy">აგენტის მოდულიდან გადმოტანილია რჩეულები, დასაკვირვებელი და ჩანაწერები, მაგრამ აქ ყველაფერი გუნდის ირგვლივაა გაერთიანებული.</p>
+                  <p class="muted">მოკლე სურათი აქტიურ გუნდზე, მოთხოვნებზე და სამუშაო სიებზე.</p>
                 </div>
               </div>
-              <div class="summary" id="overviewGrid"></div>
-            </section>
+              <div class="overview-grid" id="overviewGrid"></div>
+            </div>
 
-            <section class="card section" id="section-club">
-              <div class="panel-top">
+            <div class="panel">
+              <div class="panel-head">
+                <div>
+                  <h2>გუნდის სტატუსი</h2>
+                  <p class="muted">საჯარო კლუბი, შიდა გუნდი და მიმდინარე მოთხოვნები ერთ ადგილას.</p>
+                </div>
+              </div>
+              <div class="summary-grid" id="clubSummary"></div>
+            </div>
+          </section>
+
+          <section class="section" id="section-club">
+            <div class="panel">
+              <div class="panel-head">
                 <div>
                   <h2>გუნდის პროფილი</h2>
-                  <p class="copy">არსებული გუნდის არჩევა, ახალი გუნდის დამატება, ლოგოს შეცვლა და საკონტაქტო დეტალები.</p>
+                  <p class="muted">აირჩიე არსებული გუნდი, შეცვალე ლოგო და განაახლე მენეჯერის საკონტაქტო მონაცემები.</p>
                 </div>
               </div>
 
               <form id="clubForm">
-                <div class="logo-row">
-                  <div>
+                <div class="club-layout">
+                  <div class="logo-panel">
                     <div class="logo-box">
                       <div class="logo-fallback" id="logoFallback">DM</div>
                       <img id="logoPreview" alt="გუნდის ლოგო" hidden>
@@ -124,75 +137,114 @@
                 </div>
                 <div id="clubFormStatus" class="status info" hidden></div>
               </form>
-            </section>
+            </div>
+          </section>
 
-            <section class="card section" id="section-roster">
-              <div class="panel-top"><div><h2>ჩემი ფეხბურთელები</h2><p class="copy">Roster-ში ხელით დამატებული და არჩეულ კლუბზე მიბმული მოთამაშეები.</p></div></div>
-              <div id="rosterList" class="players"></div>
-            </section>
+          <section class="section" id="section-roster">
+            <div class="panel">
+              <div class="panel-head">
+                <div>
+                  <h2>ჩემი ფეხბურთელები</h2>
+                  <p class="muted">Roster-ში დამატებული ან შენს არჩეულ გუნდზე მიბმული მოთამაშეები.</p>
+                </div>
+              </div>
+              <div id="rosterList" class="players-grid"></div>
+            </div>
+          </section>
 
-            <section class="card section" id="section-database">
-              <div class="panel-top"><div><h2>ფეხბურთელების ბაზა</h2><p class="copy">ძებნა U8-დან პროფესიონალებამდე, გუნდში დამატება, რჩეულები და დასაკვირვებელი.</p></div></div>
+          <section class="section" id="section-database">
+            <div class="panel">
+              <div class="panel-head">
+                <div>
+                  <h2>ფეხბურთელების ბაზა</h2>
+                  <p class="muted">სერჩი, ასაკი, პოზიცია და მენეჯერის სიებში სწრაფი გადატანა.</p>
+                </div>
+              </div>
               <div class="search-grid">
                 <input id="playerSearch" class="input" type="search" placeholder="მოძებნე სახელი, გუნდი ან პოზიცია">
                 <select id="ageFilter" class="input"></select>
                 <select id="positionFilter" class="input"></select>
               </div>
               <div id="databaseStatus" class="status info" hidden></div>
-              <div id="databaseList" class="players"></div>
-            </section>
-          </div>
+              <div id="databaseList" class="players-grid"></div>
+            </div>
+          </section>
 
-          <div>
-            <section class="card section" id="section-favorites">
-              <div class="panel-top"><div><h2>რჩეულები</h2><p class="copy">ყველაზე ახლო სამიზნეები და საინტერესო მოთამაშეები.</p></div></div>
-              <div id="favoritesList" class="players"></div>
-            </section>
+          <section class="section" id="section-favorites">
+            <div class="panel">
+              <div class="panel-head">
+                <div>
+                  <h2>რჩეულები</h2>
+                  <p class="muted">ყველაზე საინტერესო სამიზნეები და ახლო დაკვირვების მოთამაშეები.</p>
+                </div>
+              </div>
+              <div id="favoritesList" class="players-grid"></div>
+            </div>
+          </section>
 
-            <section class="card section" id="section-watchlist">
-              <div class="panel-top"><div><h2>დასაკვირვებელი</h2><p class="copy">მოთამაშეები, რომლებიც ჯერ დაკვირვების ეტაპზე არიან.</p></div></div>
-              <div id="watchList" class="players"></div>
-            </section>
+          <section class="section" id="section-watchlist">
+            <div class="panel">
+              <div class="panel-head">
+                <div>
+                  <h2>დასაკვირვებელი</h2>
+                  <p class="muted">ნებისმიერი გუნდის ფეხბურთელი, რომელიც შენს შიდა დაკვირვების ბაზაში გადმოგაქვს.</p>
+                </div>
+              </div>
+              <div id="watchList" class="players-grid"></div>
+            </div>
+          </section>
 
-            <section class="card section" id="section-notes">
-              <div class="panel-top"><div><h2>ჩანაწერები</h2><p class="copy">შიდა შენიშვნები, სქაუტინგის აზრები და საკლუბო დაკვირვებები.</p></div></div>
-              <div class="summary">
-                <div class="tile">
-                  <div class="form-group"><label class="label" for="noteInput">ახალი ჩანაწერი</label><textarea id="noteInput" class="textarea" placeholder="მაგალითად: U13 მცველი საინტერესოა მაღალი ბლოკისთვის."></textarea></div>
-                  <div class="form-actions"><button id="saveNote" class="btn btn-red" type="button">ჩანაწერის შენახვა</button></div>
+          <section class="section" id="section-notes">
+            <div class="panel">
+              <div class="panel-head">
+                <div>
+                  <h2>ჩანაწერები</h2>
+                  <p class="muted">შიდა შენიშვნები, სკაუტინგის აზრები და მოკლე სამუშაო ჩანაწერები.</p>
+                </div>
+              </div>
+              <div class="notes-layout">
+                <div class="note-editor">
+                  <div class="form-group">
+                    <label class="label" for="noteInput">ახალი ჩანაწერი</label>
+                    <textarea id="noteInput" class="textarea" placeholder="მაგალითად: U13 მცველი საინტერესოა მაღალი ბლოკისთვის."></textarea>
+                  </div>
+                  <div class="form-actions">
+                    <button id="saveNote" class="btn btn-red" type="button">ჩანაწერის შენახვა</button>
+                  </div>
                   <div id="noteStatus" class="status info" hidden></div>
                 </div>
-                <div id="noteList" class="notes"></div>
+                <div id="noteList" class="notes-grid"></div>
               </div>
-            </section>
+            </div>
+          </section>
 
-            <section class="card section" id="section-requests">
-              <div class="panel-top"><div><h2>გუნდის მოთხოვნები</h2><p class="copy">თუ კლუბი საჯარო სიაში არ არის, აქედან გადაგზავნი ადმინთან.</p></div></div>
-              <div class="tile">
+          <section class="section" id="section-requests">
+            <div class="panel">
+              <div class="panel-head">
+                <div>
+                  <h2>გუნდის მოთხოვნები</h2>
+                  <p class="muted">თუ კლუბი საჯარო სიაში არ არის, აქედან უგზავნი მოთხოვნას ადმინს.</p>
+                </div>
+              </div>
+              <div class="request-form">
                 <div class="form-grid">
                   <div class="form-group"><label class="label" for="requestClubName">გუნდის სახელი</label><input id="requestClubName" class="input"></div>
                   <div class="form-group"><label class="label" for="requestCity">მდებარეობა</label><input id="requestCity" class="input"></div>
                   <div class="form-group full"><label class="label" for="requestPhone">თქვენი ტელეფონის ნომერი</label><input id="requestPhone" class="input"></div>
                 </div>
-                <div class="form-actions"><button id="sendRequest" class="btn btn-red" type="button">მოთხოვნის გაგზავნა</button></div>
+                <div class="form-actions">
+                  <button id="sendRequest" class="btn btn-red" type="button">მოთხოვნის გაგზავნა</button>
+                </div>
                 <div id="requestStatus" class="status info" hidden></div>
               </div>
-              <div id="requestList"></div>
-            </section>
-
-            <section class="card">
-              <div class="panel-top"><div><h2>სწრაფი ბმები</h2><p class="copy">გუნდები, ფეხბურთელები და ცხრილები.</p></div></div>
-              <div class="quick-grid">
-                <a href="gundebi.html" class="quick"><strong>გუნდები</strong><p class="muted">კლუბების საჯარო გვერდი.</p></a>
-                <a href="pexburtelebi.html" class="quick"><strong>ფეხბურთელები</strong><p class="muted">მთელი მოთამაშეების ბაზა.</p></a>
-                <a href="cxrilebi.html" class="quick"><strong>ცხრილები</strong><p class="muted">აქტივობის და რეიტინგის საერთო სურათი.</p></a>
-              </div>
-            </section>
-          </div>
-        </section>
-      </div>
-    </main>
+              <div id="requestList" class="requests-grid"></div>
+            </div>
+          </section>
+        </div>
+      </main>
+    </div>
   </div>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="auth-shared.js"></script>
   <script src="supabase-site-data.js"></script>

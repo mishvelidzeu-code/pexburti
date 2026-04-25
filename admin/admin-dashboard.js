@@ -1074,25 +1074,13 @@
     });
   }
 
-  async function init() {
-    const auth = window.siteAuth;
-    if (!auth?.requireAuth) {
-      alert('ავტორიზაციის მოდული ვერ ჩაიტვირთა.');
-      return;
-    }
+  async function startDashboard(client, user) {
+    state.client = client;
+    state.user = user;
 
-    const authState = await auth.requireAuth('admin/');
-    state.client = authState?.client || null;
-    state.user = authState?.user || null;
-
-    if (!state.client || !state.user) {
-      return;
-    }
-
-    if ((auth.getUserRole ? auth.getUserRole(state.user) : '') !== 'admin') {
-      alert('ამ გვერდზე წვდომა მხოლოდ ადმინისთვის არის ხელმისაწვდომი.');
-      window.location.replace('../index.html');
-      return;
+    const nameEl = document.getElementById('sidebarUserName');
+    if (nameEl) {
+      nameEl.textContent = window.siteAuth?.getUserDisplayName(user) || 'ადმინი';
     }
 
     bindEvents();
@@ -1105,6 +1093,125 @@
       loadUsers()
     ]);
     await loadMonthlySnapshot();
+  }
+
+  function showSupabaseLogin(client) {
+    if (document.getElementById('_sbLoginOverlay')) return;
+
+    const overlay = document.createElement('div');
+    overlay.id = '_sbLoginOverlay';
+    overlay.style.cssText = [
+      'position:fixed;inset:0;z-index:9998;',
+      'background:rgba(11,18,32,.96);',
+      'display:flex;align-items:center;justify-content:center;'
+    ].join('');
+
+    overlay.innerHTML = [
+      '<div style="background:#1e293b;border-radius:22px;padding:44px 40px;width:min(400px,90vw);box-shadow:0 32px 80px rgba(0,0,0,.55);">',
+        '<div style="text-align:center;margin-bottom:28px;">',
+          '<div style="width:54px;height:54px;background:#b91c1c;border-radius:15px;display:grid;place-items:center;',
+            'margin:0 auto 14px;font-size:1rem;font-weight:900;color:#fff;letter-spacing:-.02em;">FG</div>',
+          '<h2 style="margin:0;color:#f1f5f9;font-size:1.15rem;font-weight:800;">ადმინ შესვლა</h2>',
+          '<p style="margin:8px 0 0;color:#94a3b8;font-size:.83rem;">Supabase ადმინ ანგარიშით შედი</p>',
+        '</div>',
+        '<input id="_sbEmail" type="email" placeholder="admin@gmail.com" autocomplete="username" ',
+          'style="width:100%;padding:13px 15px;border-radius:12px;border:1.5px solid #334155;',
+          'background:#0f172a;color:#f1f5f9;font-size:.95rem;box-sizing:border-box;',
+          'margin-bottom:10px;outline:none;transition:border-color .15s;">',
+        '<input id="_sbPass" type="password" placeholder="პაროლი" autocomplete="current-password" ',
+          'style="width:100%;padding:13px 15px;border-radius:12px;border:1.5px solid #334155;',
+          'background:#0f172a;color:#f1f5f9;font-size:.95rem;box-sizing:border-box;',
+          'margin-bottom:10px;outline:none;transition:border-color .15s;">',
+        '<div id="_sbErr" style="color:#f87171;font-size:.82rem;min-height:20px;margin-bottom:10px;"></div>',
+        '<button id="_sbBtn" style="width:100%;padding:13px;background:#b91c1c;color:#fff;border:none;',
+          'border-radius:12px;font-weight:800;font-size:1rem;cursor:pointer;transition:background .15s;">შესვლა</button>',
+      '</div>'
+    ].join('');
+
+    document.body.appendChild(overlay);
+
+    const emailEl = document.getElementById('_sbEmail');
+    const passEl  = document.getElementById('_sbPass');
+    const errEl   = document.getElementById('_sbErr');
+    const btn     = document.getElementById('_sbBtn');
+
+    emailEl.focus();
+    emailEl.addEventListener('focus', function () { emailEl.style.borderColor = '#b91c1c'; });
+    emailEl.addEventListener('blur',  function () { emailEl.style.borderColor = '#334155'; });
+    passEl.addEventListener('focus',  function () { passEl.style.borderColor  = '#b91c1c'; });
+    passEl.addEventListener('blur',   function () { passEl.style.borderColor  = '#334155'; });
+
+    async function doLogin() {
+      const email    = emailEl.value.trim();
+      const password = passEl.value;
+
+      if (!email || !password) {
+        errEl.textContent = 'ელფოსტა და პაროლი სავალდებულოა.';
+        return;
+      }
+
+      btn.disabled = true; btn.textContent = 'შედის…'; errEl.textContent = '';
+
+      const { data, error } = await client.auth.signInWithPassword({ email, password });
+      if (error) {
+        errEl.textContent = 'შეცდომა: ' + (error.message || 'ავტორიზაცია ვერ მოხერხდა.');
+        btn.disabled = false; btn.textContent = 'შესვლა';
+        return;
+      }
+
+      const user = data?.user || null;
+      if (!user) {
+        errEl.textContent = 'მომხმარებელი ვერ მოიძებნა.';
+        btn.disabled = false; btn.textContent = 'შესვლა';
+        return;
+      }
+
+      const auth = window.siteAuth;
+      user.__resolvedRole = await auth.resolveProfileRole(client, user);
+
+      if (auth.getUserRole(user) !== 'admin') {
+        errEl.textContent = 'ეს ანგარიში admin არ არის.';
+        btn.disabled = false; btn.textContent = 'შესვლა';
+        await client.auth.signOut();
+        return;
+      }
+
+      overlay.style.transition = 'opacity .25s';
+      overlay.style.opacity = '0';
+      setTimeout(function () { overlay.remove(); }, 260);
+
+      await startDashboard(client, user);
+    }
+
+    btn.addEventListener('click', doLogin);
+    emailEl.addEventListener('keydown', function (e) { if (e.key === 'Enter') { passEl.focus(); } });
+    passEl.addEventListener('keydown',  function (e) { if (e.key === 'Enter') { doLogin(); } });
+  }
+
+  async function init() {
+    const auth = window.siteAuth;
+    if (!auth?.getClient) return;
+
+    const client = auth.getClient();
+    if (!client) return;
+
+    const { data: sd } = await client.auth.getSession();
+    const user = sd?.session?.user || null;
+
+    if (!user) {
+      showSupabaseLogin(client);
+      return;
+    }
+
+    user.__resolvedRole = await auth.resolveProfileRole(client, user);
+
+    if (auth.getUserRole(user) !== 'admin') {
+      alert('ამ გვერდზე წვდომა მხოლოდ ადმინისთვის არის ხელმისაწვდომი.');
+      window.location.replace('../index.html');
+      return;
+    }
+
+    await startDashboard(client, user);
   }
 
   init();

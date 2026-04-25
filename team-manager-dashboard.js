@@ -1,7 +1,7 @@
 (() => {
   const ROLES = ['გუნდის მენეჯერი', 'აკადემიის მენეჯერი', 'ოპერაციული მენეჯერი', 'კოორდინატორი'];
   const FOCUS = ['სრული გუნდის მართვა', 'აკადემიის განვითარება', 'რეკრუტინგი', 'ტურნირები და ლოჯისტიკა'];
-  const AGES = ['all', 'u8', 'u9', 'u10', 'u11', 'u12', 'u13', 'u14', 'u15', 'u16', 'u17', 'u18', 'pro'];
+  const AGES = ['all', 'u8', 'u9', 'u10', 'u11', 'u12', 'u13', 'u14', 'u15', 'u16', 'u17', 'u19', 'pro'];
   const POSITIONS = ['all', 'goalkeeper', 'defender', 'midfielder', 'forward'];
   const SECTIONS = [['overview', 'მთავარი'], ['club', 'გუნდის პროფილი'], ['roster', 'ჩემი ფეხბურთელები'], ['database', 'ბაზა'], ['favorites', 'რჩეულები'], ['watchlist', 'დასაკვირვებელი'], ['notes', 'ჩანაწერები'], ['requests', 'მოთხოვნები']];
   const state = { client: null, user: null, profile: {}, clubs: [], players: [], requests: [], selectedClub: null, section: 'overview', search: '', age: 'all', position: 'all' };
@@ -164,6 +164,10 @@
     const requestStateLabel = latestRequest
       ? (latestRequest.status === 'approved' ? 'დადასტურებული' : latestRequest.status === 'rejected' ? 'უარყოფილი' : 'მოლოდინში')
       : 'მოთხოვნა არ არის';
+
+    $('sidebarAvatar').textContent = initials(manager);
+    $('sidebarUserName').textContent = manager;
+    $('sidebarUserRole').textContent = (state.profile.roleTitle || 'გუნდის მენეჯერი') + ' · ' + (state.profile.focus || 'გუნდის მართვა');
 
     $('heroTitle').textContent = manager + ' · გუნდის მენეჯერი';
     $('heroCopy').textContent = activeClub
