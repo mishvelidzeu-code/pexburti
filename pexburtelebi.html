@@ -374,10 +374,7 @@
         <a href="cxrilebi.html">ცხრილები</a>
         <a href="gamokitkhvebi.html">გამოკითხვები</a>
       </nav>
-      <div class="nav-actions" id="playersAuthNav">
-        <a href="login.html?redirect=pexburtelebi.html%23login#login" class="btn btn-white">შესვლა</a>
-        <a href="login.html?redirect=pexburtelebi.html%23register#register" class="btn btn-red">რეგისტრაცია</a>
-      </div>
+      <div class="nav-actions" id="playersAuthNav"></div>
     </div>
   </header>
 
@@ -438,9 +435,9 @@
   <script src="auth-shared.js"></script>
   <script>
     (async function () {
-      // Auth nav - always renders regardless of Supabase state
+      // Auth nav
       if (window.siteAuth && window.siteAuth.renderAuthNav) {
-        window.siteAuth.renderAuthNav('#playersAuthNav', {
+        await window.siteAuth.renderAuthNav('#playersAuthNav', {
           currentPath: 'pexburtelebi.html',
           loginClass: 'btn btn-white',
           registerClass: 'btn btn-red',

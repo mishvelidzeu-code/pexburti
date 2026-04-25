@@ -23,6 +23,7 @@
     ['players', 'ფეხბურთელები'],
     ['favorites', 'რჩეულები'],
     ['watchlist', 'დასაკვირვებელი'],
+    ['finance', 'ფინანსები'],
     ['notes', 'ჩანაწერები'],
     ['requests', 'მოთხოვნები']
   ];
@@ -197,6 +198,23 @@
     }
   }
 
+  async function fetchMissingTrackedPlayers() {
+    if (!window.siteData?.fetchPlayerById) return;
+    const knownIds = new Set(state.players.map((p) => String(p.id)));
+    const missing = uniq([
+      ...state.profile.watchlist,
+      ...state.profile.favorites,
+      ...state.profile.roster
+    ]).filter((id) => id && !knownIds.has(id));
+    if (!missing.length) return;
+    const results = await Promise.allSettled(
+      missing.map((id) => window.siteData.fetchPlayerById(state.client, id))
+    );
+    results.forEach((r) => {
+      if (r.status === 'fulfilled' && r.value) state.players.push(r.value);
+    });
+  }
+
   async function load() {
     state.profile = buildProfile(state.user);
     state.requestLogoDraft = state.profile.requestLogo || '';
@@ -209,6 +227,7 @@
     state.players = Array.isArray(players) ? players : [];
     state.requests = requests;
     state.selectedClub = getSelectedClub() || getApprovedRequestClub();
+    await fetchMissingTrackedPlayers();
   }
 
   function paintLogo(src, name) {
@@ -336,7 +355,7 @@
   }
 
   function getSectionItems() {
-    return SECTIONS.concat([['finance', 'ფინანსები']]).filter((item, index, arr) => arr.findIndex((x) => x[0] === item[0]) === index);
+    return SECTIONS;
   }
 
   function financePlayerPool() {
@@ -427,7 +446,7 @@
           <button class="btn btn-red" type="button" data-a="finance-add" data-id="${esc(player.id)}">დამატება</button>
         </div>
         <div class="finance-entry-list">
-          ${entries.length ? entries.slice(0, 8).map((entry) => `
+          ${entries.length ? entries.map((entry) => `
             <div class="finance-entry">
               <small>${esc(fmt(entry.date || entry.createdAt))}</small>
               <strong class="${entry.type === 'income' ? 'finance-income' : 'finance-expense'}">${esc(entry.type === 'income' ? 'შემოსავალი' : 'ხარჯი')}</strong>
@@ -541,7 +560,7 @@
     $('watchList').innerHTML = renderGroups(filteredCollection(state.profile.watchlist, state.watchSearch, state.watchAge), 'დასაკვირვებელში შესაბამისი ფეხბურთელი ვერ მოიძებნა.');
     const visibleNotes = filteredNotes();
     $('noteList').innerHTML = visibleNotes.length
-      ? visibleNotes.map((n) => `<article class="note"><strong>${esc(n.text || '')}</strong><span>${esc(fmt(n.createdAt))}</span></article>`).join('')
+      ? visibleNotes.map((n) => `<article class="note"><strong>${esc(n.text || '')}</strong><span>${esc(fmt(n.createdAt))}</span><button class="mini-btn" type="button" data-a="delete-note" data-id="${esc(n.id)}">წაშლა</button></article>`).join('')
       : '<div class="empty">ჩანაწერები ამ ძებნით ვერ მოიძებნა.</div>';
 
     const visibleRequests = filteredRequests();
@@ -623,10 +642,14 @@
   async function toggleList(listKey, playerId) {
     const cur = uniq(state.profile[listKey]);
     const next = cur.includes(String(playerId)) ? cur.filter((x) => x !== String(playerId)) : cur.concat(String(playerId));
+    const KEY_MAP = { favorites: 'managerFavorites', watchlist: 'managerWatchlist' };
     const patch = {};
-    patch[listKey === 'favorites' ? 'managerFavorites' : 'managerWatchlist'] = next;
+    patch[KEY_MAP[listKey]] = next;
     const ok = await savePatch(patch, 'playersStatus', 'ფეხბურთელების სია განახლდა.');
-    if (ok) render();
+    if (ok) {
+      await fetchMissingTrackedPlayers();
+      render();
+    }
   }
 
   async function savePlayerComment(playerId) {
@@ -651,6 +674,12 @@
       $('noteInput').value = '';
       render();
     }
+  }
+
+  async function deleteNote(noteId) {
+    const notes = (state.profile.notes || []).filter((n) => String(n.id) !== String(noteId));
+    const ok = await savePatch({ managerNotes: notes }, 'noteStatus', 'ჩანაწერი წაიშალა.');
+    if (ok) render();
   }
 
   async function saveFinanceEntry(playerId) {
@@ -776,6 +805,7 @@
       if (a === 'save-comment') savePlayerComment(id);
       if (a === 'finance-add') saveFinanceEntry(id);
       if (a === 'finance-remove') removeFinanceEntry(act.dataset.entryId);
+      if (a === 'delete-note') deleteNote(id);
     });
 
     $('clubForm').addEventListener('submit', submitProfile);
