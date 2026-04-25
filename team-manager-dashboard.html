@@ -140,24 +140,12 @@
             </div>
           </section>
 
-          <section class="section" id="section-roster">
+          <section class="section" id="section-players">
             <div class="panel">
               <div class="panel-head">
                 <div>
-                  <h2>ჩემი ფეხბურთელები</h2>
-                  <p class="muted">Roster-ში დამატებული ან შენს არჩეულ გუნდზე მიბმული მოთამაშეები.</p>
-                </div>
-              </div>
-              <div id="rosterList" class="players-grid"></div>
-            </div>
-          </section>
-
-          <section class="section" id="section-database">
-            <div class="panel">
-              <div class="panel-head">
-                <div>
-                  <h2>ფეხბურთელების ბაზა</h2>
-                  <p class="muted">სერჩი, ასაკი, პოზიცია და მენეჯერის სიებში სწრაფი გადატანა.</p>
+                  <h2>ფეხბურთელები</h2>
+                  <p class="muted">ჩემი ფეხბურთელები და სრული ბაზა ერთიან სივრცეში, ასაკობრივი დაყოფით და კომენტარებით.</p>
                 </div>
               </div>
               <div class="search-grid">
@@ -165,8 +153,8 @@
                 <select id="ageFilter" class="input"></select>
                 <select id="positionFilter" class="input"></select>
               </div>
-              <div id="databaseStatus" class="status info" hidden></div>
-              <div id="databaseList" class="players-grid"></div>
+              <div id="playersStatus" class="status info" hidden></div>
+              <div id="playersList"></div>
             </div>
           </section>
 
@@ -231,6 +219,22 @@
                   <div class="form-group"><label class="label" for="requestClubName">გუნდის სახელი</label><input id="requestClubName" class="input"></div>
                   <div class="form-group"><label class="label" for="requestCity">მდებარეობა</label><input id="requestCity" class="input"></div>
                   <div class="form-group full"><label class="label" for="requestPhone">თქვენი ტელეფონის ნომერი</label><input id="requestPhone" class="input"></div>
+                  <div class="form-group full">
+                    <label class="label">გუნდის ლოგო საჯარო მოთხოვნისთვის</label>
+                    <div class="request-logo-row">
+                      <div class="request-logo-box">
+                        <div id="requestLogoFallback" class="request-logo-fallback">ლოგო</div>
+                        <img id="requestLogoPreview" alt="გუნდის ლოგო" hidden>
+                      </div>
+                      <div class="request-logo-actions">
+                        <label class="btn btn-white file-btn">ლოგოს ატვირთვა<input id="requestLogoFile" type="file" accept="image/png,image/jpeg,image/webp,image/gif"></label>
+                        <button id="clearRequestLogo" class="btn btn-white" type="button">წაშლა</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="request-explainer" id="requestAccessHint">
+                  სრული წვდომისთვის საჭიროა გუნდის საჯაროობაზე მოთხოვნის გაგზავნა. საჯაროდ გამოჩნდება გუნდის დასახელება და ლოგო.
                 </div>
                 <div class="form-actions">
                   <button id="sendRequest" class="btn btn-red" type="button">მოთხოვნის გაგზავნა</button>
