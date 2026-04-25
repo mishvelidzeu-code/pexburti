@@ -1,6 +1,7 @@
 -- ============================================================
 -- 1 აგენტი + 1 გუნდის მენეჯერი (academy)
 -- პაროლი: Test1234!
+-- იდემპოტენტური — მეორედ გაშვებაც უსაფრთხოა
 -- ============================================================
 --   agent1@test.ge   — გიო მხეიძე, სპორტ-აგენტი
 --   manager1@test.ge — ნიკა ბასილაშვილი, FC Saburtalo-ს მენეჯერი
@@ -8,7 +9,7 @@
 
 
 -- ============================================================
--- 1. AUTH USERS
+-- 1. AUTH USERS  (on conflict skip — safe to re-run)
 -- ============================================================
 
 insert into auth.users (
@@ -17,7 +18,6 @@ insert into auth.users (
   created_at, updated_at, aud, role
 ) values
 
--- აგენტი
 (
   'a0000000-0000-0000-0000-00000000000e'::uuid,
   '00000000-0000-0000-0000-000000000000'::uuid,
@@ -39,8 +39,6 @@ insert into auth.users (
   }'::jsonb,
   now(), now(), 'authenticated', 'authenticated'
 ),
-
--- გუნდის მენეჯერი (academy)
 (
   'a0000000-0000-0000-0000-00000000000f'::uuid,
   '00000000-0000-0000-0000-000000000000'::uuid,
@@ -68,7 +66,8 @@ insert into auth.users (
     }
   }'::jsonb,
   now(), now(), 'authenticated', 'authenticated'
-);
+)
+on conflict (id) do nothing;
 
 
 -- ============================================================
@@ -88,7 +87,7 @@ on conflict (id) do update set role = excluded.role;
 select
   au.email,
   p.role,
-  au.raw_user_meta_data->>'full_name'        as full_name,
+  au.raw_user_meta_data->>'full_name'                   as full_name,
   au.raw_user_meta_data->'profile'->>'managerClubName'  as manager_club,
   au.raw_user_meta_data->'profile'->>'agencyName'       as agency
 from public.profiles p

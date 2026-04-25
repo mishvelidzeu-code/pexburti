@@ -1,6 +1,7 @@
 -- ============================================================
 -- 5 მშობელი + 5 ბავშვი player_registry-ში
 -- პაროლი ყველასი: Test1234!
+-- იდემპოტენტური — მეორედ გაშვებაც უსაფრთხოა
 -- ============================================================
 --   parent3@test.ge  → შვილი: დავით ჯაფარიძე   (U13, Saburtalo,  MF)
 --   parent4@test.ge  → შვილი: ანა ხიდაშელი     (U12, Dinamo,     FW)
@@ -11,7 +12,7 @@
 
 
 -- ============================================================
--- 1. AUTH USERS
+-- 1. AUTH USERS  (on conflict skip — safe to re-run)
 -- ============================================================
 
 insert into auth.users (
@@ -20,7 +21,6 @@ insert into auth.users (
   created_at, updated_at, aud, role
 ) values
 
--- parent3 → დავით ჯაფარიძე, U13, Saburtalo
 (
   'a0000000-0000-0000-0000-000000000009'::uuid,
   '00000000-0000-0000-0000-000000000000'::uuid,
@@ -30,8 +30,6 @@ insert into auth.users (
   '{"full_name":"ნინო ჯაფარიძე","role":"parent","profile":{"childName":"დავით ჯაფარიძე","childTeam":"FC Saburtalo","childTeamSlug":"saburtalo","childPosition":"midfielder","childFoot":"right","childBirthDate":"2012-04-10","childAge":"13","childAgeCategory":"u13"}}'::jsonb,
   now(), now(), 'authenticated', 'authenticated'
 ),
-
--- parent4 → ანა ხიდაშელი, U12, Dinamo
 (
   'a0000000-0000-0000-0000-00000000000a'::uuid,
   '00000000-0000-0000-0000-000000000000'::uuid,
@@ -41,8 +39,6 @@ insert into auth.users (
   '{"full_name":"გიორგი ხიდაშელი","role":"parent","profile":{"childName":"ანა ხიდაშელი","childTeam":"FC Dinamo Tbilisi","childTeamSlug":"dinamo-tbilisi","childPosition":"forward","childFoot":"left","childBirthDate":"2013-07-22","childAge":"12","childAgeCategory":"u12"}}'::jsonb,
   now(), now(), 'authenticated', 'authenticated'
 ),
-
--- parent5 → ლუკა ლომიძე, U15, Gagra
 (
   'a0000000-0000-0000-0000-00000000000b'::uuid,
   '00000000-0000-0000-0000-000000000000'::uuid,
@@ -52,8 +48,6 @@ insert into auth.users (
   '{"full_name":"მარინე ლომიძე","role":"parent","profile":{"childName":"ლუკა ლომიძე","childTeam":"FC Gagra","childTeamSlug":"gagra","childPosition":"defender","childFoot":"right","childBirthDate":"2010-11-05","childAge":"15","childAgeCategory":"u15"}}'::jsonb,
   now(), now(), 'authenticated', 'authenticated'
 ),
-
--- parent6 → თეკა ქობულაძე, U14, Torpedo Kutaisi
 (
   'a0000000-0000-0000-0000-00000000000c'::uuid,
   '00000000-0000-0000-0000-000000000000'::uuid,
@@ -63,8 +57,6 @@ insert into auth.users (
   '{"full_name":"ზაზა ქობულაძე","role":"parent","profile":{"childName":"თეკა ქობულაძე","childTeam":"FC Torpedo Kutaisi","childTeamSlug":"torpedo-kutaisi","childPosition":"goalkeeper","childFoot":"right","childBirthDate":"2011-02-18","childAge":"14","childAgeCategory":"u14"}}'::jsonb,
   now(), now(), 'authenticated', 'authenticated'
 ),
-
--- parent7 → სანდრო ჩხეიძე, U16, Dila Gori
 (
   'a0000000-0000-0000-0000-00000000000d'::uuid,
   '00000000-0000-0000-0000-000000000000'::uuid,
@@ -73,7 +65,8 @@ insert into auth.users (
   now(),
   '{"full_name":"ეკა ჩხეიძე","role":"parent","profile":{"childName":"სანდრო ჩხეიძე","childTeam":"FC Dila Gori","childTeamSlug":"dila-gori","childPosition":"midfielder","childFoot":"left","childBirthDate":"2009-09-30","childAge":"16","childAgeCategory":"u16"}}'::jsonb,
   now(), now(), 'authenticated', 'authenticated'
-);
+)
+on conflict (id) do nothing;
 
 
 -- ============================================================
@@ -119,7 +112,6 @@ select
   pr.age_group,
   pr.primary_position as position,
   pr.club_name        as club,
-  pr.owner_role,
   au.email            as parent_email
 from public.player_registry pr
 join auth.users au on au.id = pr.owner_user_id
