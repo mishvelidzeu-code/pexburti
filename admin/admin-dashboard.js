@@ -236,6 +236,12 @@
       state.client.from('club_submission_requests').select('id', { count: 'exact', head: true }).eq('status', 'pending')
     ]);
 
+    results.forEach(function (r, i) {
+      if (r.status === 'fulfilled' && r.value.error) {
+        console.error('[admin] loadOverviewStats query[' + i + '] error:', r.value.error);
+      }
+    });
+
     const playersRegistry = results[0].status === 'fulfilled' ? (results[0].value.count || 0) : 0;
     const playersProfiles = results[1].status === 'fulfilled' ? (results[1].value.count || 0) : 0;
     const usersCount = results[2].status === 'fulfilled' ? (results[2].value.count || 0) : 0;
@@ -257,7 +263,8 @@
       .order('created_at', { ascending: false });
 
     if (error) {
-      setRequestState('მოთხოვნების წამოღება ვერ მოხერხდა.', true);
+      console.error('[admin] loadRequests error:', error);
+      setRequestState('მოთხოვნების წამოღება ვერ მოხერხდა: ' + escapeHtml(error.message || ''), true);
       return;
     }
 
@@ -417,7 +424,8 @@
       .order('name', { ascending: true });
 
     if (error) {
-      setClubState('კლუბების წამოღება ვერ მოხერხდა.', true);
+      console.error('[admin] loadClubs error:', error);
+      setClubState('კლუბების წამოღება ვერ მოხერხდა: ' + escapeHtml(error.message || ''), true);
       return;
     }
 
@@ -573,6 +581,7 @@
     if (!error && Array.isArray(data) && data.length) {
       rows = data;
     } else {
+      if (error) console.error('[admin] loadPlayers registry error:', error);
       const fallback = await state.client
         .from('player_profiles')
         .select('*')
@@ -580,6 +589,7 @@
         .limit(200);
 
       if (fallback.error || !Array.isArray(fallback.data) || !fallback.data.length) {
+        if (fallback.error) console.error('[admin] loadPlayers profiles fallback error:', fallback.error);
         byId('playerList').innerHTML = '<div class="state-box error">ფეხბურთელების წამოღება ვერ მოხერხდა.</div>';
         return;
       }
@@ -793,12 +803,13 @@
   async function loadUsers() {
     const { data, error } = await state.client
       .from('profiles')
-      .select('id, email, role, created_at')
+      .select('id, role, created_at')
       .order('created_at', { ascending: false })
       .limit(200);
 
     if (error) {
-      byId('userList').innerHTML = '<div class="state-box error">მომხმარებლების წამოღება ვერ მოხერხდა.</div>';
+      console.error('[admin] loadUsers error:', error);
+      byId('userList').innerHTML = '<div class="state-box error">მომხმარებლების წამოღება ვერ მოხერხდა: ' + escapeHtml(error.message || '') + '</div>';
       return;
     }
 
@@ -811,7 +822,7 @@
     const query = normalize(byId('userSearchInput')?.value);
     const users = state.users.filter((user) => {
       if (!query) return true;
-      return [user.email, user.role].some((value) => normalize(value).includes(query));
+      return [user.id, user.role].some((value) => normalize(value).includes(query));
     });
 
     if (!users.length) {
@@ -823,9 +834,9 @@
       <article class="user-card" data-user-id="${user.id}">
         <div class="user-top">
           <div>
-            <h4>${escapeHtml(user.email || 'უცნობი ელფოსტა')}</h4>
+            <h4>${escapeHtml(roleLabel(user.role))}</h4>
             <div class="meta">
-              <span>${escapeHtml(roleLabel(user.role))}</span>
+              <span>ID: ${escapeHtml(String(user.id || '').slice(0, 12))}…</span>
               <span>${escapeHtml(formatDate(user.created_at))}</span>
             </div>
           </div>
@@ -892,18 +903,29 @@
       return;
     }
 
-    let publicPlayers = [];
     let snapshot = null;
     try {
-      publicPlayers = await window.siteData.fetchPublicPlayers(state.client);
-      snapshot = await window.siteData.fetchCurrentMonthlySnapshot(state.client, publicPlayers);
-    } catch (error) {
+      const allPlayers = state.players.length
+        ? state.players.map(function (p) {
+            return {
+              id: String(p.id || ''),
+              fullName: String(p.full_name || ''),
+              positionKey: String(p.primary_position || 'midfielder'),
+              positionLabel: String(p.position_label || p.primary_position || ''),
+              votesCount: Number(p.votes_count || 0) || 0,
+              rating: 7.5
+            };
+          })
+        : await window.siteData.fetchPublicPlayers(state.client);
+      snapshot = await window.siteData.fetchCurrentMonthlySnapshot(state.client, allPlayers);
+    } catch (err) {
+      console.error('[admin] loadMonthlySnapshot error:', err);
       snapshot = null;
     }
     state.monthlySnapshot = snapshot;
 
     if (!snapshot) {
-      setMonthlyState('თვის შედეგების წამოღება ვერ მოხერხდა.', true);
+      setMonthlyState('თვის შედეგების წამოღება ვერ მოხერხდა (RPC ვერ მოიძებნა ან მონაცემი არ არის).', true);
       return;
     }
 
@@ -1015,6 +1037,7 @@
     byId('clubForm')?.addEventListener('submit', saveClub);
     byId('clubFormReset')?.addEventListener('click', resetClubForm);
     byId('clubCancelEdit')?.addEventListener('click', resetClubForm);
+    byId('reloadRequestsButton')?.addEventListener('click', loadRequests);
     byId('reloadClubsButton')?.addEventListener('click', loadClubs);
     byId('reloadPlayersButton')?.addEventListener('click', loadPlayers);
     byId('reloadUsersButton')?.addEventListener('click', loadUsers);
@@ -1082,6 +1105,10 @@
     if (nameEl) {
       nameEl.textContent = window.siteAuth?.getUserDisplayName(user) || 'ადმინი';
     }
+
+    byId('clubList').innerHTML = '<div class="state-box">კლუბები იტვირთება…</div>';
+    byId('playerList').innerHTML = '<div class="state-box">ფეხბურთელები იტვირთება…</div>';
+    byId('userList').innerHTML = '<div class="state-box">მომხმარებლები იტვირთება…</div>';
 
     bindEvents();
     resetClubForm();
@@ -1190,23 +1217,32 @@
 
   async function init() {
     const auth = window.siteAuth;
-    if (!auth?.getClient) return;
+    if (!auth?.getClient) {
+      console.error('[admin] siteAuth not available');
+      return;
+    }
 
     const client = auth.getClient();
-    if (!client) return;
+    if (!client) {
+      console.error('[admin] Supabase client could not be created');
+      return;
+    }
 
     const { data: sd } = await client.auth.getSession();
     const user = sd?.session?.user || null;
 
     if (!user) {
+      console.log('[admin] No Supabase session — showing login form');
       showSupabaseLogin(client);
       return;
     }
 
     user.__resolvedRole = await auth.resolveProfileRole(client, user);
+    const role = auth.getUserRole(user);
+    console.log('[admin] Logged in as:', user.email || user.id, '| role:', role);
 
-    if (auth.getUserRole(user) !== 'admin') {
-      alert('ამ გვერდზე წვდომა მხოლოდ ადმინისთვის არის ხელმისაწვდომი.');
+    if (role !== 'admin') {
+      alert('ამ გვერდზე წვდომა მხოლოდ ადმინისთვის არის ხელმისაწვდომი. (role: ' + role + ')');
       window.location.replace('../index.html');
       return;
     }

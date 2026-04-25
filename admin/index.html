@@ -717,7 +717,13 @@
         <section class="panel" id="requestsPanel">
           <div class="panel-head">
             <h2>გუნდის მოთხოვნები</h2>
-            <span class="chip" id="clubRequestCountChip">იტვირთება…</span>
+            <div class="panel-actions">
+              <span class="chip" id="clubRequestCountChip">იტვირთება…</span>
+              <button class="btn btn-white" type="button" id="reloadRequestsButton">
+                <svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+                განახლება
+              </button>
+            </div>
           </div>
           <div class="state-box" id="clubRequestState">მოთხოვნები იტვირთება…</div>
           <div class="card-list" id="clubRequestList" hidden></div>
@@ -985,7 +991,7 @@
     /* topbar reload — delegates to JS reload functions */
     document.getElementById('topbarReload')?.addEventListener('click', function () {
       const reloadMap = {
-        requests: 'reloadClubsButton',
+        requests: 'reloadRequestsButton',
         clubs:    'reloadClubsButton',
         players:  'reloadPlayersButton',
         monthly:  'reloadMonthlyButton',
