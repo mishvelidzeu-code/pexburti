@@ -493,10 +493,6 @@
     const requestLabel = latestRequest ? (latestRequest.status === 'approved' ? 'დადასტურებული' : latestRequest.status === 'rejected' ? 'უარყოფილი' : 'მოლოდინში') : 'მოთხოვნა არ არის';
     const unlocked = hasRequestAccess();
 
-    $('sidebarAvatar').textContent = initials(manager);
-    $('sidebarUserName').textContent = manager;
-    $('sidebarUserRole').textContent = `${state.profile.roleTitle || 'გუნდის მენეჯერი'} · ${state.profile.focus || 'გუნდის მართვა'}`;
-
     $('heroTitle').textContent = `${manager} · გუნდის მენეჯერი`;
     $('heroCopy').textContent = activeClub
       ? `აქედან მართავ "${club}"-ს, უცვლი ლოგოს, აწყობ ფეხბურთელების სიებს და მუშაობ ნებისმიერი გუნდის მოთამაშეებთან.`
