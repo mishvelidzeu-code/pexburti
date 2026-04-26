@@ -567,11 +567,18 @@
       border:1px solid rgba(185,28,28,.22);
     }
     .team-name{
-      margin:10px 0 4px;
+      margin:10px 0 2px;
       font-size:1.05rem;
       font-weight:900;
       letter-spacing:-.02em;
       line-height:1.15;
+    }
+    .team-name-en{
+      font-size:.78rem;
+      color:var(--muted);
+      font-weight:600;
+      margin-bottom:4px;
+      letter-spacing:.01em;
     }
     .team-location{
       color:var(--muted);
@@ -918,7 +925,7 @@
 
       function createDynamicEmblem(club) {
         if (club.logoPath) {
-          return `<img src="${escapeHtml(club.logoPath)}" alt="${escapeHtml(club.name)} ლოგო" loading="lazy">`;
+          return `<img src="${escapeHtml(club.logoPath)}" alt="${escapeHtml(club.nameKa || club.name)} ლოგო" loading="lazy">`;
         }
         return `
           <div style="width:74px;height:86px;border-radius:22px;background:linear-gradient(135deg,#b91c1c,#0f172a);display:grid;place-items:center;color:#fff;font-size:1.05rem;font-weight:900;letter-spacing:-.04em;box-shadow:0 16px 28px rgba(15,23,42,.16);">
@@ -941,8 +948,9 @@
         }
 
         teamsGrid.innerHTML = clubs.map(function (club) {
-        const searchText = [club.name, club.location, club.ageLabel, club.coach, club.summary].join(' ').toLowerCase();
+        const searchText = [club.nameKa, club.nameEn, club.name, club.location, club.ageLabel, club.coach, club.summary].join(' ').toLowerCase();
         const route = club.route || 'gundebi.html';
+        const showEnglish = club.nameKa && club.nameEn && club.nameKa !== club.nameEn;
         return `
           <article class="team-card" data-search="${escapeHtml(searchText)}">
             <div class="team-top">
@@ -950,6 +958,7 @@
               <div class="team-head">
                 <div class="team-badge">დარეგისტრირებული გუნდი</div>
                 <h3 class="team-name"><a href="${route}">${escapeHtml(club.name)}</a></h3>
+                ${showEnglish ? `<div class="team-name-en">${escapeHtml(club.nameEn)}</div>` : ''}
                 <div class="team-location">${escapeHtml(club.location || 'საქართველო')}</div>
               </div>
             </div>

@@ -38,14 +38,19 @@
 
   function mapClub(row) {
     const slug = String(row.slug || '').trim().toLowerCase();
+    const nameEn = String(row.name || '').trim();
+    const nameKa = String(row.name_ka || '').trim();
+    const displayName = nameKa || nameEn;
     return {
       id: String(row.id || '').trim(),
       slug: slug,
-      name: String(row.name || '').trim(),
+      name: displayName,
+      nameKa: nameKa,
+      nameEn: nameEn,
       city: [row.city, row.country].filter(Boolean).join(', '),
       route: buildTeamRoute(slug),
-      shortCode: shortCode(row.name, row.short_code),
-      mark: shortCode(row.name, row.short_code),
+      shortCode: shortCode(displayName, row.short_code),
+      mark: shortCode(displayName, row.short_code),
       logoPath: String(row.logo_path || '').trim(),
       age: String(row.age_band || 'pro').trim().toLowerCase(),
       ageLabel: String(row.age_band || 'PRO').trim().toUpperCase()
@@ -62,7 +67,7 @@
     if (!loadPromise) {
       loadPromise = client
         .from('clubs')
-        .select('id, slug, short_code, name, city, country, age_band, logo_path, is_public, is_active')
+        .select('id, slug, short_code, name, name_ka, city, country, age_band, logo_path, is_public, is_active')
         .eq('is_public', true)
         .eq('is_active', true)
         .order('name', { ascending: true })
@@ -111,6 +116,8 @@
     return teams
       .filter(function (team) {
         return normalizeText(team.name).includes(normalized) ||
+          normalizeText(team.nameKa || '').includes(normalized) ||
+          normalizeText(team.nameEn || '').includes(normalized) ||
           normalizeText(team.city).includes(normalized) ||
           normalizeText(team.ageLabel).includes(normalized);
       })
