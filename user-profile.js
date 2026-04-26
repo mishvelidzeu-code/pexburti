@@ -1099,11 +1099,11 @@
         lead: '',
         side: '',
         quick: [
-          { l: 'საერთო ქულა', v: formatOverallPoints(performanceStore, { role, profile, config }) },
-          { l: 'თამაშები', v: formatMetricValue('matchesPlayed', performanceStore, { role, profile, config }) },
-          { l: 'წუთები / 90', v: formatMetricValue('matches90', performanceStore, { role, profile, config }) },
-          { l: 'დისციპლინა', v: discipline.value },
-          { l: 'გოლში მონაწილეობა', v: formatMetricValue('goalContributions', performanceStore, { role, profile, config }) }
+          { l: 'საკვანძო პასები', v: formatMetricValue('keyPasses', performanceStore, { role, profile, config }) },
+          { l: 'პროგრესული პასები', v: formatMetricValue('progressivePasses', performanceStore, { role, profile, config }) },
+          { l: 'პასის სიზუსტე %', v: formatMetricValue('passAccuracy', performanceStore, { role, profile, config }) },
+          { l: 'წარმ. დრიბლინგები', v: formatMetricValue('successfulDribbles', performanceStore, { role, profile, config }) },
+          { l: 'მოგებ. წართმევები', v: formatMetricValue('tacklesWon', performanceStore, { role, profile, config }) }
         ],
         pass: common.concat([
           { l: 'დაბადების თარიღი', v: safe(dateText(profile.playerBirthDate)) },
@@ -1152,11 +1152,11 @@
         lead: '',
         side: '',
         quick: [
-          { l: 'საერთო ქულა', v: formatOverallPoints(performanceStore, { role, profile, config }) },
-          { l: 'თამაშები', v: formatMetricValue('matchesPlayed', performanceStore, { role, profile, config }) },
-          { l: 'წუთები / 90', v: formatMetricValue('matches90', performanceStore, { role, profile, config }) },
-          { l: 'დისციპლინა', v: discipline.value },
-          { l: 'გოლში მონაწილეობა', v: formatMetricValue('goalContributions', performanceStore, { role, profile, config }) }
+          { l: 'საკვანძო პასები', v: formatMetricValue('keyPasses', performanceStore, { role, profile, config }) },
+          { l: 'პროგრესული პასები', v: formatMetricValue('progressivePasses', performanceStore, { role, profile, config }) },
+          { l: 'პასის სიზუსტე %', v: formatMetricValue('passAccuracy', performanceStore, { role, profile, config }) },
+          { l: 'წარმ. დრიბლინგები', v: formatMetricValue('successfulDribbles', performanceStore, { role, profile, config }) },
+          { l: 'მოგებ. წართმევები', v: formatMetricValue('tacklesWon', performanceStore, { role, profile, config }) }
         ],
         pass: common.concat([
           { l: 'ბავშვის სახელი', v: safe(profile.childName) },
@@ -2425,11 +2425,11 @@
     const discipline = formatDiscipline(store);
     const metricContext = { role, profile, config };
     const coreCards = [
-            { label: 'საერთო ქულა', value: formatOverallPoints(store, metricContext), copy: 'არსებული ქულა / მაქსიმუმი • 109' },
-      { label: 'თამაშები', value: formatMetricValue('matchesPlayed', store, metricContext), copy: 'ოფიციალურად დაფიქსირებული მატჩები' },
-      { label: 'წუთები / 90', value: formatMetricValue('matches90', store, metricContext), copy: 'რეალური 90-წუთიანები' },
-      { label: 'დისციპლინა', value: discipline.value, copy: `ბარათები • ${discipline.copy}` },
-      { label: 'გოლში მონაწილეობა', value: formatMetricValue('goalContributions', store, metricContext), copy: 'გოლი და ასისტი' }
+      { label: 'საკვანძო პასები', value: formatMetricValue('keyPasses', store, metricContext), copy: 'პასები დარტყმისთვის' },
+      { label: 'პროგრესული პასები', value: formatMetricValue('progressivePasses', store, metricContext), copy: 'წინ მიმტანი პასები' },
+      { label: 'პასის სიზუსტე %', value: formatMetricValue('passAccuracy', store, metricContext), copy: 'პასების სიზუსტე სეზონში' },
+      { label: 'წარმ. დრიბლინგები', value: formatMetricValue('successfulDribbles', store, metricContext), copy: 'წარმატებული 1v1 გარღვევები' },
+      { label: 'მოგებული წართმევები', value: formatMetricValue('tacklesWon', store, metricContext), copy: 'მოგებული წართმევები სეზონში' }
     ];
 
     const commonItems = [
@@ -2590,13 +2590,6 @@
               </div>
             </article>
             <div class="metric-groups">
-              <article class="performance-panel">
-                <h3>ძირითადი მაჩვენებლები</h3>
-                <p class="position-copy">პირველივე შეხედვით ყველაზე მნიშვნელოვანი რიცხვები.</p>
-                <div class="metric-grid">
-                  ${performance.commonItems.map((item) => `<div class="metric-item"><span class="metric-item-label">${esc(item.title)}</span><strong class="metric-item-value">${esc(item.value)}</strong><span class="metric-item-copy">${esc(item.copy)}</span></div>`).join('')}
-                </div>
-              </article>
               <article class="performance-panel">
                 <h3>გავლენის მაჩვენებლები</h3>
                 <p class="position-copy">პოზიციაზე მორგებული დამატებითი სურათი და გავლენა.</p>

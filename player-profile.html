@@ -424,6 +424,11 @@
       border:1px solid var(--line);
       box-shadow:var(--shadow);
     }
+    .imp-badge{display:inline-flex;align-items:center;padding:2px 7px;border-radius:999px;font-size:.68rem;font-weight:900;margin-left:4px}
+    .imp-critical{background:#fef2f2;color:#b91c1c;border:1px solid rgba(185,28,28,.18)}
+    .imp-primary{background:#eff6ff;color:#1d4ed8;border:1px solid rgba(29,78,216,.18)}
+    .imp-secondary{background:#f8fafc;color:#667085;border:1px solid rgba(15,23,42,.1)}
+    .stat-desc{margin:3px 0 0;font-size:.72rem;color:var(--muted);line-height:1.4;font-style:normal}
     @media (max-width:1080px){
       .profile-hero,
       .summary-grid,
@@ -628,68 +633,165 @@
         return `width:${Math.max(6, Math.min(100, (clampMetric(value) / 109) * 100))}%;background:${palette.fill};`;
       }
 
+      // Physical parameter metadata — label, description, and role importance
+      const PHYSICAL_PARAMS = {
+        sprint5:   {
+          label: '5-10მ სპრინტი',
+          description: 'ფეთქებადი ძალა — პირველ მეტრებში სიჩქარის სწრაფი მოკრება (Explosive Power).',
+          importance: { goalkeeper: 'secondary', defender: 'primary', midfielder: 'secondary', forward: 'critical' }
+        },
+        sprint30:  {
+          label: '30მ სპრინტი',
+          description: 'მოთამაშის მაქსიმალური სიჩქარის სტანდარტული ტესტი — ბოლო მეტრებში ტოპ-სპიდი.',
+          importance: { goalkeeper: 'secondary', defender: 'primary', midfielder: 'secondary', forward: 'critical' }
+        },
+        vertJump:  {
+          label: 'ვერტ. ხტომა',
+          description: 'ფეხების სიმძლავრე და ჰაერში ბრძოლის უნარი — მნიშვნელოვანია ჰედინგსა და ბლოკირებაში.',
+          importance: { goalkeeper: 'critical', defender: 'critical', midfielder: 'secondary', forward: 'primary' }
+        },
+        agility:   {
+          label: 'Agility (5-10-5)',
+          description: '5-10-5მ შატლ რანი — მიმართულების სწრაფად შეცვლის უნარი. გადამწყვეტია ერთ-ერთ სიტუაციებში.',
+          importance: { goalkeeper: 'primary', defender: 'primary', midfielder: 'primary', forward: 'primary' }
+        },
+        endurance: {
+          label: 'გამძლეობა',
+          description: 'Cooper / Yo-Yo ტესტი (კმ/სთ) — ერობული შესაძლებლობა, 90 წუთის ინტენსივობის შენარჩუნება.',
+          importance: { goalkeeper: 'secondary', defender: 'secondary', midfielder: 'critical', forward: 'secondary' }
+        }
+      };
+
+      // Elite benchmarks per position — used for AI-assisted raw-value → score mapping
+      // Sprint / Agility: lower seconds = better; VertJump / Endurance: higher = better
+      const ROLE_BENCHMARKS = {
+        goalkeeper: {
+          sprint5:   { elite: 1.70, good: 1.85, average: 2.00, min: 2.20 },
+          sprint30:  { elite: 4.20, good: 4.40, average: 4.65, min: 5.00 },
+          vertJump:  { elite: 68,   good: 60,   average: 52,   min: 42   },
+          agility:   { elite: 4.20, good: 4.40, average: 4.65, min: 5.00 },
+          endurance: { elite: 16.5, good: 15.0, average: 13.5, min: 11.0 }
+        },
+        defender: {
+          sprint5:   { elite: 1.60, good: 1.75, average: 1.90, min: 2.10 },
+          sprint30:  { elite: 3.90, good: 4.10, average: 4.35, min: 4.70 },
+          vertJump:  { elite: 72,   good: 64,   average: 56,   min: 46   },
+          agility:   { elite: 4.10, good: 4.30, average: 4.55, min: 4.90 },
+          endurance: { elite: 17.0, good: 15.5, average: 14.0, min: 11.5 }
+        },
+        midfielder: {
+          sprint5:   { elite: 1.65, good: 1.80, average: 1.95, min: 2.15 },
+          sprint30:  { elite: 3.95, good: 4.15, average: 4.40, min: 4.75 },
+          vertJump:  { elite: 65,   good: 57,   average: 50,   min: 40   },
+          agility:   { elite: 4.05, good: 4.25, average: 4.50, min: 4.85 },
+          endurance: { elite: 18.0, good: 16.5, average: 15.0, min: 12.5 }
+        },
+        forward: {
+          sprint5:   { elite: 1.55, good: 1.70, average: 1.85, min: 2.05 },
+          sprint30:  { elite: 3.80, good: 4.00, average: 4.25, min: 4.60 },
+          vertJump:  { elite: 70,   good: 62,   average: 54,   min: 44   },
+          agility:   { elite: 4.00, good: 4.20, average: 4.45, min: 4.80 },
+          endurance: { elite: 17.5, good: 16.0, average: 14.5, min: 12.0 }
+        }
+      };
+
+      // For these params, lower raw value = higher score
+      const INVERTED_PARAMS = new Set(['sprint5', 'sprint30', 'agility']);
+
+      // Convert a real test measurement to 0–109 score based on position benchmarks
+      function buildPhysicalScoreFromRaw(paramKey, rawValue, positionKey) {
+        const pos = ROLE_BENCHMARKS[positionKey] ? positionKey : 'midfielder';
+        const bench = ROLE_BENCHMARKS[pos][paramKey];
+        if (!bench || rawValue == null) return null;
+        const inv = INVERTED_PARAMS.has(paramKey);
+        let ratio;
+        if (inv) {
+          if (rawValue <= bench.elite) return 109;
+          if (rawValue >= bench.min) return 18;
+          ratio = (bench.min - rawValue) / (bench.min - bench.elite);
+        } else {
+          if (rawValue >= bench.elite) return 109;
+          if (rawValue <= bench.min) return 18;
+          ratio = (rawValue - bench.min) / (bench.elite - bench.min);
+        }
+        return clampMetric(18 + Math.round(ratio * 91));
+      }
+
       function buildPublicMetricSet(playerData) {
+        const pos = playerData.positionKey || 'midfielder';
         const ratingBase = clampMetric((Number(playerData.rating || 0) * 10) || 58);
         const votesBase = clampMetric(24 + (Number(playerData.votesCount || 0) * 9));
         const ageBase = clampMetric(36 + (Number(playerData.age || 0) * 3));
 
-        if (playerData.positionKey === 'goalkeeper') {
-          return [
-            { label: 'რეაქცია', value: clampMetric(ratingBase + 8) },
-            { label: 'განაწილება', value: clampMetric(ratingBase - 4 + (votesBase / 6)) },
-            { label: 'საჯარიმოს კონტროლი', value: clampMetric(ratingBase + 2) },
-            { label: 'სტაბილურობა', value: clampMetric(52 + (votesBase / 2)) },
-            { label: 'შეფასება', value: ratingBase }
-          ];
-        }
-
-        if (playerData.positionKey === 'defender') {
-          return [
-            { label: 'დაცვა', value: clampMetric(ratingBase + 6) },
-            { label: 'ორთაბრძოლა', value: clampMetric(48 + (votesBase / 2)) },
-            { label: 'ბურთის ამოტანა', value: clampMetric(ratingBase - 2 + (ageBase / 8)) },
-            { label: 'შეტევითი ჩართვა', value: clampMetric(44 + (ratingBase / 3)) },
-            { label: 'შეფასება', value: ratingBase }
-          ];
-        }
-
-        if (playerData.positionKey === 'forward') {
-          return [
-            { label: 'ფინიში', value: clampMetric(ratingBase + 7) },
-            { label: 'მოძრაობა', value: clampMetric(50 + (ageBase / 3)) },
-            { label: 'გოლის საფრთხე', value: clampMetric(46 + (votesBase / 2)) },
-            { label: 'კომბინაცია', value: clampMetric(ratingBase - 3 + (votesBase / 5)) },
-            { label: 'შეფასება', value: ratingBase }
-          ];
-        }
+        // Role-specific score multipliers per physical param
+        const roleWeights = {
+          goalkeeper: { sprint5: 0.88, sprint30: 0.85, vertJump: 1.18, agility: 1.10, endurance: 0.98 },
+          defender:   { sprint5: 1.08, sprint30: 1.05, vertJump: 1.14, agility: 1.10, endurance: 0.92 },
+          midfielder: { sprint5: 0.96, sprint30: 0.94, vertJump: 0.90, agility: 1.08, endurance: 1.22 },
+          forward:    { sprint5: 1.20, sprint30: 1.16, vertJump: 1.06, agility: 1.08, endurance: 0.88 }
+        };
+        const w = roleWeights[pos] || roleWeights.midfielder;
 
         return [
-          { label: 'ხედვა', value: clampMetric(ratingBase + 5) },
-          { label: 'პასი', value: clampMetric(ratingBase + 1) },
-          { label: 'თამაშის კონტროლი', value: clampMetric(50 + (ageBase / 3)) },
-          { label: 'დაცვითი მუშაობა', value: clampMetric(42 + (votesBase / 2)) },
-          { label: 'შეფასება', value: ratingBase }
+          {
+            key: 'sprint5',
+            label: PHYSICAL_PARAMS.sprint5.label,
+            description: PHYSICAL_PARAMS.sprint5.description,
+            importance: PHYSICAL_PARAMS.sprint5.importance[pos] || 'secondary',
+            value: clampMetric(Math.round(ratingBase * w.sprint5 + votesBase * 0.06 + ageBase * 0.04))
+          },
+          {
+            key: 'sprint30',
+            label: PHYSICAL_PARAMS.sprint30.label,
+            description: PHYSICAL_PARAMS.sprint30.description,
+            importance: PHYSICAL_PARAMS.sprint30.importance[pos] || 'secondary',
+            value: clampMetric(Math.round(ratingBase * w.sprint30 + ageBase * 0.08))
+          },
+          {
+            key: 'vertJump',
+            label: PHYSICAL_PARAMS.vertJump.label,
+            description: PHYSICAL_PARAMS.vertJump.description,
+            importance: PHYSICAL_PARAMS.vertJump.importance[pos] || 'secondary',
+            value: clampMetric(Math.round(ratingBase * w.vertJump + ageBase * 0.07))
+          },
+          {
+            key: 'agility',
+            label: PHYSICAL_PARAMS.agility.label,
+            description: PHYSICAL_PARAMS.agility.description,
+            importance: PHYSICAL_PARAMS.agility.importance[pos] || 'secondary',
+            value: clampMetric(Math.round(ratingBase * w.agility + votesBase * 0.07))
+          },
+          {
+            key: 'endurance',
+            label: PHYSICAL_PARAMS.endurance.label,
+            description: PHYSICAL_PARAMS.endurance.description,
+            importance: PHYSICAL_PARAMS.endurance.importance[pos] || 'secondary',
+            value: clampMetric(Math.round(ratingBase * w.endurance + votesBase * 0.10 + ageBase * 0.05))
+          }
         ];
       }
 
       function buildSummaryCopy(playerData, metrics) {
-        const topMetrics = metrics.slice(0, 3).map(function (item) {
-          return `${item.label.toLowerCase()} ${formatMetric(item.value)}`;
+        const pos = playerData.positionKey;
+        const criticals = metrics.filter(function (m) { return m.importance === 'critical'; });
+        const topPhys = criticals.length ? criticals : metrics.slice(0, 2);
+        const topStr = topPhys.map(function (m) {
+          return `${m.label.toLowerCase()} ${formatMetric(m.value)}`;
         }).join(', ');
 
-        if (playerData.positionKey === 'goalkeeper') {
-          return `${playerData.fullName} როგორც მეკარე ყველაზე მეტად გამოირჩევა ${topMetrics}-ით. აქ კომპაქტურად ჩანს ის ხუთი მაჩვენებელი, რაც კარის ხაზზე სანდოობას და საჯარო შეფასებას ყველაზე კარგად აჩვენებს.`;
+        if (pos === 'goalkeeper') {
+          return `${playerData.fullName}-ის მეკარის ფიზიკური პროფილი: ყველაზე კრიტიკულია ${topStr}. ვერტიკალური ხტომა ჰაერსაჭიდობლობისა და ბლოკირებისთვის, agility კი პენალტი ზონაში სწრაფი პოზიციონირებისთვის გადამწყვეტია.`;
         }
 
-        if (playerData.positionKey === 'defender') {
-          return `${playerData.fullName} დაცვის ხაზში განსაკუთრებით ჩანს ${topMetrics}. გვერდი ერთ სივრცეში აჩვენებს საჯარო შეფასებას, გუნდურ სტატუსს და მცველისთვის ყველაზე რელევანტურ მთავარ მაჩვენებლებს.`;
+        if (pos === 'defender') {
+          return `${playerData.fullName}-ის მცველის ფიზიკური პროფილი: გამოკვეთილია ${topStr}. ვერტიკალური ხტომა ჰაერში ორთაბრძოლაში, agility კი ფორვარდის მიყოლებისა და ბოლო ხაზზე ბლოკირებისთვის განსაკუთრებულ მნიშვნელობას ატარებს.`;
         }
 
-        if (playerData.positionKey === 'forward') {
-          return `${playerData.fullName} შეტევაში ყველაზე მეტად გამოიკვეთება ${topMetrics}. ამ მოკლე ბლოკში ჩანს რამდენად სახიფათოა ის ბოლო მესამედში და რა დონეზეა მისი საჯარო შეფასება დღეს.`;
+        if (pos === 'forward') {
+          return `${playerData.fullName}-ის ფორვარდის ფიზიკური პროფილი: ყველაზე ძლიერია ${topStr}. ფეთქებადი სპრინტი და ტოპ-სიჩქარე გასვლის, ჩართვის და გოლის სიტუაციებში ამ პოზიციაზე კრიტიკულია.`;
         }
 
-        return `${playerData.fullName} ნახევარდაცვაში გამოირჩევა ${topMetrics}. ეს არის კომპაქტური საჯარო სურათი, რომელიც აჩვენებს თამაშის მართვას, პასის ხარისხს და საერთო შეფასებას ზედმეტი გადატვირთვის გარეშე.`;
+        return `${playerData.fullName}-ის ნახევარდაცვის ფიზიკური პროფილი: გამოკვეთილია ${topStr}. გამძლეობა 90-წუთიანი ინტენსივობის შენარჩუნებისთვის, agility კი ბლოკირებისა და პრესინგის სიტუაციებისთვის ამ პოზიციაზე განუცვლელია.`;
       }
 
       function buildRadarSvg(metrics) {
@@ -751,11 +853,12 @@
       document.getElementById('playerLead').textContent = `${player.team || 'უგუნდოდ'} • ${player.positionLabel || 'მოთამაშე'} • ${player.ageLabel || 'PRO'} კატეგორია. აქ ჩანს მიმდინარე პოზიცია, ასაკი, მუშა ფეხი, გუნდი და მოთამაშის საჯარო შეფასების მოკლე სურათი.`;
       document.getElementById('photoBadge').textContent = `${player.ageLabel || 'PRO'} • ${player.team || 'უგუნდოდ'}`;
       document.getElementById('eyebrow').textContent = `${player.ageLabel || 'PRO'} მოთამაშე`;
-      document.getElementById('summaryTitle').textContent = `${player.positionLabel || 'მოთამაშე'}ს მთავარი სურათი`;
+      document.getElementById('summaryTitle').textContent = `${player.positionLabel || 'მოთამაშე'}ს ფიზიკური სურათი`;
       document.getElementById('playerSummary').textContent = buildSummaryCopy(player, compactMetrics);
+      document.getElementById('radarTitle').textContent = 'ფიზიკური პარამეტრები — ' + (player.positionLabel || 'მოთამაშე');
       document.getElementById('playerRadar').innerHTML = buildRadarSvg(compactMetrics);
       document.getElementById('radarLegend').innerHTML = compactMetrics.map(function (item) {
-        return `<span>${item.label}<strong>${metricMarkup(item.value)}</strong></span>`;
+        return `<span title="${item.description || ''}">${item.label}<strong>${metricMarkup(item.value)}</strong></span>`;
       }).join('');
 
       document.getElementById('heroChips').innerHTML = [
@@ -778,13 +881,21 @@
         `;
       }).join('');
 
+      const impBadgeMap = {
+        critical:  '<span class="imp-badge imp-critical">★ კრიტიკული</span>',
+        primary:   '<span class="imp-badge imp-primary">● მნიშვნელოვანი</span>',
+        secondary: '<span class="imp-badge imp-secondary">○ სასარგებლო</span>'
+      };
+
       document.getElementById('playerStats').innerHTML = compactMetrics.map(function (item) {
+        const badge = impBadgeMap[item.importance] || impBadgeMap.secondary;
         return `
           <div class="stat">
             <div class="stat-top">
-              <span>${item.label}</span>
+              <span>${item.label}${badge}</span>
               <strong class="stat-score">${metricMarkup(item.value)}</strong>
             </div>
+            ${item.description ? `<p class="stat-desc">${item.description}</p>` : ''}
             <div class="stat-meter">
               <div class="stat-meter-fill" style="${scoreFillStyle(item.value)}"></div>
             </div>
@@ -933,6 +1044,15 @@
       }
 
       await mountAgentProspectAction();
+
+      // Expose physics engine globally — agent dashboard uses this to map real test values to radar scores
+      window.playerPhysics = {
+        PHYSICAL_PARAMS: PHYSICAL_PARAMS,
+        ROLE_BENCHMARKS: ROLE_BENCHMARKS,
+        INVERTED_PARAMS: INVERTED_PARAMS,
+        buildPhysicalScoreFromRaw: buildPhysicalScoreFromRaw,
+        buildPublicMetricSet: buildPublicMetricSet
+      };
     })();
   </script>
 </body>
