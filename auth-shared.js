@@ -7,6 +7,8 @@
   const DEFAULT_AGENT_ROUTE = 'agent-dashboard.html';
   const AUTH_STATE_CACHE_MS = 1200;
   const ROLE_CACHE_MS = 15000;
+  const AUTH_STATE_STORAGE_KEY = 'siteAuthStateCache';
+  const ROLE_CACHE_STORAGE_KEY = 'siteAuthRoleCache';
 
   function getClient() {
     if (window.__mfgSupabaseClient) {
@@ -29,6 +31,9 @@
         writeAuthStateCache(session || null, nextUser);
         if (!nextUser?.id) {
           window.__siteAuthRoleCache = {};
+          try {
+            window.sessionStorage.removeItem(ROLE_CACHE_STORAGE_KEY);
+          } catch (error) {}
         }
       });
     }
@@ -38,31 +43,66 @@
 
   function readAuthStateCache() {
     const cache = window.__siteAuthStateCache;
-    if (!cache || (Date.now() - cache.ts) > AUTH_STATE_CACHE_MS) {
+    if (cache && (Date.now() - cache.ts) <= AUTH_STATE_CACHE_MS) {
+      return cache;
+    }
+
+    try {
+      const raw = window.sessionStorage.getItem(AUTH_STATE_STORAGE_KEY);
+      if (!raw) {
+        return null;
+      }
+      const parsed = JSON.parse(raw);
+      if (!parsed || (Date.now() - parsed.ts) > AUTH_STATE_CACHE_MS) {
+        return null;
+      }
+      window.__siteAuthStateCache = parsed;
+      return parsed;
+    } catch (error) {
       return null;
     }
-    return cache;
   }
 
   function writeAuthStateCache(session, user) {
-    window.__siteAuthStateCache = {
+    const nextCache = {
       ts: Date.now(),
       session: session || null,
       user: user || null
     };
+    window.__siteAuthStateCache = nextCache;
+    try {
+      window.sessionStorage.setItem(AUTH_STATE_STORAGE_KEY, JSON.stringify(nextCache));
+    } catch (error) {}
   }
 
   function clearAuthStateCache() {
     window.__siteAuthStateCache = null;
+    try {
+      window.sessionStorage.removeItem(AUTH_STATE_STORAGE_KEY);
+    } catch (error) {}
   }
 
   function readRoleCache(userId) {
     const map = window.__siteAuthRoleCache || {};
     const cache = map[userId];
-    if (!cache || (Date.now() - cache.ts) > ROLE_CACHE_MS) {
+    if (cache && (Date.now() - cache.ts) <= ROLE_CACHE_MS) {
+      return cache.role;
+    }
+    try {
+      const raw = window.sessionStorage.getItem(ROLE_CACHE_STORAGE_KEY);
+      if (!raw) {
+        return null;
+      }
+      const parsed = JSON.parse(raw) || {};
+      const stored = parsed[userId];
+      if (!stored || (Date.now() - stored.ts) > ROLE_CACHE_MS) {
+        return null;
+      }
+      window.__siteAuthRoleCache = parsed;
+      return stored.role;
+    } catch (error) {
       return null;
     }
-    return cache.role;
   }
 
   function writeRoleCache(userId, role) {
@@ -71,6 +111,9 @@
       ts: Date.now(),
       role: role
     };
+    try {
+      window.sessionStorage.setItem(ROLE_CACHE_STORAGE_KEY, JSON.stringify(window.__siteAuthRoleCache));
+    } catch (error) {}
   }
 
   function delay(ms) {
@@ -690,6 +733,9 @@
     clearSupabaseBrowserSession();
     clearAuthStateCache();
     window.__siteAuthRoleCache = {};
+    try {
+      window.sessionStorage.removeItem(ROLE_CACHE_STORAGE_KEY);
+    } catch (error) {}
     window.location.replace(sanitizeInternalPath(settings.redirect, 'index.html'));
   }
 
