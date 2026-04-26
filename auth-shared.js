@@ -5,6 +5,8 @@
   const DEFAULT_ADMIN_ROUTE = 'admin/';
   const DEFAULT_MANAGER_ROUTE = 'team-manager-dashboard.html';
   const DEFAULT_AGENT_ROUTE = 'agent-dashboard.html';
+  const AUTH_STATE_CACHE_MS = 1200;
+  const ROLE_CACHE_MS = 15000;
 
   function getClient() {
     if (window.__mfgSupabaseClient) {
@@ -20,7 +22,61 @@
       SUPABASE_PUBLISHABLE_KEY
     );
 
+    if (!window.__mfgSupabaseAuthListenerBound && window.__mfgSupabaseClient?.auth?.onAuthStateChange) {
+      window.__mfgSupabaseAuthListenerBound = true;
+      window.__mfgSupabaseClient.auth.onAuthStateChange(function (_event, session) {
+        const nextUser = session?.user || null;
+        writeAuthStateCache(session || null, nextUser);
+        if (!nextUser?.id) {
+          window.__siteAuthRoleCache = {};
+        }
+      });
+    }
+
     return window.__mfgSupabaseClient;
+  }
+
+  function readAuthStateCache() {
+    const cache = window.__siteAuthStateCache;
+    if (!cache || (Date.now() - cache.ts) > AUTH_STATE_CACHE_MS) {
+      return null;
+    }
+    return cache;
+  }
+
+  function writeAuthStateCache(session, user) {
+    window.__siteAuthStateCache = {
+      ts: Date.now(),
+      session: session || null,
+      user: user || null
+    };
+  }
+
+  function clearAuthStateCache() {
+    window.__siteAuthStateCache = null;
+  }
+
+  function readRoleCache(userId) {
+    const map = window.__siteAuthRoleCache || {};
+    const cache = map[userId];
+    if (!cache || (Date.now() - cache.ts) > ROLE_CACHE_MS) {
+      return null;
+    }
+    return cache.role;
+  }
+
+  function writeRoleCache(userId, role) {
+    window.__siteAuthRoleCache = window.__siteAuthRoleCache || {};
+    window.__siteAuthRoleCache[userId] = {
+      ts: Date.now(),
+      role: role
+    };
+  }
+
+  function delay(ms) {
+    return new Promise(function (resolve) {
+      window.setTimeout(resolve, ms);
+    });
   }
 
   function normalizeRole(rawRole) {
@@ -60,6 +116,11 @@
       return getUserRole(user);
     }
 
+    const cachedRole = readRoleCache(user.id);
+    if (cachedRole) {
+      return cachedRole;
+    }
+
     try {
       const { data, error } = await client
         .from('profiles')
@@ -71,7 +132,9 @@
         return getUserRole(user);
       }
 
-      return normalizeRole(data?.role || getUserRole(user));
+      const resolvedRole = normalizeRole(data?.role || getUserRole(user));
+      writeRoleCache(user.id, resolvedRole);
+      return resolvedRole;
     } catch (error) {
       return getUserRole(user);
     }
@@ -80,6 +143,11 @@
   async function getCurrentAuthState(client) {
     if (!client?.auth) {
       return { session: null, user: null };
+    }
+
+    const cached = readAuthStateCache();
+    if (cached) {
+      return { session: cached.session, user: cached.user };
     }
 
     let session = null;
@@ -94,6 +162,16 @@
       user = null;
     }
 
+    if (!user) {
+      try {
+        const { data } = await client.auth.getUser();
+        user = data?.user || null;
+      } catch (error) {
+        user = null;
+      }
+    }
+
+    writeAuthStateCache(session, user);
     return { session, user };
   }
 
@@ -610,6 +688,8 @@
     }
 
     clearSupabaseBrowserSession();
+    clearAuthStateCache();
+    window.__siteAuthRoleCache = {};
     window.location.replace(sanitizeInternalPath(settings.redirect, 'index.html'));
   }
 
@@ -634,98 +714,96 @@
       '<a href="', registerHref, '" class="', registerClass, '">რეგისტრაცია</a>'
     ].join('');
 
-    const client = getClient();
-    if (!client) {
-      target.innerHTML = [
-        '<a href="', loginHref, '" class="', loginClass, '">შესვლა</a>',
-        '<a href="', registerHref, '" class="', registerClass, '">რეგისტრაცია</a>'
-      ].join('');
-      return;
-    }
-
-    const { user } = await getCurrentAuthState(client);
-
-    if (!user) {
-      target.innerHTML = [
-        '<a href="', loginHref, '" class="', loginClass, '">შესვლა</a>',
-        '<a href="', registerHref, '" class="', registerClass, '">რეგისტრაცია</a>'
-      ].join('');
-      return;
-    }
-
-    user.__resolvedRole = await resolveProfileRole(client, user);
-
-    const profileHref = buildProfileHref(
-      getProfileRouteForUser(user),
-      currentPath
-    );
-    const displayName = getUserDisplayName(user);
-    const roleLabel = getRoleLabel(getUserRole(user));
-    if (typeof settings.renderLoggedIn === 'function') {
-      const handled = await settings.renderLoggedIn({
-        currentPath: currentPath,
-        displayName: displayName,
-        getUserRole: getUserRole,
-        profileHref: profileHref,
-        profileRoute: getProfileRouteForUser(user),
-        signOut: signOut,
-        target: target,
-        user: user
-      });
-
-      if (handled !== false) {
+    try {
+      const client = getClient();
+      if (!client) {
+        target.innerHTML = guestMarkup;
         return;
       }
-    }
-    ensureProfileMenuStyles();
-    const menuItems = buildProfileMenuItems(user, currentPath);
-    target.innerHTML = [
-      '<div class="site-auth-profile-menu">',
-        '<button type="button" class="', profileClass, ' site-auth-profile-trigger" aria-haspopup="true" aria-expanded="false" title="', escapeHtml(displayName), '">',
-          '<span class="site-auth-profile-trigger-text"><strong>პროფილი</strong><span>', escapeHtml(roleLabel), '</span></span>',
-        '</button>',
-        '<div class="site-auth-profile-panel">',
-          '<div class="site-auth-profile-label">',
-            '<strong>', escapeHtml(displayName), '</strong>',
-            '<span>', escapeHtml(roleLabel), '</span>',
-          '</div>',
-          menuItems.map(function (item) {
-            return [
-              '<a href="', item.href, '" class="site-auth-profile-link">',
-                escapeHtml(item.title),
-              '</a>'
-            ].join('');
-          }).join(''),
-          '<button type="button" class="site-auth-profile-logout" data-auth-logout>გასვლა</button>',
-        '</div>',
-      '</div>'
-    ].join('');
 
-    const menu = target.querySelector('.site-auth-profile-menu');
-    const trigger = target.querySelector('.site-auth-profile-trigger');
-    const logoutButton = target.querySelector('[data-auth-logout]');
+      const { user } = await getCurrentAuthState(client);
 
-    if (trigger && menu) {
-      trigger.addEventListener('click', function () {
-        const isOpen = menu.classList.toggle('open');
-        trigger.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
-      });
+      if (!user) {
+        target.innerHTML = guestMarkup;
+        return;
+      }
 
-      document.addEventListener('click', function (event) {
-        if (!menu.contains(event.target)) {
-          menu.classList.remove('open');
-          trigger.setAttribute('aria-expanded', 'false');
+      user.__resolvedRole = await resolveProfileRole(client, user);
+
+      const profileHref = buildProfileHref(
+        getProfileRouteForUser(user),
+        currentPath
+      );
+      const displayName = getUserDisplayName(user);
+      const roleLabel = getRoleLabel(getUserRole(user));
+      if (typeof settings.renderLoggedIn === 'function') {
+        const handled = await settings.renderLoggedIn({
+          currentPath: currentPath,
+          displayName: displayName,
+          getUserRole: getUserRole,
+          profileHref: profileHref,
+          profileRoute: getProfileRouteForUser(user),
+          signOut: signOut,
+          target: target,
+          user: user
+        });
+
+        if (handled !== false) {
+          return;
         }
-      });
-    }
+      }
+      ensureProfileMenuStyles();
+      const menuItems = buildProfileMenuItems(user, currentPath);
+      target.innerHTML = [
+        '<div class="site-auth-profile-menu">',
+          '<button type="button" class="', profileClass, ' site-auth-profile-trigger" aria-haspopup="true" aria-expanded="false" title="', escapeHtml(displayName), '">',
+            '<span class="site-auth-profile-trigger-text"><strong>პროფილი</strong><span>', escapeHtml(roleLabel), '</span></span>',
+          '</button>',
+          '<div class="site-auth-profile-panel">',
+            '<div class="site-auth-profile-label">',
+              '<strong>', escapeHtml(displayName), '</strong>',
+              '<span>', escapeHtml(roleLabel), '</span>',
+            '</div>',
+            menuItems.map(function (item) {
+              return [
+                '<a href="', item.href, '" class="site-auth-profile-link">',
+                  escapeHtml(item.title),
+                '</a>'
+              ].join('');
+            }).join(''),
+            '<button type="button" class="site-auth-profile-logout" data-auth-logout>გასვლა</button>',
+          '</div>',
+        '</div>'
+      ].join('');
 
-    if (logoutButton) {
-      logoutButton.addEventListener('click', async function (event) {
-        event.preventDefault();
-        event.stopPropagation();
-        logoutButton.disabled = true;
-        await signOut({ redirect: settings.afterLogout || 'index.html' });
-      });
+      const menu = target.querySelector('.site-auth-profile-menu');
+      const trigger = target.querySelector('.site-auth-profile-trigger');
+      const logoutButton = target.querySelector('[data-auth-logout]');
+
+      if (trigger && menu) {
+        trigger.addEventListener('click', function () {
+          const isOpen = menu.classList.toggle('open');
+          trigger.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        });
+
+        document.addEventListener('click', function (event) {
+          if (!menu.contains(event.target)) {
+            menu.classList.remove('open');
+            trigger.setAttribute('aria-expanded', 'false');
+          }
+        });
+      }
+
+      if (logoutButton) {
+        logoutButton.addEventListener('click', async function (event) {
+          event.preventDefault();
+          event.stopPropagation();
+          logoutButton.disabled = true;
+          await signOut({ redirect: settings.afterLogout || 'index.html' });
+        });
+      }
+    } catch (error) {
+      target.innerHTML = guestMarkup;
     }
   }
 
@@ -741,16 +819,22 @@
       return { client: null, user: null };
     }
 
-    const { session, user } = await getCurrentAuthState(client);
+    let authState = await getCurrentAuthState(client);
+    if (!authState.user) {
+      for (let attempt = 0; attempt < 3 && !authState.user; attempt += 1) {
+        await delay(140);
+        authState = await getCurrentAuthState(client);
+      }
+    }
 
-    if (!user) {
+    if (!authState.user) {
       window.location.href = buildLoginHref(redirectPath);
       return { client: client, user: null };
     }
 
-    user.__resolvedRole = await resolveProfileRole(client, user);
+    authState.user.__resolvedRole = await resolveProfileRole(client, authState.user);
 
-    return { client: client, user: user, session: session };
+    return { client: client, user: authState.user, session: authState.session };
   }
 
   window.siteAuth = {
@@ -762,6 +846,7 @@
     getProfileRouteForRole: getProfileRouteForRole,
     getProfileRouteForUser: getProfileRouteForUser,
     getCurrentAuthState: getCurrentAuthState,
+    primeAuthStateCache: writeAuthStateCache,
     getRedirectParam: getRedirectParam,
     getUserDisplayName: getUserDisplayName,
     getUserRole: getUserRole,

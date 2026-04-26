@@ -1817,7 +1817,7 @@
         return fallbackUser || null;
       }
 
-      for (let attempt = 0; attempt < 8; attempt += 1) {
+      for (let attempt = 0; attempt < 4; attempt += 1) {
         try {
           if (window.siteAuth?.getCurrentAuthState) {
             const authState = await window.siteAuth.getCurrentAuthState(supabaseClient);
@@ -1832,7 +1832,7 @@
           }
         } catch (error) {}
 
-        await new Promise((resolve) => window.setTimeout(resolve, 250));
+        await new Promise((resolve) => window.setTimeout(resolve, 120));
       }
 
       return fallbackUser || null;
@@ -1935,6 +1935,9 @@
           throw error;
         }
 
+        if (window.siteAuth?.primeAuthStateCache) {
+          window.siteAuth.primeAuthStateCache(data.session || null, data.user || null);
+        }
         setStatus(loginStatus, 'წარმატებით შეხვედი. პროფილი უკვე მზად არის. ახლავე გადაგამისამართებ.', 'success');
         try {
           if (window.sitePlayerDomain?.syncMyAccountDomain) {
@@ -2002,6 +2005,9 @@
           throw error;
         }
 
+        if (window.siteAuth?.primeAuthStateCache) {
+          window.siteAuth.primeAuthStateCache(data.session || null, data.user || null);
+        }
         if (data.session && window.sitePlayerDomain?.syncMyAccountDomain) {
           try {
             await window.sitePlayerDomain.syncMyAccountDomain(supabaseClient);

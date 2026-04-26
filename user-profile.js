@@ -2828,6 +2828,10 @@
       location.href = 'admin/';
       return;
     }
+    if (role === 'agent') {
+      location.href = 'agent-dashboard.html';
+      return;
+    }
     if (role === 'academy') {
       location.href = 'team-manager-dashboard.html';
       return;
