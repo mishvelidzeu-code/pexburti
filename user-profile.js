@@ -694,7 +694,6 @@
         `<div class="form-group">`,
           `<label class="form-label" for="${sectionId}_${key}">${esc(field.label)}</label>`,
           `<input id="${sectionId}_${key}" class="form-input" type="number" min="0" max="${esc(field.max)}" step="${esc(field.step)}" value="${esc(String(store?.[key] || ''))}" placeholder="${esc(field.note)}">`,
-          `<div class="form-hint">${esc(field.note)}</div>`,
         `</div>`
       ].join('');
     }).join('');
