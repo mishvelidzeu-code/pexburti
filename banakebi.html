@@ -302,16 +302,18 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="auth-shared.js"></script>
   <script>
-    if (window.siteAuth?.renderAuthNav) {
-      window.siteAuth.renderAuthNav('#campsAuthNav', {
-        currentPath: 'banakebi.html',
-        loginClass: 'btn btn-secondary',
-        registerClass: 'btn btn-primary',
-        profileClass: 'btn btn-primary',
-        logoutClass: 'btn btn-secondary',
-        afterLogout: 'banakebi.html'
-      });
-    }
+    (async function () {
+      if (window.siteAuth?.renderAuthNav) {
+        await window.siteAuth.renderAuthNav('#campsAuthNav', {
+          currentPath: 'banakebi.html',
+          loginClass: 'btn btn-secondary',
+          registerClass: 'btn btn-primary',
+          profileClass: 'btn btn-primary',
+          logoutClass: 'btn btn-secondary',
+          afterLogout: 'banakebi.html'
+        });
+      }
+    })();
   </script>
 </body>
 </html>

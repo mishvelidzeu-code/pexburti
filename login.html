@@ -1910,9 +1910,11 @@
         }
 
         setStatus(loginStatus, 'წარმატებით შეხვედი. პროფილი უკვე მზად არის. ახლავე გადაგამისამართებ.', 'success');
-        if (window.sitePlayerDomain?.syncMyAccountDomain) {
-          await window.sitePlayerDomain.syncMyAccountDomain(supabaseClient);
-        }
+        try {
+          if (window.sitePlayerDomain?.syncMyAccountDomain) {
+            await window.sitePlayerDomain.syncMyAccountDomain(supabaseClient);
+          }
+        } catch (syncErr) {}
         setTimeout(() => redirectToTarget(data.user), 700);
       } catch (error) {
         setStatus(loginStatus, error.message || 'შესვლა ვერ შესრულდა. მონაცემები გადაამოწმე.', 'error');
@@ -1974,7 +1976,9 @@
         }
 
         if (data.session && window.sitePlayerDomain?.syncMyAccountDomain) {
-          await window.sitePlayerDomain.syncMyAccountDomain(supabaseClient);
+          try {
+            await window.sitePlayerDomain.syncMyAccountDomain(supabaseClient);
+          } catch (syncErr) {}
         }
         registerForm.reset();
         resetRoleState();
@@ -2023,13 +2027,32 @@
     });
 
     window.addEventListener('hashchange', syncFormFromLocation);
-    window.addEventListener('DOMContentLoaded', () => {
+    window.addEventListener('DOMContentLoaded', async () => {
       syncFormFromLocation();
       resetRoleState();
       sanitizeDigitsField(document.getElementById('personalNumber'));
       sanitizeDigitsField(document.getElementById('phoneNumber'));
+
+      if (!supabaseClient) {
+        setStatus(loginStatus, 'Supabase კავშირი ჯერ არ არის მზად.', 'error');
+        setStatus(registerStatus, 'Supabase კავშირი ჯერ არ არის მზად.', 'error');
+        return;
+      }
+
+      // თუ user უკვე შეულია — profile-ზე გადამისამართება
+      if (window.siteAuth?.getCurrentAuthState) {
+        const { user } = await window.siteAuth.getCurrentAuthState(supabaseClient);
+        if (user) {
+          const target = window.siteAuth.resolvePostAuthTarget
+            ? await window.siteAuth.resolvePostAuthTarget(user, window.siteAuth.getRedirectParam())
+            : (window.siteAuth.getProfileRouteForUser ? window.siteAuth.getProfileRouteForUser(user) : 'user-profile.html');
+          window.location.replace(target);
+          return;
+        }
+      }
+
       if (window.siteAuth?.renderAuthNav) {
-        window.siteAuth.renderAuthNav('#loginAuthNav', {
+        await window.siteAuth.renderAuthNav('#loginAuthNav', {
           currentPath: 'login.html',
           loginHref: '#login',
           registerHref: '#register',
@@ -2039,10 +2062,6 @@
           logoutClass: 'btn btn-white',
           afterLogout: 'login.html'
         });
-      }
-      if (!supabaseClient) {
-        setStatus(loginStatus, 'Supabase კავშირი ჯერ არ არის მზად.', 'error');
-        setStatus(registerStatus, 'Supabase კავშირი ჯერ არ არის მზად.', 'error');
       }
     });
   </script>

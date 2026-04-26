@@ -1809,15 +1809,17 @@
   <script src="supabase-site-data.js"></script>
   <script src="auth-shared.js"></script>
   <script>
-    if (window.siteAuth?.renderAuthNav) {
-      window.siteAuth.renderAuthNav('#homeAuthNav', {
-        currentPath: 'index.html',
-        loginClass: 'btn btn-secondary',
-        registerClass: 'btn btn-primary',
-        profileClass: 'btn btn-primary',
-        afterLogout: 'index.html'
-      });
-    }
+    (async function () {
+      if (window.siteAuth?.renderAuthNav) {
+        await window.siteAuth.renderAuthNav('#homeAuthNav', {
+          currentPath: 'index.html',
+          loginClass: 'btn btn-secondary',
+          registerClass: 'btn btn-primary',
+          profileClass: 'btn btn-primary',
+          afterLogout: 'index.html'
+        });
+      }
+    })();
   </script>
   <script>
     (async function () {

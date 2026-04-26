@@ -285,16 +285,18 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="auth-shared.js"></script>
   <script>
-    if (window.siteAuth?.renderAuthNav) {
-      window.siteAuth.renderAuthNav('#coachingAuthNav', {
-        currentPath: 'coaching.html',
-        loginClass: 'btn btn-secondary',
-        registerClass: 'btn btn-primary',
-        profileClass: 'btn btn-primary',
-        logoutClass: 'btn btn-secondary',
-        afterLogout: 'coaching.html'
-      });
-    }
+    (async function () {
+      if (window.siteAuth?.renderAuthNav) {
+        await window.siteAuth.renderAuthNav('#coachingAuthNav', {
+          currentPath: 'coaching.html',
+          loginClass: 'btn btn-secondary',
+          registerClass: 'btn btn-primary',
+          profileClass: 'btn btn-primary',
+          logoutClass: 'btn btn-secondary',
+          afterLogout: 'coaching.html'
+        });
+      }
+    })();
   </script>
 </body>
 </html>

@@ -378,16 +378,18 @@
   <script src="supabase-site-data.js"></script>
   <script src="auth-shared.js"></script>
   <script>
-    if (window.siteAuth?.renderAuthNav) {
-      window.siteAuth.renderAuthNav('#tablesAuthNav', {
-        currentPath: 'cxrilebi.html',
-        loginClass: 'btn btn-secondary',
-        registerClass: 'btn btn-primary',
-        profileClass: 'btn btn-primary',
-        logoutClass: 'btn btn-secondary',
-        afterLogout: 'cxrilebi.html'
-      });
-    }
+    (async function () {
+      if (window.siteAuth?.renderAuthNav) {
+        await window.siteAuth.renderAuthNav('#tablesAuthNav', {
+          currentPath: 'cxrilebi.html',
+          loginClass: 'btn btn-secondary',
+          registerClass: 'btn btn-primary',
+          profileClass: 'btn btn-primary',
+          logoutClass: 'btn btn-secondary',
+          afterLogout: 'cxrilebi.html'
+        });
+      }
+    })();
   </script>
   <script>
     (async function () {

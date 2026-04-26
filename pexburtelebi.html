@@ -452,9 +452,9 @@
   </section>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="supabase-site-data.js"></script>
-  <script src="supabase-domain-shared.js"></script>
   <script src="auth-shared.js"></script>
+  <script src="supabase-domain-shared.js"></script>
+  <script src="supabase-site-data.js"></script>
   <script>
     (async function () {
       // Auth nav
@@ -615,11 +615,30 @@
       }
 
       // Fetch public players from Supabase
+      var playerFetchError = false;
       try {
         pagePlayers = await window.siteData.fetchPublicPlayers(client);
         if (!Array.isArray(pagePlayers)) { pagePlayers = []; }
       } catch (fetchErr) {
         pagePlayers = [];
+        playerFetchError = true;
+      }
+
+      if (playerFetchError && !pagePlayers.length) {
+        if (playersGridNode) {
+          playersGridNode.innerHTML = [
+            '<article class="player-card" style="grid-column:1 / -1; min-height:auto; align-items:flex-start;">',
+            '<div class="player-info" style="width:100%;">',
+            '<h3 class="player-name">ჩატვირთვის შეცდომა</h3>',
+            '<div class="meta-grid" style="margin-top:10px;">',
+            '<div class="meta-item" style="grid-column:1 / -1;">',
+            '<span>მდგომარეობა</span>',
+            '<strong>მონაცემების ჩატვირთვა ვერ მოხერხდა. გადაამოწმე ინტერნეტ კავშირი და განაახლე გვერდი.</strong>',
+            '</div></div></div></article>'
+          ].join('');
+        }
+        if (resultCountNode) { resultCountNode.textContent = 'ნაპოვნია: 0'; }
+        return;
       }
 
       // Get current user session

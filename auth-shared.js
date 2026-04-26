@@ -94,20 +94,6 @@
       user = null;
     }
 
-    try {
-      if (client.auth.getUser) {
-        const { data, error } = await client.auth.getUser();
-        if (!error && data?.user) {
-          user = data.user;
-          if (session) {
-            session = { ...session, user };
-          }
-        }
-      }
-    } catch (error) {
-      // Fall back to session user.
-    }
-
     return { session, user };
   }
 

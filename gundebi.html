@@ -893,13 +893,16 @@
         setRequestStatus('', '');
       }
 
-      function createEmptyState() {
+      function createEmptyState(isError) {
+        const msg = isError
+          ? 'მონაცემების ჩატვირთვა ვერ მოხერხდა. გადაამოწმე ინტერნეტ კავშირი და განაახლე გვერდი.'
+          : 'ჯერ არცერთი საჯარო გუნდი არ არის ბაზაში.';
         return [
           '<article class="team-card" style="grid-column:1 / -1; min-height:auto;">',
           '<div class="team-head">',
           '<div class="team-badge">გუნდები</div>',
-          '<h3 class="team-name">ჯერ არცერთი გუნდი არ ჩანს</h3>',
-          '<div class="team-location">როცა ბაზაში საჯარო გუნდები დაემატება, ისინი აქ ავტომატურად გამოჩნდება.</div>',
+          '<h3 class="team-name">' + (isError ? 'ჩატვირთვის შეცდომა' : 'გუნდები არ მოიძებნა') + '</h3>',
+          '<div class="team-location">' + msg + '</div>',
           '</div>',
           '</article>'
         ].join('');
@@ -1064,6 +1067,7 @@
         return;
       }
 
+      let fetchError = false;
       try {
         clubs = await window.siteData.fetchPublicClubs(client);
         if (!Array.isArray(clubs)) {
@@ -1071,6 +1075,13 @@
         }
       } catch (error) {
         clubs = [];
+        fetchError = true;
+      }
+
+      if (fetchError && !clubs.length) {
+        teamsGrid.innerHTML = createEmptyState(true);
+        if (resultCount) resultCount.textContent = 'ნაპოვნია: 0 გუნდი';
+        return;
       }
 
       renderTeams();
