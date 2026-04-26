@@ -837,15 +837,20 @@
       line-height: 1.85;
     }
     .brand-box {
-      border-radius: 16px;
+      border-radius: 20px;
       padding: 24px 16px;
-      background: linear-gradient(135deg, #c81e1e 0%, #991b1b 100%);
-      border: 1px solid rgba(185,28,28,0.18);
+      background: rgba(255, 255, 255, 0.52);
+      backdrop-filter: blur(24px) saturate(200%);
+      -webkit-backdrop-filter: blur(24px) saturate(200%);
+      border: 1px solid rgba(255, 255, 255, 0.78);
       text-align: center;
       font-weight: 800;
       font-size: 0.95rem;
-      color: #fff;
-      box-shadow: 0 18px 34px rgba(185,28,28,0.18);
+      color: var(--text);
+      box-shadow:
+        0 8px 32px rgba(15, 23, 42, 0.07),
+        inset 0 1px 0 rgba(255, 255, 255, 0.95),
+        inset 0 -1px 0 rgba(15, 23, 42, 0.04);
       transition: all 0.3s ease;
       cursor: default;
       position: relative;
@@ -855,13 +860,16 @@
       content: "";
       position: absolute;
       inset: 0;
-      background: linear-gradient(180deg, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0) 48%);
+      background: linear-gradient(180deg, rgba(255,255,255,0.35) 0%, rgba(255,255,255,0) 50%);
       pointer-events: none;
     }
     .brand-box:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 22px 42px rgba(185,28,28,0.24);
-      border-color: rgba(255,255,255,0.22);
+      transform: translateY(-5px) scale(1.015);
+      background: rgba(255, 255, 255, 0.78);
+      box-shadow:
+        0 22px 52px rgba(15, 23, 42, 0.13),
+        inset 0 1px 0 rgba(255, 255, 255, 1);
+      border-color: rgba(255, 255, 255, 0.95);
     }
     .grid-2, .grid-3, .grid-4 { display: grid; gap: 24px; }
     .grid-2 { grid-template-columns: repeat(2, 1fr); }
@@ -909,6 +917,33 @@
       color: var(--red);
       border: 1px solid rgba(185,28,28,0.1);
     }
+
+    /* ─── iPhone Glass – App Download Section ─── */
+    #app-download {
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(135deg, #fff0f0 0%, #f8fafc 50%, #f0f4ff 100%);
+    }
+    #app-download::before {
+      content: '';
+      position: absolute;
+      width: 520px; height: 520px;
+      background: radial-gradient(circle, rgba(185,28,28,0.14) 0%, transparent 68%);
+      top: -150px; left: -110px;
+      border-radius: 50%;
+      pointer-events: none;
+    }
+    #app-download::after {
+      content: '';
+      position: absolute;
+      width: 380px; height: 380px;
+      background: radial-gradient(circle, rgba(59,130,246,0.1) 0%, transparent 68%);
+      bottom: -80px; right: -80px;
+      border-radius: 50%;
+      pointer-events: none;
+    }
+    #app-download .container { position: relative; z-index: 1; }
+    /* ─────────────────────────────────────────── */
 
     /* ─── iPhone Glass – Features Section ─── */
     #features {
