@@ -447,8 +447,29 @@
       gap:10px;
       flex-wrap:wrap;
     }
+    .compare-control-group{
+      display:grid;
+      gap:8px;
+      min-width:min(280px,100%);
+      flex:1 1 280px;
+    }
+    .compare-control-group label{
+      font-size:.8rem;
+      font-weight:800;
+      color:var(--muted);
+    }
     .compare-select{
       min-width:min(320px,100%);
+      min-height:46px;
+      padding:0 16px;
+      border-radius:16px;
+      border:1px solid var(--line);
+      background:#fff;
+      font:inherit;
+      color:var(--text);
+      box-shadow:0 8px 20px rgba(15,23,42,.05);
+    }
+    .compare-search{
       min-height:46px;
       padding:0 16px;
       border-radius:16px;
@@ -733,8 +754,20 @@
               <p id="comparisonLead">შედარება ნაჩვენებია მხოლოდ ერთნაირ პოზიციებს შორის.</p>
             </div>
             <div class="compare-controls" id="comparisonControls" hidden>
-              <select id="comparisonSelect" class="compare-select"></select>
+              <div class="compare-control-group">
+                <label for="comparisonSelect">შენი ფეხბურთელები</label>
+                <select id="comparisonSelect" class="compare-select"></select>
+              </div>
               <button id="comparisonApplyBtn" type="button" class="btn btn-red">შედარება</button>
+              <div class="compare-control-group">
+                <label for="comparisonSearchInput">სხვა ფეხბურთელის ძებნა</label>
+                <input id="comparisonSearchInput" class="compare-search" type="search" placeholder="სახელი ან გვარი">
+              </div>
+              <div class="compare-control-group">
+                <label for="comparisonSearchSelect">შედეგები</label>
+                <select id="comparisonSearchSelect" class="compare-select"></select>
+              </div>
+              <button id="comparisonSearchApplyBtn" type="button" class="btn btn-white">ძიებით შედარება</button>
               <button id="comparisonClearBtn" type="button" class="btn btn-white">გასუფთავება</button>
             </div>
           </div>
@@ -813,7 +846,10 @@
       const comparisonLead = document.getElementById('comparisonLead');
       const comparisonControls = document.getElementById('comparisonControls');
       const comparisonSelect = document.getElementById('comparisonSelect');
+      const comparisonSearchInput = document.getElementById('comparisonSearchInput');
+      const comparisonSearchSelect = document.getElementById('comparisonSearchSelect');
       const comparisonApplyBtn = document.getElementById('comparisonApplyBtn');
+      const comparisonSearchApplyBtn = document.getElementById('comparisonSearchApplyBtn');
       const comparisonClearBtn = document.getElementById('comparisonClearBtn');
       const comparisonMessage = document.getElementById('comparisonMessage');
       const comparisonPrimaryCard = document.getElementById('comparisonPrimaryCard');
@@ -1232,6 +1268,15 @@
           .join('');
       }
 
+      function buildSearchOptions(playersPool) {
+        if (!comparisonSearchSelect) return;
+        comparisonSearchSelect.innerHTML = ['<option value="">აირჩიე ნაპოვნი ფეხბურთელი</option>']
+          .concat(playersPool.map(function (entry) {
+            return `<option value="${entry.id}">${entry.fullName} • ${entry.team || 'უგუნდოდ'} • ${entry.ageLabel || 'PRO'}</option>`;
+          }))
+          .join('');
+      }
+
       const compactMetrics = buildPublicMetricSet(player);
       playerView.hidden = false;
       document.title = `${player.fullName} | Football Georgia`;
@@ -1351,27 +1396,44 @@
           : [];
         const comparePool = (Array.isArray(publicPlayers) ? publicPlayers : []).filter(function (entry) {
           return String(entry.id || '') !== String(player.id)
-            && positionsMatch(player, entry);
+            && positionsMatch(player, entry)
+            && String(entry.ageGroup || '').trim().toLowerCase() === String(player.ageGroup || '').trim().toLowerCase();
         }).sort(function (a, b) {
           return String(a.fullName || '').localeCompare(String(b.fullName || ''), 'ka');
         });
 
         comparisonControls.hidden = false;
-        buildComparisonOptions(comparePool);
-        comparisonLead.textContent = 'აირჩიე იმავე პოზიციის ფეხბურთელი და შეადარე მიმდინარე პროფილს.';
+        const ownIds = resolvedRole === 'agent'
+          ? (Array.isArray(user.user_metadata?.profile?.agentRoster) ? user.user_metadata.profile.agentRoster.map(String) : [])
+          : (Array.isArray(user.user_metadata?.profile?.managerRoster) ? user.user_metadata.profile.managerRoster.map(String) : []);
+        const ownSet = new Set(ownIds);
+        const ownPool = comparePool.filter(function (entry) {
+          return ownSet.has(String(entry.id));
+        });
+        const externalPool = comparePool.filter(function (entry) {
+          return !ownSet.has(String(entry.id));
+        });
+
+        buildComparisonOptions(ownPool);
+        buildSearchOptions(externalPool);
+        comparisonLead.textContent = 'ჯერ გამოჩნდება შენი შესაბამისი ფეხბურთელები, ხოლო ქვემოთ შეგიძლია მოძებნო სხვა ფეხბურთელიც იმავე პოზიციით და იმავე ასაკობრივით.';
 
         if (!comparePool.length) {
-          setComparisonMessage('ამ პოზიციაზე საჯარო ბაზაში სხვა ფეხბურთელი ჯერ არ მოიძებნა.', 'info');
+          setComparisonMessage('ამავე პოზიციასა და ამავე ასაკობრივში სხვა ფეხბურთელი ჯერ არ მოიძებნა.', 'info');
           return;
+        }
+
+        if (!ownPool.length) {
+          setComparisonMessage('შენს ბაზაში ამავე პოზიციისა და ამავე ასაკობრივის ფეხბურთელი არ მოიძებნა. შეგიძლია ქვემოთ ძიებით იპოვო სხვა ფეხბურთელი.', 'info');
         }
 
         comparisonApplyBtn.addEventListener('click', function () {
           const selectedId = String(comparisonSelect.value || '').trim();
           if (!selectedId) {
-            setComparisonMessage('ჯერ აირჩიე იმავე პოზიციის ფეხბურთელი სიიდან.', 'error');
+            setComparisonMessage('ჯერ აირჩიე შენი შესაბამისი ფეხბურთელი სიიდან.', 'error');
             return;
           }
-          const selectedPlayer = comparePool.find(function (entry) {
+          const selectedPlayer = ownPool.find(function (entry) {
             return String(entry.id) === selectedId;
           });
           if (!selectedPlayer) {
@@ -1382,12 +1444,54 @@
           setComparisonMessage('', '');
         });
 
+        function refreshExternalResults() {
+          const query = String(comparisonSearchInput?.value || '').trim().toLowerCase();
+          const filteredExternal = externalPool.filter(function (entry) {
+            if (!query) {
+              return true;
+            }
+            return [entry.fullName, entry.firstName, entry.lastName].join(' ').toLowerCase().includes(query);
+          });
+          buildSearchOptions(filteredExternal);
+          return filteredExternal;
+        }
+
+        if (comparisonSearchInput) {
+          comparisonSearchInput.addEventListener('input', function () {
+            refreshExternalResults();
+          });
+        }
+
+        comparisonSearchApplyBtn.addEventListener('click', function () {
+          const filteredExternal = refreshExternalResults();
+          const selectedId = String(comparisonSearchSelect?.value || '').trim();
+          if (!selectedId) {
+            setComparisonMessage('ჯერ მოძებნე და აირჩიე სხვა შესაბამისი ფეხბურთელი.', 'error');
+            return;
+          }
+          const selectedPlayer = filteredExternal.find(function (entry) {
+            return String(entry.id) === selectedId;
+          }) || externalPool.find(function (entry) {
+            return String(entry.id) === selectedId;
+          });
+          if (!selectedPlayer) {
+            setComparisonMessage('ნაპოვნი ფეხბურთელი ვერ მოიძებნა. სცადე თავიდან.', 'error');
+            return;
+          }
+          renderComparison(player, selectedPlayer, 'შედარება შეიქმნა იმავე პოზიციისა და იმავე ასაკობრივი კატეგორიის ფეხბურთელებს შორის.');
+          setComparisonMessage('', '');
+        });
+
         comparisonClearBtn.addEventListener('click', function () {
           comparisonSecondaryCard.innerHTML = '';
           comparisonRadar.innerHTML = '';
           comparisonLegend.innerHTML = '';
           comparisonStats.innerHTML = '';
           comparisonSelect.value = '';
+          if (comparisonSearchInput) {
+            comparisonSearchInput.value = '';
+          }
+          buildSearchOptions(externalPool);
           setComparisonMessage('შედარება გასუფთავდა. შეგიძლია სხვა ფეხბურთელი აირჩიო.', 'info');
         });
       }
