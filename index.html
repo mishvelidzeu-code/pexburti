@@ -910,6 +910,59 @@
       border: 1px solid rgba(185,28,28,0.1);
     }
 
+    /* ─── iPhone Glass – Features Section ─── */
+    #features {
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(135deg, #f0f4ff 0%, #fdf2f8 50%, #f0fdf4 100%);
+    }
+    #features::before {
+      content: '';
+      position: absolute;
+      width: 560px; height: 560px;
+      background: radial-gradient(circle, rgba(185,28,28,0.13) 0%, transparent 68%);
+      top: -140px; right: -120px;
+      border-radius: 50%;
+      pointer-events: none;
+    }
+    #features::after {
+      content: '';
+      position: absolute;
+      width: 420px; height: 420px;
+      background: radial-gradient(circle, rgba(59,130,246,0.1) 0%, transparent 68%);
+      bottom: -80px; left: -100px;
+      border-radius: 50%;
+      pointer-events: none;
+    }
+    #features .container { position: relative; z-index: 1; }
+
+    #features .grid-4 .card {
+      background: rgba(255, 255, 255, 0.52);
+      backdrop-filter: blur(24px) saturate(200%);
+      -webkit-backdrop-filter: blur(24px) saturate(200%);
+      border: 1px solid rgba(255, 255, 255, 0.78);
+      box-shadow:
+        0 8px 32px rgba(15, 23, 42, 0.07),
+        inset 0 1px 0 rgba(255, 255, 255, 0.95),
+        inset 0 -1px 0 rgba(15, 23, 42, 0.04);
+      border-radius: 28px;
+    }
+    #features .grid-4 .card:hover {
+      background: rgba(255, 255, 255, 0.78);
+      box-shadow:
+        0 22px 52px rgba(15, 23, 42, 0.13),
+        inset 0 1px 0 rgba(255, 255, 255, 1);
+      transform: translateY(-8px) scale(1.015);
+      border-color: rgba(255, 255, 255, 0.95);
+    }
+    #features .grid-4 .icon-box {
+      background: rgba(185, 28, 28, 0.1);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(185, 28, 28, 0.18);
+    }
+    /* ─────────────────────────────────────── */
+
     .story-head {
       display: flex; justify-content: space-between; align-items: flex-start;
       margin-bottom: 20px;
