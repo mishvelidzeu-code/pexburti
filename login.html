@@ -849,9 +849,9 @@
                 <span>დაამატე არასრულწლოვანი მოთამაშე, შეურჩიე გუნდი და აკონტროლე მისი პროგრესი.</span>
               </button>
               <button type="button" class="role-option theme-red" data-role-option="agent" aria-pressed="false">
-                <span class="role-option-badge">აგენტი</span>
+                <span class="role-option-badge">სკაუტი</span>
                 <strong>მართე კავშირები სწორად</strong>
-                <span>შეიყვანე სააგენტოს მონაცემები და იმუშავე მოთამაშეების კარიერულ მიმართულებაზე.</span>
+                <span>შეიყვანე სკაუტის მონაცემები და იმუშავე მოთამაშეების აღმოჩენასა და შეფასებაზე.</span>
               </button>
               <button type="button" class="role-option theme-green" data-role-option="academy" aria-pressed="false">
                 <span class="role-option-badge">გუნდის მენეჯერი</span>
@@ -863,7 +863,7 @@
 
           <div id="roleNote" class="role-note">
             <strong>აირჩიე ერთ-ერთი როლი</strong>
-            <span>მოთამაშე, მშობელი, აგენტი ან გუნდის მენეჯერი.</span>
+            <span>მოთამაშე, მშობელი, სკაუტი ან გუნდის მენეჯერი.</span>
           </div>
 
           <div id="roleFields" class="role-fields"></div>
@@ -951,7 +951,7 @@
 
     const defaultRoleNote = {
       title: 'აირჩიე ერთ-ერთი როლი',
-      description: 'მოთამაშე, მშობელი, აგენტი ან გუნდის მენეჯერი.'
+      description: 'მოთამაშე, მშობელი, სკაუტი ან გუნდის მენეჯერი.'
     };
 
     const roleConfigurations = {
@@ -1003,8 +1003,8 @@
         ]
       },
       agent: {
-        title: 'აგენტის რეგისტრაცია',
-        description: 'მიუთითე სააგენტოს ან წარმომადგენლობის მონაცემები და რამდენ მოთამაშესთან მუშაობ.',
+        title: 'სკაუტის რეგისტრაცია',
+        description: 'მიუთითე შენი სამუშაო მონაცემები და დაიწყე მოთამაშეების აღმოჩენა და შეფასება.',
         fields: [
           { id: 'agencyName', label: 'სააგენტო / ბრენდი', type: 'text', placeholder: 'მაგ: Prime Football Agency' },
           { id: 'playersManaged', label: 'რამდენ მოთამაშეს წარმოადგენ', type: 'number', placeholder: 'მაგ: 8', min: '1', max: '200' },

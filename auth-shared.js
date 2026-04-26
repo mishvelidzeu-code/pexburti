@@ -147,7 +147,7 @@
     const normalizedRole = normalizeRole(role);
     if (normalizedRole === 'player') return 'მოთამაშე';
     if (normalizedRole === 'parent') return 'მშობელი';
-    if (normalizedRole === 'agent') return 'აგენტი';
+  if (normalizedRole === 'agent') return 'სკაუტი';
     if (normalizedRole === 'scout') return 'სკაუტი';
     if (normalizedRole === 'academy') return 'გუნდის მენეჯერი';
     if (normalizedRole === 'admin') return 'ადმინი';
@@ -625,7 +625,7 @@
       return [
         {
           href: buildProfileHref(`${DEFAULT_AGENT_ROUTE}`, fromPath),
-          title: 'აგენტის დაფა',
+      title: 'სკაუტის დაფა',
           copy: 'კლიენტები, სამიზნეები, გარიგებები და ფეხბურთელების დამატება.'
         },
         {

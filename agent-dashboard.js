@@ -270,18 +270,18 @@
   }
 
   function render() {
-    const agent = state.profile.full || state.user?.email || 'აგენტი';
+    const agent = state.profile.full || state.user?.email || 'სკაუტი';
     const rosterCount = state.profile.roster.length;
     const prospectsCount = state.profile.prospects.length;
     const dealsCount = state.profile.deals.length;
     const activeDeals = state.profile.deals.filter((d) => d.status === 'negotiation' || d.status === 'agreed').length;
 
-    $('heroTitle').textContent = `${agent} · აგენტი`;
+    $('heroTitle').textContent = `${agent} · სკაუტი`;
     $('heroCopy').textContent = state.profile.agency
       ? `"${state.profile.agency}" — ${state.profile.spec || ''} · ${state.profile.region || ''}`
       : 'შეავსე პროფილი, დაამატე ფეხბურთელები და თვალი ადევნე გარიგებებს ერთ სივრცეში.';
     $('heroChips').innerHTML = `
-      <span class="chip blue">აგენტი</span>
+      <span class="chip blue">სკაუტი</span>
       ${state.profile.agency ? `<span class="chip">${esc(state.profile.agency)}</span>` : ''}
       ${state.profile.spec ? `<span class="chip green">${esc(state.profile.spec)}</span>` : ''}
     `;

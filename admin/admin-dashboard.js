@@ -113,7 +113,7 @@
     return ({
       player: 'მოთამაშე',
       parent: 'მშობელი',
-      agent: 'აგენტი',
+  agent: 'სკაუტი',
       academy: 'გუნდის მენეჯერი',
       admin: 'ადმინი'
     })[String(role || '').trim().toLowerCase()] || 'მომხმარებელი';
@@ -845,7 +845,7 @@
           <select class="inline-select" data-user-role>
             <option value="player">მოთამაშე</option>
             <option value="parent">მშობელი</option>
-            <option value="agent">აგენტი</option>
+          <option value="agent">სკაუტი</option>
             <option value="academy">გუნდის მენეჯერი</option>
             <option value="admin">ადმინი</option>
           </select>
