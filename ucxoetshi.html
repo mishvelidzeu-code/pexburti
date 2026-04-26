@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>უცხოეთში მყოფი ქართველები | Football Georgia</title>
+  <meta name="description" content="Football Georgia — საზღვარგარეთ მოღვაწე ქართველი ფეხბურთელები. გაფილტრე პოზიციით, ასაკობრივი კატეგორიით ან სახელით.">
+  <style>
+    :root {
+      --bg: #ffffff;
+      --panel: #ffffff;
+      --panel-2: #f8fafc;
+      --panel-3: #eef2f6;
+      --text: #0b1220;
+      --muted: #344054;
+      --muted-2: #1f2937;
+      --line: rgba(16,24,40,0.12);
+      --line-2: rgba(16,24,40,0.22);
+      --red: #b91c1c;
+      --red-2: #991b1b;
+      --black: #020617;
+      --shadow: 0 12px 32px rgba(15,23,42,.08);
+      --shadow-hover: 0 20px 48px rgba(185,28,28,.12);
+      --radius: 20px;
+      --container: 1280px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "Sylfaen", "Noto Sans Georgian", "DejaVu Sans", sans-serif;
+      background: var(--panel-2);
+      color: var(--text);
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    a { text-decoration: none; color: inherit; }
+    button, input { font: inherit; }
+    [hidden] { display: none !important; }
+    .container { width: min(var(--container), calc(100% - 36px)); margin-inline: auto; }
+
+    .header {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: rgba(255,255,255,.95);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--line);
+    }
+    .nav {
+      min-height: 74px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 1rem;
+      font-weight: 800;
+      letter-spacing: -.02em;
+    }
+    .logo {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      background: #b91c1c;
+      color: #fff;
+      font-weight: 900;
+      font-size: .95rem;
+      line-height: 1;
+      letter-spacing: -.02em;
+      text-transform: uppercase;
+      box-shadow: 0 8px 20px rgba(185,28,28,.25);
+    }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 22px;
+      color: var(--muted-2);
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .nav-links a { position: relative; transition: color .2s; }
+    .nav-links a:hover,
+    .nav-links a.active { color: var(--text); }
+    .nav-links a.active::after {
+      content: '';
+      position: absolute;
+      bottom: -6px;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: var(--red);
+      border-radius: 2px;
+    }
+    .nav-actions { display: flex; align-items: center; gap: 10px; }
+    .nav-actions .btn {
+      min-height: 46px;
+      padding: 0 18px;
+      font-size: 13px;
+    }
+    .nav-actions .btn-white {
+      background: var(--red);
+      color: #fff;
+      border: none;
+      box-shadow: 0 6px 14px rgba(185,28,28,.2);
+    }
+    .nav-actions .btn-white:hover { background: var(--red-2); transform: translateY(-3px); }
+    .nav-actions .btn-red {
+      background: #0f172a;
+      color: #fff;
+      border-color: #0f172a;
+      box-shadow: 0 6px 14px rgba(15,23,42,.15);
+    }
+    .nav-actions .btn-red:hover { background: #1e293b; transform: translateY(-3px); }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 48px;
+      padding: 0 20px;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      font-size: 13px;
+      font-weight: 800;
+      transition: .25s ease;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+    .btn-red { background: var(--red); color: #fff; box-shadow: 0 8px 20px rgba(185,28,28,.25); }
+    .btn-red:hover { background: var(--red-2); transform: translateY(-2px); }
+    .btn-white { background: #fff; color: var(--text); border: 1px solid var(--line); }
+    .btn-white:hover { background: #eef2f6; transform: translateY(-2px); }
+
+    .hero {
+      background: #fff;
+      padding: 14px 0 12px;
+      border-bottom: 1px solid var(--line);
+    }
+    .hero-inner {
+      display: flex;
+      align-items: baseline;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .hero h1 {
+      margin: 0;
+      font-size: 1.45rem;
+      font-weight: 950;
+      letter-spacing: -.03em;
+      white-space: nowrap;
+    }
+    .hero p {
+      margin: 0;
+      color: var(--muted);
+      font-size: .85rem;
+    }
+
+    .filter-section {
+      background: #fff;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--line);
+      position: sticky;
+      top: 74px;
+      z-index: 990;
+    }
+
+    .search-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+    .search-wrap {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 14px;
+      border-radius: 999px;
+      background: var(--panel-2);
+      border: 1px solid var(--line);
+      max-width: 380px;
+    }
+    .search-input {
+      width: 100%;
+      border: none;
+      outline: none;
+      background: transparent;
+      color: var(--text);
+      font-size: .9rem;
+    }
+    .result-count {
+      font-weight: 800;
+      color: var(--red);
+      font-size: .9rem;
+      white-space: nowrap;
+    }
+
+    .filter-combined {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      padding-bottom: 2px;
+    }
+    .filter-combined::-webkit-scrollbar { display: none; }
+    .filter-divider {
+      width: 1px;
+      height: 20px;
+      background: var(--line-2, var(--line));
+      flex-shrink: 0;
+      margin: 0 6px;
+    }
+    .filter-label {
+      font-size: .75rem;
+      font-weight: 800;
+      color: var(--muted);
+      white-space: nowrap;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      flex-shrink: 0;
+    }
+
+    .chip-btn {
+      padding: 6px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--muted-2);
+      font-size: .8rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: .2s ease;
+    }
+    .chip-btn:hover { border-color: var(--red); color: var(--red); }
+    .chip-btn.active {
+      background: var(--red);
+      border-color: var(--red);
+      color: #fff;
+    }
+
+    .players-section { padding: 24px 0 64px; }
+    .players-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 14px;
+    }
+
+    .player-card {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: var(--shadow);
+      transition: .25s ease;
+      position: relative;
+      cursor: pointer;
+    }
+    .player-card:hover {
+      transform: translateY(-5px);
+      border-color: rgba(185,28,28,.4);
+      box-shadow: var(--shadow-hover);
+    }
+    .player-photo-link { display: block; line-height: 0; }
+    .player-name a { color: inherit; text-decoration: none; }
+    .player-name a:hover { text-decoration: underline; }
+
+    .player-photo {
+      width: 100%;
+      aspect-ratio: 4/5;
+      background: var(--panel-3);
+      object-fit: cover;
+      display: block;
+    }
+    .player-photo--fallback {
+      width: 100%;
+      aspect-ratio: 4/5;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg,#0f172a,#334155);
+      color: #fff;
+      font-size: 2rem;
+      font-weight: 900;
+      letter-spacing: -.04em;
+    }
+
+    .pos-indicator {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(4px);
+      color: #fff;
+      padding: 4px 8px;
+      border-radius: 8px;
+      font-size: .7rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+
+    .player-info {
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+
+    .player-name {
+      margin: 0 0 6px;
+      font-size: 1rem;
+      font-weight: 900;
+      line-height: 1.1;
+      letter-spacing: -.02em;
+    }
+
+    .meta-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+    .meta-item { display: flex; flex-direction: column; }
+    .meta-item span {
+      font-size: 0.65rem;
+      color: var(--muted);
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    .meta-item strong {
+      font-size: 0.8rem;
+      color: var(--text);
+      font-weight: 800;
+    }
+
+    .btn-enter {
+      width: 100%;
+      margin-top: auto;
+      padding: 8px;
+      background: var(--panel-2);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      color: var(--red);
+      font-size: .8rem;
+      font-weight: 800;
+      text-align: center;
+      transition: .2s ease;
+      cursor: pointer;
+    }
+    .player-card:hover .btn-enter {
+      background: var(--red);
+      color: #fff;
+      border-color: var(--red);
+    }
+
+    .btn-prospect {
+      width: 100%;
+      margin-top: 6px;
+      padding: 7px;
+      background: #1d4ed8;
+      border: none;
+      border-radius: 12px;
+      color: #fff;
+      font-size: .78rem;
+      font-weight: 800;
+      text-align: center;
+      cursor: pointer;
+      transition: .2s ease;
+    }
+    .btn-prospect:hover { background: #1e40af; transform: translateY(-1px); }
+    .btn-prospect.is-prospect {
+      background: #eff6ff;
+      color: #1d4ed8;
+      border: 1px solid #bfdbfe;
+    }
+    .btn-prospect.is-prospect:hover { background: #dbeafe; }
+
+    @media (max-width: 768px) {
+      .players-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
+      .search-row { flex-direction: column; align-items: stretch; }
+      .search-wrap { max-width: 100%; }
+      .nav-links { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="header">
+    <div class="container nav">
+      <a href="index.html" class="brand">
+        <span class="logo">DM</span>
+        <span>Football Georgia</span>
+      </a>
+      <nav class="nav-links">
+        <a href="index.html">მთავარი</a>
+        <a href="gundebi.html">გუნდები</a>
+        <a href="pexburtelebi.html">ფეხბურთელები</a>
+        <a href="ucxoetshi.html" class="active">საზღვარგარეთ</a>
+        <a href="coaching.html">ქოუჩინგი</a>
+        <a href="banakebi.html">ბანაკები</a>
+        <a href="cxrilebi.html">ცხრილები</a>
+      </nav>
+      <div class="nav-actions" id="abroadAuthNav"></div>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="container">
+      <div class="hero-inner">
+        <h1>უცხოეთში მყოფი ქართველები</h1>
+        <p>საზღვარგარეთ მოღვაწე ქართველი ფეხბურთელები. გაფილტრე პოზიციით ან ასაკობრივი კატეგორიით.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="filter-section">
+    <div class="container">
+
+      <div class="search-row">
+        <label class="search-wrap">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          <input id="searchInput" class="search-input" type="text" placeholder="მოძებნე სახელით...">
+        </label>
+        <div class="result-count" id="resultCount">ნაპოვნია: 0</div>
+      </div>
+
+      <div class="filter-combined">
+        <span class="filter-label">პოზიცია:</span>
+        <span id="posFilters" style="display:contents;">
+          <button class="chip-btn active" data-pos="all">ყველა</button>
+          <button class="chip-btn" data-pos="fw">თავდამსხმელი</button>
+          <button class="chip-btn" data-pos="mf">ნახევარმცველი</button>
+          <button class="chip-btn" data-pos="df">მცველი</button>
+          <button class="chip-btn" data-pos="gk">მეკარე</button>
+        </span>
+        <div class="filter-divider"></div>
+        <span class="filter-label">ასაკი:</span>
+        <span id="ageFilters" style="display:contents;">
+          <button class="chip-btn active" data-age="all">ყველა</button>
+          <button class="chip-btn" data-age="u8">U8</button>
+          <button class="chip-btn" data-age="u9">U9</button>
+          <button class="chip-btn" data-age="u10">U10</button>
+          <button class="chip-btn" data-age="u11">U11</button>
+          <button class="chip-btn" data-age="u12">U12</button>
+          <button class="chip-btn" data-age="u13">U13</button>
+          <button class="chip-btn" data-age="u14">U14</button>
+          <button class="chip-btn" data-age="u15">U15</button>
+          <button class="chip-btn" data-age="u16">U16</button>
+          <button class="chip-btn" data-age="u17">U17</button>
+        </span>
+      </div>
+
+    </div>
+  </div>
+
+  <section class="players-section">
+    <div class="container">
+      <div class="players-grid" id="playersGrid"></div>
+    </div>
+  </section>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="auth-shared.js"></script>
+  <script src="supabase-domain-shared.js"></script>
+  <script src="supabase-site-data.js"></script>
+  <script>
+    (async function () {
+      var abroadAuthNav = document.getElementById('abroadAuthNav');
+      try {
+        if (window.siteAuth && window.siteAuth.renderAuthNav) {
+          await window.siteAuth.renderAuthNav('#abroadAuthNav', {
+            currentPath: 'ucxoetshi.html',
+            loginClass: 'btn btn-white',
+            registerClass: 'btn btn-red',
+            profileClass: 'btn btn-red',
+            afterLogout: 'ucxoetshi.html'
+          });
+        }
+      } catch (e) {}
+      if (abroadAuthNav && !abroadAuthNav.querySelector('a,button')) {
+        abroadAuthNav.innerHTML = '<a href="login.html?redirect=ucxoetshi.html%23login#login" class="btn btn-white">შესვლა</a><a href="login.html?redirect=ucxoetshi.html%23register#register" class="btn btn-red">რეგისტრაცია</a>';
+      }
+
+      var client = window.siteAuth && window.siteAuth.getClient ? window.siteAuth.getClient() : null;
+      var playersGridNode = document.getElementById('playersGrid');
+      var resultCountNode = document.getElementById('resultCount');
+      var searchNode = document.getElementById('searchInput');
+      var positionFilters = document.querySelectorAll('#posFilters .chip-btn');
+      var ageFilters = document.querySelectorAll('#ageFilters .chip-btn');
+
+      var pagePlayers = [];
+      var managedPlayerId = '';
+      var agentProspects = [];
+      var isAgent = false;
+
+      function escapeHtml(value) {
+        return String(value || '')
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;');
+      }
+
+      function initials(name) {
+        return String(name || 'MF')
+          .split(/\s+/)
+          .filter(Boolean)
+          .slice(0, 2)
+          .map(function (part) { return part[0] ? part[0].toUpperCase() : ''; })
+          .join('') || 'MF';
+      }
+
+      function renderPlayers() {
+        if (!playersGridNode) { return; }
+
+        if (!pagePlayers.length) {
+          playersGridNode.innerHTML = [
+            '<article class="player-card" style="grid-column:1 / -1; min-height:auto; align-items:flex-start;">',
+            '<div class="player-info" style="width:100%;">',
+            '<h3 class="player-name">უცხოეთში მყოფი ქართველები ჯერ არ ჩანს</h3>',
+            '<div class="meta-grid" style="margin-top:10px;">',
+            '<div class="meta-item" style="grid-column:1 / -1;">',
+            '<span>მდგომარეობა</span>',
+            '<strong>როცა is_abroad=true მოთამაშეები ბაზაში დაემატება, აქ ავტომატურად გამოჩნდება.</strong>',
+            '</div></div></div></article>'
+          ].join('');
+          if (resultCountNode) { resultCountNode.textContent = 'ნაპოვნია: 0'; }
+          return;
+        }
+
+        playersGridNode.innerHTML = pagePlayers.map(function (player) {
+          var fullName = String(player.fullName || '').trim();
+          var ageGroup = String(player.ageGroup || 'pro').toLowerCase();
+          var positionCode = player.positionCode || 'MF';
+          var isManaged = Boolean(managedPlayerId && String(player.id) === String(managedPlayerId));
+          var actionHref = isManaged
+            ? 'user-profile.html?view=overview&from=ucxoetshi.html'
+            : (window.siteData && window.siteData.buildPlayerHref
+                ? window.siteData.buildPlayerHref(player.id, 'ucxoetshi.html')
+                : 'player-profile.html?player=' + encodeURIComponent(String(player.id || '')) + '&from=ucxoetshi.html');
+          var actionLabel = isManaged ? 'ჩემი პროფილი' : 'პროფილი';
+          var searchText = [fullName, player.team || '', player.positionLabel || ''].join(' ').toLowerCase();
+          var photoMarkup = player.photo
+            ? '<img src="' + escapeHtml(player.photo) + '" alt="' + escapeHtml(fullName) + '" class="player-photo" loading="lazy">'
+            : '<div class="player-photo player-photo--fallback">' + initials(fullName) + '</div>';
+
+          var playerId = String(player.id || '');
+          var inProspects = isAgent && agentProspects.includes(playerId);
+          var agentBtnMarkup = isAgent
+            ? '<button class="btn-prospect' + (inProspects ? ' is-prospect' : '') + '" data-prospect-id="' + escapeHtml(playerId) + '">' +
+              (inProspects ? '✓ სამიზნეში' : '+ სამიზნეში') + '</button>'
+            : '';
+
+          return (
+            '<article class="player-card"' +
+            ' data-pos="' + escapeHtml(positionCode.toLowerCase()) + '"' +
+            ' data-age="' + escapeHtml(ageGroup) + '"' +
+            ' data-search="' + escapeHtml(searchText) + '"' +
+            ' data-href="' + escapeHtml(actionHref) + '">' +
+            '<a href="' + escapeHtml(actionHref) + '" class="player-photo-link" tabindex="-1">' + photoMarkup + '</a>' +
+            '<div class="pos-indicator">' + escapeHtml(positionCode) + '</div>' +
+            '<div class="player-info">' +
+            '<h3 class="player-name"><a href="' + escapeHtml(actionHref) + '">' + escapeHtml(fullName) + '</a></h3>' +
+            '<div class="meta-grid">' +
+            '<div class="meta-item"><span>კატეგორია</span>' +
+            '<strong>' + escapeHtml(player.ageLabel || ageGroup.toUpperCase()) +
+            ' (' + escapeHtml(String(player.age != null ? player.age : '-')) + ' წ.)</strong></div>' +
+            '<div class="meta-item"><span>გუნდი</span>' +
+            '<strong>' + escapeHtml(player.team || 'არ არის მითითებული') + '</strong></div>' +
+            '</div>' +
+            '<a href="' + actionHref + '" class="btn-enter">' + actionLabel + '</a>' +
+            agentBtnMarkup +
+            '</div></article>'
+          );
+        }).join('');
+      }
+
+      function activeFilterValue(nodes) {
+        var activeNode = Array.from(nodes).find(function (button) {
+          return button.classList.contains('active');
+        });
+        return activeNode ? String(activeNode.dataset.pos || activeNode.dataset.age || 'all') : 'all';
+      }
+
+      function applyFilters() {
+        var term = String(searchNode && searchNode.value || '').trim().toLowerCase();
+        var currentPos = activeFilterValue(positionFilters);
+        var currentAge = activeFilterValue(ageFilters);
+        var cards = playersGridNode ? Array.from(playersGridNode.querySelectorAll('.player-card')) : [];
+        var visible = 0;
+
+        cards.forEach(function (card) {
+          var matchesSearch = String(card.dataset.search || '').includes(term);
+          var matchesPos = currentPos === 'all' || card.dataset.pos === currentPos;
+          var matchesAge = currentAge === 'all' || card.dataset.age === currentAge;
+          var show = matchesSearch && matchesPos && matchesAge;
+          card.style.display = show ? 'flex' : 'none';
+          if (show) { visible += 1; }
+        });
+
+        if (resultCountNode) {
+          resultCountNode.textContent = 'ნაპოვნია: ' + visible;
+        }
+      }
+
+      if (searchNode) { searchNode.addEventListener('input', applyFilters); }
+      positionFilters.forEach(function (button) {
+        button.addEventListener('click', function () {
+          positionFilters.forEach(function (b) { b.classList.remove('active'); });
+          button.classList.add('active');
+          applyFilters();
+        });
+      });
+      ageFilters.forEach(function (button) {
+        button.addEventListener('click', function () {
+          ageFilters.forEach(function (b) { b.classList.remove('active'); });
+          button.classList.add('active');
+          applyFilters();
+        });
+      });
+
+      if (playersGridNode) {
+        playersGridNode.addEventListener('click', function (e) {
+          if (e.target.closest('a, button')) { return; }
+          var card = e.target.closest('.player-card');
+          if (!card || !card.dataset.href) { return; }
+          window.location.href = card.dataset.href;
+        });
+      }
+
+      if (!client || !window.siteData || !window.siteData.fetchAbroadPlayers) {
+        renderPlayers();
+        applyFilters();
+        return;
+      }
+
+      var fetchError = false;
+      try {
+        pagePlayers = await window.siteData.fetchAbroadPlayers(client);
+        if (!Array.isArray(pagePlayers)) { pagePlayers = []; }
+      } catch (e) {
+        pagePlayers = [];
+        fetchError = true;
+      }
+
+      if (fetchError && !pagePlayers.length) {
+        if (playersGridNode) {
+          playersGridNode.innerHTML = [
+            '<article class="player-card" style="grid-column:1 / -1; min-height:auto; align-items:flex-start;">',
+            '<div class="player-info" style="width:100%;">',
+            '<h3 class="player-name">ჩატვირთვის შეცდომა</h3>',
+            '<div class="meta-grid" style="margin-top:10px;">',
+            '<div class="meta-item" style="grid-column:1 / -1;">',
+            '<span>მდგომარეობა</span>',
+            '<strong>მონაცემების ჩატვირთვა ვერ მოხერხდა. გადაამოწმე ინტერნეტ კავშირი და განაახლე გვერდი.</strong>',
+            '</div></div></div></article>'
+          ].join('');
+        }
+        if (resultCountNode) { resultCountNode.textContent = 'ნაპოვნია: 0'; }
+        return;
+      }
+
+      var authState = window.siteAuth && window.siteAuth.getCurrentAuthState
+        ? await window.siteAuth.getCurrentAuthState(client)
+        : await client.auth.getSession().then(function (r) {
+            return {
+              session: r && r.data ? r.data.session : null,
+              user: r && r.data && r.data.session ? r.data.session.user : null
+            };
+          });
+      var user = authState ? authState.user : null;
+
+      if (user && window.sitePlayerDomain && window.sitePlayerDomain.syncMyAccountDomain) {
+        try { await window.sitePlayerDomain.syncMyAccountDomain(client); } catch (e) {}
+      }
+
+      pagePlayers.sort(function (a, b) {
+        var av = Number(a.votesCount || 0) || 0;
+        var bv = Number(b.votesCount || 0) || 0;
+        if (bv !== av) { return bv - av; }
+        return String(a.fullName || '').localeCompare(String(b.fullName || ''), 'ka');
+      });
+
+      if (user && window.siteAuth && window.siteAuth.resolveProfileRole) {
+        try {
+          var resolvedRole = await window.siteAuth.resolveProfileRole(client, user);
+          if (resolvedRole === 'agent') {
+            isAgent = true;
+            var profileMeta = (user.user_metadata && user.user_metadata.profile) || {};
+            agentProspects = Array.isArray(profileMeta.agentProspects)
+              ? profileMeta.agentProspects.map(String) : [];
+          }
+        } catch (e) {}
+      }
+
+      renderPlayers();
+      applyFilters();
+
+      if (isAgent && playersGridNode) {
+        playersGridNode.addEventListener('click', async function (e) {
+          var btn = e.target.closest('[data-prospect-id]');
+          if (!btn) return;
+          e.preventDefault();
+          var pid = String(btn.dataset.prospectId || '');
+          if (!pid) return;
+
+          btn.disabled = true;
+          var wasIn = agentProspects.includes(pid);
+          var nextProspects = wasIn
+            ? agentProspects.filter(function (id) { return id !== pid; })
+            : agentProspects.concat(pid);
+
+          try {
+            var profileMeta = (user.user_metadata && user.user_metadata.profile) || {};
+            var res = await client.auth.updateUser({
+              data: Object.assign({}, user.user_metadata || {}, {
+                profile: Object.assign({}, profileMeta, { agentProspects: nextProspects })
+              })
+            });
+            if (res.error) throw res.error;
+
+            agentProspects = nextProspects;
+            user.user_metadata = res.data && res.data.user
+              ? res.data.user.user_metadata : user.user_metadata;
+
+            if (!wasIn) {
+              btn.textContent = '✓ სამიზნეში';
+              btn.classList.add('is-prospect');
+              setTimeout(function () { window.location.href = 'agent-dashboard.html'; }, 700);
+            } else {
+              btn.textContent = '+ სამიზნეში';
+              btn.classList.remove('is-prospect');
+              btn.disabled = false;
+            }
+          } catch (err) {
+            btn.disabled = false;
+          }
+        });
+      }
+    })();
+  </script>
+</body>
+</html>

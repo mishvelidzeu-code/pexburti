@@ -220,6 +220,7 @@
       votesCount: Number(entry.votesCount || entry.votes || 0) || 0,
       rating: buildRating(entry),
       ownerRole: String(entry.ownerRole || entry.roleSource || 'player').trim(),
+      isAbroad: Boolean(entry.isAbroad),
       updatedAt: String(entry.updatedAt || entry.registeredAt || '').trim()
     };
   }
@@ -290,6 +291,11 @@
     } catch (error) {
       return enriched;
     }
+  }
+
+  async function fetchAbroadPlayers(client) {
+    const all = await fetchPublicPlayers(client);
+    return all.filter(function (p) { return p.isAbroad === true; });
   }
 
   async function fetchPlayerById(client, playerId) {
@@ -606,6 +612,7 @@
     fetchPlayersForClub: fetchPlayersForClub,
     fetchPublicClubs: fetchPublicClubs,
     fetchPublicPlayers: fetchPublicPlayers,
+    fetchAbroadPlayers: fetchAbroadPlayers,
     getAgeLabel: getAgeLabel,
     normalizeText: normalizeText,
     resolvePhoto: resolvePhoto,
