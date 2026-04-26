@@ -629,6 +629,10 @@
     const loginClass = settings.loginClass || 'btn btn-white';
     const registerClass = settings.registerClass || 'btn btn-red';
     const profileClass = settings.profileClass || loginClass;
+    const guestMarkup = [
+      '<a href="', loginHref, '" class="', loginClass, '">შესვლა</a>',
+      '<a href="', registerHref, '" class="', registerClass, '">რეგისტრაცია</a>'
+    ].join('');
 
     const client = getClient();
     if (!client) {

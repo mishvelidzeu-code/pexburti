@@ -618,14 +618,22 @@
     });
 
     async function init() {
-      if (window.siteAuth?.renderAuthNav) {
-        await window.siteAuth.renderAuthNav('#pollAuthNav', {
-          currentPath: 'gamokitkhvebi.html',
-          loginClass: 'btn btn-secondary',
-          registerClass: 'btn btn-primary',
-          profileClass: 'btn btn-primary',
-          afterLogout: 'gamokitkhvebi.html'
-        });
+      const pollAuthNav = document.getElementById('pollAuthNav');
+      try {
+        if (window.siteAuth?.renderAuthNav) {
+          await window.siteAuth.renderAuthNav('#pollAuthNav', {
+            currentPath: 'gamokitkhvebi.html',
+            loginClass: 'btn btn-secondary',
+            registerClass: 'btn btn-primary',
+            profileClass: 'btn btn-primary',
+            afterLogout: 'gamokitkhvebi.html'
+          });
+        }
+      } catch (error) {
+        console.warn('poll auth nav fallback', error);
+      }
+      if (pollAuthNav && !pollAuthNav.querySelector('a,button')) {
+        pollAuthNav.innerHTML = '<a href="login.html?redirect=gamokitkhvebi.html%23login#login" class="btn btn-secondary">შესვლა</a><a href="login.html?redirect=gamokitkhvebi.html%23register#register" class="btn btn-primary">რეგისტრაცია</a>';
       }
 
       await loadCurrentUser();

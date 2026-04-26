@@ -806,15 +806,23 @@
   <script>
     (async function () {
       const client = window.siteAuth?.getClient ? window.siteAuth.getClient() : null;
-      if (window.siteAuth?.renderAuthNav) {
-        await window.siteAuth.renderAuthNav('#teamsAuthNav', {
-          currentPath: 'gundebi.html',
-          loginClass: 'btn btn-white',
-          registerClass: 'btn btn-red',
-          profileClass: 'btn btn-red',
-          logoutClass: 'btn btn-white',
-          afterLogout: 'gundebi.html'
-        });
+      const teamsAuthNav = document.getElementById('teamsAuthNav');
+      try {
+        if (window.siteAuth?.renderAuthNav) {
+          await window.siteAuth.renderAuthNav('#teamsAuthNav', {
+            currentPath: 'gundebi.html',
+            loginClass: 'btn btn-white',
+            registerClass: 'btn btn-red',
+            profileClass: 'btn btn-red',
+            logoutClass: 'btn btn-white',
+            afterLogout: 'gundebi.html'
+          });
+        }
+      } catch (error) {
+        console.warn('teams auth nav fallback', error);
+      }
+      if (teamsAuthNav && !teamsAuthNav.querySelector('a,button')) {
+        teamsAuthNav.innerHTML = '<a href="login.html?redirect=gundebi.html%23login#login" class="btn btn-white">შესვლა</a><a href="login.html?redirect=gundebi.html%23register#register" class="btn btn-red">რეგისტრაცია</a>';
       }
 
       const teamsGrid = document.getElementById('teamsGrid');

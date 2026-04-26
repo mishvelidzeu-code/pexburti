@@ -458,14 +458,22 @@
   <script>
     (async function () {
       // Auth nav
-      if (window.siteAuth && window.siteAuth.renderAuthNav) {
-        await window.siteAuth.renderAuthNav('#playersAuthNav', {
-          currentPath: 'pexburtelebi.html',
-          loginClass: 'btn btn-white',
-          registerClass: 'btn btn-red',
-          profileClass: 'btn btn-red',
-          afterLogout: 'pexburtelebi.html'
-        });
+      var playersAuthNav = document.getElementById('playersAuthNav');
+      try {
+        if (window.siteAuth && window.siteAuth.renderAuthNav) {
+          await window.siteAuth.renderAuthNav('#playersAuthNav', {
+            currentPath: 'pexburtelebi.html',
+            loginClass: 'btn btn-white',
+            registerClass: 'btn btn-red',
+            profileClass: 'btn btn-red',
+            afterLogout: 'pexburtelebi.html'
+          });
+        }
+      } catch (authError) {
+        console.warn('players auth nav fallback', authError);
+      }
+      if (playersAuthNav && !playersAuthNav.querySelector('a,button')) {
+        playersAuthNav.innerHTML = '<a href="login.html?redirect=pexburtelebi.html%23login#login" class="btn btn-white">შესვლა</a><a href="login.html?redirect=pexburtelebi.html%23register#register" class="btn btn-red">რეგისტრაცია</a>';
       }
 
       var client = window.siteAuth && window.siteAuth.getClient ? window.siteAuth.getClient() : null;
