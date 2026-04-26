@@ -1809,7 +1809,33 @@
       const normalizedTarget = fallbackHash && !target.includes('#')
         ? `${target}${fallbackHash}`
         : target;
-      window.location.href = normalizedTarget;
+      window.location.replace(normalizedTarget);
+    }
+
+    async function waitForStableAuthUser(fallbackUser) {
+      if (!supabaseClient) {
+        return fallbackUser || null;
+      }
+
+      for (let attempt = 0; attempt < 8; attempt += 1) {
+        try {
+          if (window.siteAuth?.getCurrentAuthState) {
+            const authState = await window.siteAuth.getCurrentAuthState(supabaseClient);
+            if (authState?.user) {
+              return authState.user;
+            }
+          } else {
+            const { data } = await supabaseClient.auth.getSession();
+            if (data?.session?.user) {
+              return data.session.user;
+            }
+          }
+        } catch (error) {}
+
+        await new Promise((resolve) => window.setTimeout(resolve, 250));
+      }
+
+      return fallbackUser || null;
     }
 
     function toggleForm(type, syncHash = true) {
@@ -1915,7 +1941,8 @@
             await window.sitePlayerDomain.syncMyAccountDomain(supabaseClient);
           }
         } catch (syncErr) {}
-        setTimeout(() => redirectToTarget(data.user), 700);
+        const stableUser = await waitForStableAuthUser(data.user);
+        await redirectToTarget(stableUser || data.user);
       } catch (error) {
         setStatus(loginStatus, error.message || 'შესვლა ვერ შესრულდა. მონაცემები გადაამოწმე.', 'error');
       } finally {
@@ -1985,7 +2012,8 @@
 
         if (data.session) {
           setStatus(registerStatus, 'ანგარიში შეიქმნა და არჩეული როლის მიხედვით პროფილიც მომზადდა. ახლავე გადაგამისამართებ.', 'success');
-          setTimeout(() => redirectToTarget(data.user), 700);
+          const stableUser = await waitForStableAuthUser(data.user);
+          await redirectToTarget(stableUser || data.user);
           return;
         }
 
