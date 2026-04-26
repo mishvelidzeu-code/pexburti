@@ -2600,29 +2600,20 @@
             </div>
           </div>
           <article class="metric-form-card">
-            <div class="section-top">
+            <div class="daily-head">
               <div>
                 <h3>დღიური განახლება</h3>
-                <p class="position-copy">აქედან სწრაფად ანახლებ მატჩისა და ფორმის მონაცემებს.</p>
+                <p class="position-copy">${esc(performance.config.position)} · მატჩისა და ფორმის მონაცემების სწრაფი განახლება.</p>
               </div>
-              <div class="metric-updated">ბოლო განახლება: ${esc(performance.updatedAt)}</div>
+              <span class="metric-updated">განახლდა: ${esc(performance.updatedAt)}</span>
             </div>
-            <div class="metric-form-grid">
-              <section class="metric-form-section">
-                <h4>ძირითადი მაჩვენებლები</h4>
-                <p>აქ ავსებ თამაშების რაოდენობას, წუთებს / 90-ს და დისციპლინას. საერთო ქულა და გოლში მონაწილეობა ზემოთ ავტომატურად დაითვლება შეყვანილი მონაცემებიდან.</p>
-                ${performance.commonForm}
-              </section>
-              <section class="metric-form-section">
-                <h4>${esc(performance.config.position)} · გავლენის მაჩვენებლები</h4>
-                <p>აქ მხოლოდ იმ პოზიციისთვის მნიშვნელოვანი მაჩვენებლები ჩნდება, რომელიც პროფილში გაქვს არჩეული.</p>
-                ${performance.advancedForm}
-              </section>
+            <div class="daily-fields">
+              ${performance.commonForm}${performance.advancedForm}
             </div>
-            <div class="actions team-actions">
-              <button id="savePerformanceBtn" type="button" class="btn btn-red">განახლების შენახვა</button>
+            <div class="daily-foot">
+              <button id="savePerformanceBtn" type="button" class="btn btn-red">შენახვა</button>
+              <div id="performanceStatus" class="form-status" data-state="info" hidden></div>
             </div>
-            <div id="performanceStatus" class="form-status" data-state="info" hidden></div>
           </article>
         </section>
       `;
