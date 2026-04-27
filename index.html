@@ -2186,6 +2186,24 @@
           </div>
         </div>
 
+        <div class="abroad-form-group">
+          <label>უპირატესი ფეხი</label>
+          <div class="abroad-radio-group">
+            <label class="abroad-radio">
+              <input type="radio" name="preferred_foot" value="right">
+              <span>მარჯვენა</span>
+            </label>
+            <label class="abroad-radio">
+              <input type="radio" name="preferred_foot" value="left">
+              <span>მარცხენა</span>
+            </label>
+            <label class="abroad-radio">
+              <input type="radio" name="preferred_foot" value="both">
+              <span>ორივე</span>
+            </label>
+          </div>
+        </div>
+
         <div class="abroad-form-row">
           <div class="abroad-form-group">
             <label for="arCountry">ქვეყანა *</label>
@@ -2573,6 +2591,8 @@
         var position    = (document.getElementById('arPosition').value  || '').trim();
         var country     = (document.getElementById('arCountry').value   || '').trim();
         var clubName    = (document.getElementById('arClub').value      || '').trim();
+        var footRadio   = form.querySelector('input[name="preferred_foot"]:checked');
+        var preferredFoot = footRadio ? footRadio.value : null;
         var terms       = document.getElementById('abroadAcceptTerms');
 
         if (!firstName || !lastName) {
@@ -2651,9 +2671,10 @@
                 is_abroad:        true,
                 profile: {
                   birth_date:  birthDate,
-                  position:    position || null,
-                  club_name:   clubName || null,
-                  country:     country
+                  position:       position || null,
+                  preferred_foot: preferredFoot || null,
+                  club_name:      clubName || null,
+                  country:        country
                 }
               }
             }
@@ -2673,6 +2694,7 @@
               full_name:       fullName,
               birth_year:      birthYear,
               position:        position || null,
+              preferred_foot:  preferredFoot || null,
               country:         country,
               club_name:       clubName || null,
               registrant_type: role,
