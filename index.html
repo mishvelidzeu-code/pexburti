@@ -1316,9 +1316,10 @@
           <h3 style="margin-top:10px;">უცხოეთში მყოფი ქართველები</h3>
           <p class="small" style="margin-top:8px;">ნახე ყველა ქართველი ფეხბურთელი, ვინც საზღვარგარეთ თამაშობს.</p>
           <button
-            onclick="event.stopPropagation(); event.preventDefault(); document.getElementById('abroadRegModal').classList.add('open');"
+            id="abroadFloatBtn"
+            onclick="event.stopPropagation(); event.preventDefault(); window.__abroadBtnAction && window.__abroadBtnAction();"
             style="margin-top:12px; width:100%; padding:8px 0; background:#16a34a; color:#fff; border:none; border-radius:10px; font-size:12px; font-weight:800; cursor:pointer; letter-spacing:.03em; font-family:inherit;">
-            რეგისტრაცია
+            <span id="abroadFloatBtnLabel">რეგისტრაცია</span>
           </button>
         </a>
 
@@ -2067,6 +2068,33 @@
       text-decoration: underline;
     }
     .abroad-form-check a:hover { color: #991b1b; }
+    .abroad-role-picker {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 2px;
+    }
+    .abroad-role-btn {
+      padding: 12px 14px;
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      background: #fff;
+      text-align: left;
+      cursor: pointer;
+      transition: .15s;
+      font-family: inherit;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .abroad-role-btn strong { font-size: .9rem; color: #0f172a; font-weight: 800; }
+    .abroad-role-btn span   { font-size: .75rem; color: #64748b; font-weight: 500; line-height: 1.4; }
+    .abroad-role-btn:hover  { border-color: #16a34a; }
+    .abroad-role-btn.active {
+      border-color: #16a34a;
+      background: #f0fdf4;
+    }
+    .abroad-role-btn.active strong { color: #15803d; }
     @media (max-width: 520px) {
       .abroad-modal-box { padding: 20px 16px; }
       .abroad-form-row { grid-template-columns: 1fr; }
@@ -2084,14 +2112,67 @@
         <strong>მნიშვნელოვანი:</strong> ეს ფორმა განკუთვნილია მხოლოდ იმ ქართველი ფეხბურთელებისთვის, ვინც ამჟამად <strong>საქართველოს გარეთ, უცხოეთში</strong> თამაშობს. ფორმის შევსება შეუძლია როგორც თავად მოთამაშეს, ასევე მის მშობელს.
       </div>
       <form id="abroadRegForm" class="abroad-modal-form" novalidate>
+
         <div class="abroad-form-group">
-          <label for="arFullName">მოთამაშის სახელი და გვარი *</label>
-          <input id="arFullName" type="text" name="full_name" placeholder="მაგ. გიორგი კვილიტაია" required>
+          <label>როლი *</label>
+          <div class="abroad-role-picker">
+            <button type="button" class="abroad-role-btn" data-role="player">
+              <strong>მოთამაშე</strong>
+              <span>ვარ ფეხბურთელი, ვთამაშობ უცხოეთში</span>
+            </button>
+            <button type="button" class="abroad-role-btn" data-role="parent">
+              <strong>მშობელი</strong>
+              <span>ვარეგისტრირებ ჩემს ბავშვს</span>
+            </button>
+          </div>
+          <input type="hidden" id="arRole" name="role" value="">
+          <div class="abroad-minor-notice">
+            ⚠️ თუ მოთამაშე <strong>18 წელზე ახალგაზრდაა</strong>, რეგისტრაცია აუცილებლად უნდა გააკეთოს <strong>მშობელმა</strong>.
+          </div>
         </div>
+
         <div class="abroad-form-row">
           <div class="abroad-form-group">
-            <label for="arBirthYear">დაბადების წელი</label>
-            <input id="arBirthYear" type="number" name="birth_year" placeholder="2007" min="1990" max="2020">
+            <label for="arFirstName">სახელი *</label>
+            <input id="arFirstName" type="text" name="first_name" placeholder="სახელი" autocomplete="given-name" required>
+          </div>
+          <div class="abroad-form-group">
+            <label for="arLastName">გვარი *</label>
+            <input id="arLastName" type="text" name="last_name" placeholder="გვარი" autocomplete="family-name" required>
+          </div>
+        </div>
+
+        <div class="abroad-form-row">
+          <div class="abroad-form-group">
+            <label for="arPersonalNum">პირადი ნომერი *</label>
+            <input id="arPersonalNum" type="text" name="personal_number" placeholder="11 ციფრი" inputmode="numeric" maxlength="11" required>
+          </div>
+          <div class="abroad-form-group">
+            <label for="arPhone">ტელეფონი *</label>
+            <input id="arPhone" type="tel" name="contact_phone" placeholder="5xxxxxxxx" inputmode="numeric" required>
+          </div>
+        </div>
+
+        <div class="abroad-form-group">
+          <label for="arEmail">ელ-ფოსტა *</label>
+          <input id="arEmail" type="email" name="email" placeholder="mail@example.com" autocomplete="email" required>
+        </div>
+
+        <div class="abroad-form-row">
+          <div class="abroad-form-group">
+            <label for="arPassword">პაროლი *</label>
+            <input id="arPassword" type="password" name="password" placeholder="მინ. 8 სიმბოლო" minlength="8" autocomplete="new-password" required>
+          </div>
+          <div class="abroad-form-group">
+            <label for="arPasswordConfirm">გაიმეორე პაროლი *</label>
+            <input id="arPasswordConfirm" type="password" name="password_confirm" placeholder="••••••••" autocomplete="new-password" required>
+          </div>
+        </div>
+
+        <div class="abroad-form-row">
+          <div class="abroad-form-group">
+            <label for="arBirthDate">დაბადების თარიღი *</label>
+            <input id="arBirthDate" type="date" name="birth_date" required>
           </div>
           <div class="abroad-form-group">
             <label for="arPosition">პოზიცია</label>
@@ -2104,6 +2185,7 @@
             </select>
           </div>
         </div>
+
         <div class="abroad-form-row">
           <div class="abroad-form-group">
             <label for="arCountry">ქვეყანა *</label>
@@ -2114,45 +2196,17 @@
             <input id="arClub" type="text" name="club_name" placeholder="კლუბის სახელი">
           </div>
         </div>
-        <div class="abroad-form-group">
-          <label>ვინ ავსებს ფორმას?</label>
-          <div class="abroad-radio-group">
-            <label class="abroad-radio">
-              <input type="radio" name="registrant_type" value="player" checked>
-              <span>მოთამაშე</span>
-            </label>
-            <label class="abroad-radio">
-              <input type="radio" name="registrant_type" value="parent">
-              <span>მშობელი</span>
-            </label>
-          </div>
-          <div class="abroad-minor-notice">
-            ⚠️ თუ მოთამაშე <strong>18 წელზე ახალგაზრდაა</strong>, რეგისტრაცია აუცილებლად უნდა გააკეთოს <strong>მშობელმა</strong>.
-          </div>
-        </div>
-        <div class="abroad-form-row">
-          <div class="abroad-form-group">
-            <label for="arEmail">ელ-ფოსტა</label>
-            <input id="arEmail" type="email" name="contact_email" placeholder="mail@example.com">
-          </div>
-          <div class="abroad-form-group">
-            <label for="arPhone">ტელეფონი</label>
-            <input id="arPhone" type="tel" name="contact_phone" placeholder="+995 5xx xxx xxx">
-          </div>
-        </div>
-        <div class="abroad-form-group">
-          <label for="arNotes">დამატებითი ინფო</label>
-          <textarea id="arNotes" name="notes" rows="3" placeholder="სასარგებლო დეტალები მოთამაშის შესახებ..."></textarea>
-        </div>
+
         <div class="abroad-form-check">
           <input id="abroadAcceptTerms" type="checkbox" required>
           <label for="abroadAcceptTerms">
             ვეთანხმები <a href="terms.html" target="_blank" rel="noopener">წესებს და პირობებს</a> და ვადასტურებ, რომ მოწოდებული ინფორმაცია სწორია.
           </label>
         </div>
+
         <div id="abroadRegMsg" class="abroad-reg-msg" hidden></div>
         <button type="submit" class="abroad-submit-btn">
-          <span id="abroadRegBtnText">განაცხადის გაგზავნა</span>
+          <span id="abroadRegBtnText">ანგარიშის შექმნა</span>
         </button>
       </form>
     </div>
@@ -2410,12 +2464,41 @@
 
   <script>
     (function () {
-      var modal    = document.getElementById('abroadRegModal');
-      var form     = document.getElementById('abroadRegForm');
-      var msgEl    = document.getElementById('abroadRegMsg');
-      var btnText  = document.getElementById('abroadRegBtnText');
+      var modal     = document.getElementById('abroadRegModal');
+      var form      = document.getElementById('abroadRegForm');
+      var msgEl     = document.getElementById('abroadRegMsg');
+      var btnText   = document.getElementById('abroadRegBtnText');
       var submitBtn = form ? form.querySelector('.abroad-submit-btn') : null;
+      var roleInput = document.getElementById('arRole');
+      var floatBtn  = document.getElementById('abroadFloatBtn');
+      var floatLabel= document.getElementById('abroadFloatBtnLabel');
 
+      /* ---- ღილაკის default action: modal გახსნა ---- */
+      window.__abroadBtnAction = function () {
+        if (modal) { modal.classList.add('open'); }
+      };
+
+      /* ---- Auth state: თუ შესულია — ღილაკი გადაიქცევა "დაათვალიერეთ"-ად ---- */
+      (async function () {
+        try {
+          var client = window.siteAuth && window.siteAuth.getClient ? window.siteAuth.getClient() : null;
+          if (!client) { return; }
+          var authState = window.siteAuth.getCurrentAuthState
+            ? await window.siteAuth.getCurrentAuthState(client)
+            : await client.auth.getSession().then(function (r) {
+                return { user: r.data && r.data.session ? r.data.session.user : null };
+              });
+          if (authState && authState.user) {
+            if (floatLabel) { floatLabel.textContent = 'დაათვალიერეთ'; }
+            if (floatBtn)   { floatBtn.style.background = '#b91c1c'; }
+            window.__abroadBtnAction = function () {
+              window.location.href = 'ucxoetshi.html';
+            };
+          }
+        } catch (e) {}
+      })();
+
+      /* ---- Modal გახსნა / დახურვა ---- */
       if (modal) {
         modal.addEventListener('click', function (e) {
           if (e.target === modal) { modal.classList.remove('open'); }
@@ -2425,6 +2508,17 @@
         if (e.key === 'Escape' && modal) { modal.classList.remove('open'); }
       });
 
+      /* ---- Role picker ---- */
+      var roleBtns = document.querySelectorAll('.abroad-role-btn');
+      roleBtns.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          roleBtns.forEach(function (b) { b.classList.remove('active'); });
+          btn.classList.add('active');
+          if (roleInput) { roleInput.value = btn.dataset.role || ''; }
+        });
+      });
+
+      /* ---- Helpers ---- */
       function getClient() {
         if (window.siteAuth && window.siteAuth.getClient) { return window.siteAuth.getClient(); }
         if (window.__mfgSupabaseClient) { return window.__mfgSupabaseClient; }
@@ -2441,72 +2535,184 @@
         msgEl.hidden = true;
         msgEl.textContent = '';
       }
-      function resetBtn() {
+      function resetBtn(label) {
         if (submitBtn) { submitBtn.disabled = false; }
-        if (btnText)   { btnText.textContent = 'განაცხადის გაგზავნა'; }
+        if (btnText)   { btnText.textContent = label || 'ანგარიშის შექმნა'; }
       }
 
+      /* ---- Personal number digits only ---- */
+      var personalNumInput = document.getElementById('arPersonalNum');
+      var phoneInput = document.getElementById('arPhone');
+      [personalNumInput, phoneInput].forEach(function (inp) {
+        if (!inp) { return; }
+        inp.addEventListener('input', function () {
+          inp.value = inp.value.replace(/\D/g, '');
+        });
+      });
+
+      /* ---- Form submit ---- */
       if (!form) { return; }
       form.addEventListener('submit', async function (e) {
         e.preventDefault();
         hideMsg();
 
-        var fd = new FormData(form);
-        var fullName = (fd.get('full_name') || '').trim();
-        var country  = (fd.get('country') || '').trim();
-
-        if (!fullName || !country) {
-          showMsg('error', 'გთხოვთ შეავსოთ სავალდებულო ველები (სახელი და ქვეყანა).');
+        var role = roleInput ? roleInput.value : '';
+        if (!role) {
+          showMsg('error', 'გთხოვთ აირჩიოთ როლი: მოთამაშე ან მშობელი.');
           return;
         }
 
-        var termsCheckbox = document.getElementById('abroadAcceptTerms');
-        if (!termsCheckbox || !termsCheckbox.checked) {
-          showMsg('error', 'გაგზავნამდე აუცილებელია წესებს და პირობებს დაეთანხმოთ.');
-          if (termsCheckbox) { termsCheckbox.focus(); }
+        var firstName   = (document.getElementById('arFirstName').value || '').trim();
+        var lastName    = (document.getElementById('arLastName').value  || '').trim();
+        var personalNum = (document.getElementById('arPersonalNum').value || '').replace(/\D/g, '');
+        var phone       = (document.getElementById('arPhone').value     || '').replace(/\D/g, '');
+        var email       = (document.getElementById('arEmail').value     || '').trim();
+        var password    = (document.getElementById('arPassword').value  || '');
+        var passwordCon = (document.getElementById('arPasswordConfirm').value || '');
+        var birthDate   = (document.getElementById('arBirthDate').value || '').trim();
+        var position    = (document.getElementById('arPosition').value  || '').trim();
+        var country     = (document.getElementById('arCountry').value   || '').trim();
+        var clubName    = (document.getElementById('arClub').value      || '').trim();
+        var terms       = document.getElementById('abroadAcceptTerms');
+
+        if (!firstName || !lastName) {
+          showMsg('error', 'შეავსეთ სახელი და გვარი.');
+          return;
+        }
+        if (personalNum.length !== 11) {
+          showMsg('error', 'პირადი ნომერი უნდა შედგებოდეს ზუსტად 11 ციფრისგან.');
+          document.getElementById('arPersonalNum').focus();
+          return;
+        }
+        if (phone.length < 9) {
+          showMsg('error', 'ტელეფონის ნომერი სწორად შეიყვანეთ.');
+          document.getElementById('arPhone').focus();
+          return;
+        }
+        if (!email) {
+          showMsg('error', 'ელ-ფოსტა სავალდებულოა.');
+          document.getElementById('arEmail').focus();
+          return;
+        }
+        if (password.length < 8) {
+          showMsg('error', 'პაროლი მინიმუმ 8 სიმბოლო უნდა იყოს.');
+          document.getElementById('arPassword').focus();
+          return;
+        }
+        if (password !== passwordCon) {
+          showMsg('error', 'ორივე პაროლი ერთმანეთს უნდა ემთხვეოდეს.');
+          document.getElementById('arPasswordConfirm').focus();
+          return;
+        }
+        if (!birthDate) {
+          showMsg('error', 'დაბადების თარიღი სავალდებულოა.');
+          document.getElementById('arBirthDate').focus();
+          return;
+        }
+        if (!country) {
+          showMsg('error', 'ქვეყნის მითითება სავალდებულოა.');
+          document.getElementById('arCountry').focus();
+          return;
+        }
+        if (!terms || !terms.checked) {
+          showMsg('error', 'რეგისტრაციამდე აუცილებელია წესებს და პირობებს დაეთანხმოთ.');
+          if (terms) { terms.focus(); }
           return;
         }
 
-        var birthYearRaw = fd.get('birth_year');
-        var payload = {
-          full_name:       fullName,
-          birth_year:      birthYearRaw ? Number(birthYearRaw) : null,
-          position:        fd.get('position') || null,
-          country:         country,
-          club_name:       (fd.get('club_name') || '').trim() || null,
-          registrant_type: fd.get('registrant_type') || 'player',
-          contact_email:   (fd.get('contact_email') || '').trim() || null,
-          contact_phone:   (fd.get('contact_phone') || '').trim() || null,
-          notes:           (fd.get('notes') || '').trim() || null
-        };
+        var fullName   = (firstName + ' ' + lastName).trim();
+        var birthYear  = birthDate ? Number(birthDate.split('-')[0]) : null;
 
         if (submitBtn) { submitBtn.disabled = true; }
-        if (btnText)   { btnText.textContent = 'იგზავნება...'; }
+        if (btnText)   { btnText.textContent = 'იქმნება ანგარიში...'; }
 
         var client = getClient();
         if (!client) {
-          showMsg('error', 'კავშირის პრობლემა. გადატვირთეთ გვერდი და სცადეთ თავიდან.');
+          showMsg('error', 'კავშირის პრობლემა. გადატვირთეთ გვერდი.');
           resetBtn();
           return;
         }
 
         try {
-          var result = await client.from('abroad_registrations').insert(payload);
-          if (result.error) {
-            showMsg('error', 'შეცდომა: ' + (result.error.message || 'მონაცემი ვერ დაემატა. სცადეთ მოგვიანებით.'));
+          /* 1. Supabase Auth SignUp */
+          var signUpResult = await client.auth.signUp({
+            email: email,
+            password: password,
+            options: {
+              data: {
+                first_name:       firstName,
+                last_name:        lastName,
+                full_name:        fullName,
+                personal_number:  personalNum,
+                phone_number:     phone,
+                accepted_terms:   true,
+                accepted_terms_at: new Date().toISOString(),
+                role:             role,
+                is_abroad:        true,
+                profile: {
+                  birth_date:  birthDate,
+                  position:    position || null,
+                  club_name:   clubName || null,
+                  country:     country
+                }
+              }
+            }
+          });
+
+          if (signUpResult.error) {
+            showMsg('error', 'შეცდომა: ' + (signUpResult.error.message || 'რეგისტრაცია ვერ შესრულდა.'));
+            resetBtn();
+            return;
+          }
+
+          var newUser = signUpResult.data && signUpResult.data.user ? signUpResult.data.user : null;
+
+          /* 2. abroad_registrations ცხრილში ჩაწერა */
+          try {
+            await client.from('abroad_registrations').insert({
+              full_name:       fullName,
+              birth_year:      birthYear,
+              position:        position || null,
+              country:         country,
+              club_name:       clubName || null,
+              registrant_type: role,
+              contact_email:   email,
+              contact_phone:   phone || null,
+              auth_user_id:    newUser ? newUser.id : null
+            });
+          } catch (regErr) {}
+
+          /* 3. Session sync */
+          if (signUpResult.data && signUpResult.data.session && window.siteAuth && window.siteAuth.primeAuthStateCache) {
+            window.siteAuth.primeAuthStateCache(signUpResult.data.session, newUser);
+          }
+          if (signUpResult.data && signUpResult.data.session && window.sitePlayerDomain && window.sitePlayerDomain.syncMyAccountDomain) {
+            try { await window.sitePlayerDomain.syncMyAccountDomain(client); } catch (e) {}
+          }
+
+          form.reset();
+          roleBtns.forEach(function (b) { b.classList.remove('active'); });
+          if (roleInput) { roleInput.value = ''; }
+
+          if (signUpResult.data && signUpResult.data.session) {
+            /* session მყისიერად — დეშბორდზე გადა */
+            showMsg('success', 'ანგარიში შეიქმნა! გადაგამისამართებ...');
+            var dashTarget = window.siteAuth && window.siteAuth.getProfileRouteForUser
+              ? window.siteAuth.getProfileRouteForUser(newUser)
+              : 'user-profile.html';
+            setTimeout(function () { window.location.href = dashTarget; }, 1200);
           } else {
-            showMsg('success', 'განაცხადი წარმატებით გაიგზავნა! ადმინი მალე დაგიკავშირდებათ.');
-            form.reset();
+            /* email დადასტურება საჭიროა */
+            showMsg('success', 'ანგარიში შეიქმნა! შეამოწმეთ ელ-ფოსტა დადასტურების ბმულისთვის, შემდეგ შედით სისტემაში.');
             setTimeout(function () {
               modal.classList.remove('open');
               hideMsg();
-            }, 3500);
+            }, 5000);
           }
         } catch (err) {
           showMsg('error', 'შეცდომა. სცადეთ მოგვიანებით.');
+          resetBtn();
         }
-
-        resetBtn();
       });
     })();
   </script>
