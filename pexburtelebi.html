@@ -658,31 +658,56 @@
         return;
       }
 
-      // Fetch public players from Supabase
-      var playerFetchError = false;
+      // Fetch public players
       try {
         pagePlayers = await window.siteData.fetchPublicPlayers(client);
         if (!Array.isArray(pagePlayers)) { pagePlayers = []; }
-      } catch (fetchErr) {
+      } catch (e) {
         pagePlayers = [];
-        playerFetchError = true;
       }
 
-      if (playerFetchError && !pagePlayers.length) {
-        if (playersGridNode) {
-          playersGridNode.innerHTML = [
-            '<article class="player-card" style="grid-column:1 / -1; min-height:auto; align-items:flex-start;">',
-            '<div class="player-info" style="width:100%;">',
-            '<h3 class="player-name">ჩატვირთვის შეცდომა</h3>',
-            '<div class="meta-grid" style="margin-top:10px;">',
-            '<div class="meta-item" style="grid-column:1 / -1;">',
-            '<span>მდგომარეობა</span>',
-            '<strong>მონაცემების ჩატვირთვა ვერ მოხერხდა. გადაამოწმე ინტერნეტ კავშირი და განაახლე გვერდი.</strong>',
-            '</div></div></div></article>'
-          ].join('');
-        }
-        if (resultCountNode) { resultCountNode.textContent = 'ნაპოვნია: 0'; }
-        return;
+      // Direct fallback: if shared function returned nothing, query player_profiles directly
+      if (!pagePlayers.length) {
+        try {
+          var directResult = await client
+            .from('player_profiles')
+            .select('user_id, display_name, full_name, primary_position, position_label, age_group, birth_date, avatar_path, club_name, club_slug, preferred_foot, created_at, updated_at')
+            .order('updated_at', { ascending: false });
+
+          if (!directResult.error && Array.isArray(directResult.data) && directResult.data.length) {
+            pagePlayers = directResult.data
+              .filter(function (row) { return String(row.display_name || row.full_name || '').trim(); })
+              .map(function (row) {
+                var fullName = String(row.display_name || row.full_name || '').trim();
+                var posRaw   = String(row.position_label || row.primary_position || '').trim();
+                var posKey   = posRaw.toLowerCase();
+                var posCode  = posKey === 'gk' || posKey === 'goalkeeper' ? 'GK'
+                             : posKey === 'df' || posKey === 'defender'   ? 'DF'
+                             : posKey === 'fw' || posKey === 'forward'    ? 'FW' : 'MF';
+                var ageGroup = String(row.age_group || 'pro').toLowerCase();
+                var age = null;
+                if (row.birth_date) {
+                  var by = new Date(row.birth_date).getFullYear();
+                  age = new Date().getFullYear() - by;
+                }
+                var foot = String(row.preferred_foot || '').toLowerCase();
+                var footLabel = foot === 'left' ? 'მარცხენა' : foot === 'right' ? 'მარჯვენა' : foot === 'both' ? 'ორივე' : 'არ არის მითითებული';
+                return {
+                  id:            String(row.user_id || '').trim(),
+                  fullName:      fullName,
+                  positionCode:  posCode,
+                  positionLabel: posRaw || posCode,
+                  ageGroup:      ageGroup,
+                  ageLabel:      ageGroup.toUpperCase(),
+                  age:           age,
+                  foot:          footLabel,
+                  team:          String(row.club_name || '').trim() || 'უგუნდოდ',
+                  teamSlug:      String(row.club_slug || '').trim(),
+                  photo:         String(row.avatar_path || '').trim()
+                };
+              });
+          }
+        } catch (e2) {}
       }
 
       // Get current user session
