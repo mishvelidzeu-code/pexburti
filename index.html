@@ -853,7 +853,7 @@
         inset 0 1px 0 rgba(255, 255, 255, 0.95),
         inset 0 -1px 0 rgba(15, 23, 42, 0.04);
       transition: all 0.3s ease;
-      cursor: default;
+      cursor: pointer;
       position: relative;
       overflow: hidden;
     }
@@ -871,6 +871,126 @@
         0 22px 52px rgba(15, 23, 42, 0.13),
         inset 0 1px 0 rgba(255, 255, 255, 1);
       border-color: rgba(255, 255, 255, 0.95);
+    }
+
+    /* ── App Download Overlay ── */
+    .app-dl-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(248, 250, 252, 0.70);
+      backdrop-filter: blur(2px);
+      z-index: 8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+    }
+    .app-dl-badge {
+      background: #f1f5f9;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 50px;
+      padding: 8px 22px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #64748b;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      user-select: none;
+    }
+
+    /* ── App Promo Modal ── */
+    .app-promo-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.52);
+      z-index: 1300;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .app-promo-overlay.open { display: flex; }
+    .app-promo-box {
+      background: #fff;
+      border-radius: 24px;
+      padding: 44px 36px 36px;
+      max-width: 440px;
+      width: 100%;
+      text-align: center;
+      position: relative;
+      box-shadow: 0 32px 72px rgba(15, 23, 42, 0.2);
+    }
+    .app-promo-close {
+      position: absolute;
+      top: 14px;
+      right: 18px;
+      background: #f1f5f9;
+      border: none;
+      border-radius: 50%;
+      width: 34px;
+      height: 34px;
+      font-size: 1.25rem;
+      cursor: pointer;
+      color: #64748b;
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .app-promo-close:hover { background: #e2e8f0; }
+    .app-promo-emoji { font-size: 3rem; margin-bottom: 16px; }
+    .app-promo-box h3 {
+      font-size: 1.45rem;
+      font-weight: 800;
+      color: #0f172a;
+      margin-bottom: 12px;
+      line-height: 1.2;
+    }
+    .app-promo-box p {
+      color: #475569;
+      line-height: 1.75;
+      font-size: 0.93rem;
+      margin-bottom: 10px;
+    }
+    .app-promo-soon {
+      display: inline-block;
+      background: #fef3c7;
+      color: #92400e;
+      border: 1px solid #fde68a;
+      border-radius: 50px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 4px 14px;
+      letter-spacing: .04em;
+      margin-top: 8px;
+    }
+    .app-promo-stores {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin-top: 24px;
+    }
+    .app-store-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #0f172a;
+      color: #fff;
+      border: none;
+      border-radius: 14px;
+      padding: 11px 20px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      opacity: 0.4;
+      cursor: not-allowed;
+      font-family: inherit;
+    }
+    .app-store-btn span.sub {
+      font-size: 0.68rem;
+      font-weight: 400;
+      opacity: 0.8;
+      display: block;
+      text-align: left;
     }
     .grid-2, .grid-3, .grid-4 { display: grid; gap: 24px; }
     .grid-2 { grid-template-columns: repeat(2, 1fr); }
@@ -1543,6 +1663,9 @@
   </section>
 
   <section id="app-download" class="section-sm bg-alt">
+    <div class="app-dl-overlay">
+      <span class="app-dl-badge">🔄 მიმდინარეობს განახლება</span>
+    </div>
     <div class="container progress-showcase">
       <div class="progress-top">
         <div class="progress-side-image">
@@ -1562,11 +1685,11 @@
       </div>
 
       <div class="brand-strip">
-        <div class="brand-box">ინდივიდუალური<br>ვარჯიში</div>
-        <div class="brand-box">პროფესიონალური<br>ქოუჩინგი</div>
-        <div class="brand-box">ტაქტიკური<br>ვიდეოები</div>
-        <div class="brand-box">მენტალიტეტის<br>განვითარება</div>
-        <div class="brand-box">ბანაკები და<br>შეფასება</div>
+        <div class="brand-box" role="button" tabindex="0" onclick="document.getElementById('appPromoModal').classList.add('open')">ინდივიდუალური<br>ვარჯიში</div>
+        <div class="brand-box" role="button" tabindex="0" onclick="document.getElementById('appPromoModal').classList.add('open')">პროფესიონალური<br>ქოუჩინგი</div>
+        <div class="brand-box" role="button" tabindex="0" onclick="document.getElementById('appPromoModal').classList.add('open')">ტაქტიკური<br>ვიდეოები</div>
+        <div class="brand-box" role="button" tabindex="0" onclick="document.getElementById('appPromoModal').classList.add('open')">მენტალიტეტის<br>განვითარება</div>
+        <div class="brand-box" role="button" tabindex="0" onclick="document.getElementById('appPromoModal').classList.add('open')">ბანაკები და<br>შეფასება</div>
       </div>
     </div>
   </section>
@@ -1904,6 +2027,45 @@
       </div>
     </div>
   </footer>
+
+  <!-- App Promo Modal -->
+  <div id="appPromoModal" class="app-promo-overlay" role="dialog" aria-modal="true" aria-label="გადმოიწერეთ ჩვენი აპი">
+    <div class="app-promo-box">
+      <button class="app-promo-close" onclick="document.getElementById('appPromoModal').classList.remove('open')" aria-label="დახურვა">×</button>
+      <div class="app-promo-emoji">⚽</div>
+      <h3>გადმოიწერეთ DM Football Georgia</h3>
+      <p>150+ ინდივიდუალური ვარჯიში, ტაქტიკური ვიდეოები, ელიტური ქოუჩინგი, მენტალიტეტის განვითარება და ბანაკები — ყველაფერი ერთ აპლიკაციაში, ნებისმიერ დროს.</p>
+      <p style="font-size:0.87rem; color:#94a3b8;">შექმენი პროფილი, აკონტროლე პროგრესი და განვითარდი პროფესიონალებისგან სწავლებით.</p>
+      <span class="app-promo-soon">🚀 მალე ხელმისაწვდომი</span>
+      <div class="app-promo-stores">
+        <button class="app-store-btn" disabled title="მალე">
+          <span style="font-size:1.2rem;">🍎</span>
+          <span>App Store<span class="sub">მალე</span></span>
+        </button>
+        <button class="app-store-btn" disabled title="მალე">
+          <span style="font-size:1.2rem;">▶</span>
+          <span>Google Play<span class="sub">მალე</span></span>
+        </button>
+      </div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      var pm = document.getElementById('appPromoModal');
+      if (!pm) return;
+      pm.addEventListener('click', function (e) {
+        if (e.target === pm) pm.classList.remove('open');
+      });
+      document.querySelectorAll('.brand-box').forEach(function (box) {
+        box.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            pm.classList.add('open');
+          }
+        });
+      });
+    })();
+  </script>
 
   <!-- abroad registration modal -->
   <style>
@@ -2304,7 +2466,7 @@
         summaryText.textContent = `${players.length} საჯარო ფეხბურთელიდან ავტომატურად დალაგებული 4-3-3 შემადგენლობა ხმებისა და რეიტინგის მიხედვით.`;
       }
       if (helperText) {
-        helperText.textContent = 'მოთამაშეზე კლიკით იხსნება მისი პროფილი Supabase-იდან.';
+        helperText.textContent = '';
       }
 
       if (topPlayer) {
@@ -2392,10 +2554,10 @@
       const summaryText = document.querySelector('.month-squad-card .month-card-summary p');
       const helperText = document.querySelector('.month-squad-expanded .small');
       if (summaryText) {
-        summaryText.textContent = `სიმბოლური 11-ეული ჩაკეტილია მიმდინარე ციკლისთვის (${snapshot.cycleStart} - ${snapshot.cycleEnd}) და განახლდება ყოველი თვის 28 რიცხვში.`;
+        summaryText.textContent = '';
       }
       if (helperText) {
-        helperText.textContent = `მოთამაშეზე კლიკით იხსნება მისი პროფილი. მიმდინარე შედეგი ჩაკეტილია ${snapshot.cycleStart}-დან ${snapshot.cycleEnd}-მდე.`;
+        helperText.textContent = '';
       }
 
       const pitchNode = document.querySelector('.weekly-pitch');
@@ -2472,7 +2634,7 @@
         `;
       }
       if (monthNote) {
-        monthNote.textContent = `${topPlayer.fullName} არჩეულია მიმდინარე თვის საუკეთესო ფეხბურთელად. შედეგი ჩაიკეტა ${snapshot.cycleStart}-ზე და შემდეგი განახლება მოხდება შემდეგი თვის 28 რიცხვში.`;
+        monthNote.textContent = '';
       }
       if (monthPrimaryAction) {
         monthPrimaryAction.href = playerHref;
