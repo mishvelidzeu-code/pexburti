@@ -1312,7 +1312,7 @@
         </div>
 
         <a href="ucxoetshi.html" class="floating f1" style="display:block; text-decoration:none; color:inherit;">
-          <div class="pill" style="background:#000;">ქართველები უცხოეთში</div>
+          <div class="pill" style="background:#b91c1c;">ქართველები უცხოეთში</div>
           <h3 style="margin-top:10px;">უცხოეთში მყოფი ქართველები</h3>
           <p class="small" style="margin-top:8px;">ნახე ყველა ქართველი ფეხბურთელი, ვინც საზღვარგარეთ თამაშობს.</p>
           <button
@@ -2031,6 +2031,42 @@
     }
     .abroad-reg-msg.success { background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; }
     .abroad-reg-msg.error   { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
+    .abroad-minor-notice {
+      margin-top: 10px;
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: .82rem;
+      line-height: 1.6;
+      color: #92400e;
+    }
+    .abroad-form-check {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    .abroad-form-check input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      margin-top: 2px;
+      accent-color: #b91c1c;
+      flex: 0 0 auto;
+      cursor: pointer;
+    }
+    .abroad-form-check label {
+      color: #475569;
+      font-size: .84rem;
+      font-weight: 700;
+      line-height: 1.5;
+      cursor: pointer;
+    }
+    .abroad-form-check a {
+      color: #b91c1c;
+      font-weight: 800;
+      text-decoration: underline;
+    }
+    .abroad-form-check a:hover { color: #991b1b; }
     @media (max-width: 520px) {
       .abroad-modal-box { padding: 20px 16px; }
       .abroad-form-row { grid-template-columns: 1fr; }
@@ -2090,6 +2126,9 @@
               <span>მშობელი</span>
             </label>
           </div>
+          <div class="abroad-minor-notice">
+            ⚠️ თუ მოთამაშე <strong>18 წელზე ახალგაზრდაა</strong>, რეგისტრაცია აუცილებლად უნდა გააკეთოს <strong>მშობელმა</strong>.
+          </div>
         </div>
         <div class="abroad-form-row">
           <div class="abroad-form-group">
@@ -2104,6 +2143,12 @@
         <div class="abroad-form-group">
           <label for="arNotes">დამატებითი ინფო</label>
           <textarea id="arNotes" name="notes" rows="3" placeholder="სასარგებლო დეტალები მოთამაშის შესახებ..."></textarea>
+        </div>
+        <div class="abroad-form-check">
+          <input id="abroadAcceptTerms" type="checkbox" required>
+          <label for="abroadAcceptTerms">
+            ვეთანხმები <a href="terms.html" target="_blank" rel="noopener">წესებს და პირობებს</a> და ვადასტურებ, რომ მოწოდებული ინფორმაცია სწორია.
+          </label>
         </div>
         <div id="abroadRegMsg" class="abroad-reg-msg" hidden></div>
         <button type="submit" class="abroad-submit-btn">
@@ -2412,6 +2457,13 @@
 
         if (!fullName || !country) {
           showMsg('error', 'გთხოვთ შეავსოთ სავალდებულო ველები (სახელი და ქვეყანა).');
+          return;
+        }
+
+        var termsCheckbox = document.getElementById('abroadAcceptTerms');
+        if (!termsCheckbox || !termsCheckbox.checked) {
+          showMsg('error', 'გაგზავნამდე აუცილებელია წესებს და პირობებს დაეთანხმოთ.');
+          if (termsCheckbox) { termsCheckbox.focus(); }
           return;
         }
 
