@@ -372,7 +372,10 @@
           thumb: parsed.thumb,
           title: String(item.title || parsed.defaultTitle || 'ვიდეო').trim() || 'ვიდეო',
           comment: String(item.comment || '').trim(),
-          date: String(item.date || '').trim()
+          date: String(item.date || '').trim(),
+          number: String(item.number || '').trim(),
+          position: String(item.position || '').trim(),
+          teams: String(item.teams || '').trim()
         };
       })
       .filter(Boolean)
@@ -384,7 +387,10 @@
       title: String(item.title || '').trim(),
       url: String(item.url || '').trim(),
       comment: String(item.comment || '').trim(),
-      date: String(item.date || '').trim()
+      date: String(item.date || '').trim(),
+      number: String(item.number || '').trim(),
+      position: String(item.position || '').trim(),
+      teams: String(item.teams || '').trim()
     }));
   }
 
@@ -1806,25 +1812,33 @@
       return;
     }
 
-    list.innerHTML = videos.map((video, index) => `
-      <article class="video-card">
-        <div class="video-frame">
-          <iframe src="${esc(video.embedUrl)}" title="${esc(video.title)}" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-        </div>
-        <div class="video-card-top">
-          <div>
-            <h3 class="video-card-title">${esc(video.title)}</h3>
-            <div class="video-card-copy">${esc(video.url)}</div>
+    const count = videos.length;
+    const minSize = count >= 9 ? '170px' : count >= 5 ? '200px' : count >= 3 ? '230px' : '270px';
+    list.style.gridTemplateColumns = `repeat(auto-fill, minmax(${minSize}, 1fr))`;
+
+    list.innerHTML = videos.map((video) => {
+      const metaChips = [
+        video.date ? `<span>📅 ${esc(formatVideoDate(video.date))}</span>` : '',
+        video.number ? `<span>🔢 №${esc(video.number)}</span>` : '',
+        video.position ? `<span>📍 ${esc(video.position)}</span>` : '',
+        video.teams ? `<span>⚽ ${esc(video.teams)}</span>` : '',
+        '<span>YouTube</span>'
+      ].filter(Boolean).join('');
+
+      return `
+        <article class="video-card">
+          <div class="video-frame">
+            <iframe src="${esc(video.embedUrl)}" title="${esc(video.title)}" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
           </div>
-          <button type="button" class="btn btn-white remove-video-btn" data-video-id="${esc(video.id)}" data-video-date="${esc(video.date)}">წაშლა</button>
-        </div>
-        <div class="video-meta">
-          <span>${esc(formatVideoDate(video.date))}</span>
-          <span>YouTube</span>
-        </div>
-        <div class="video-comment">${esc(video.comment || 'კომენტარი არ არის დამატებული.')}</div>
-      </article>
-    `).join('');
+          <div class="video-card-top">
+            <h3 class="video-card-title">${esc(video.title)}</h3>
+            <button type="button" class="btn btn-white remove-video-btn" data-video-id="${esc(video.id)}" data-video-date="${esc(video.date)}">✕</button>
+          </div>
+          <div class="video-meta">${metaChips}</div>
+          <div class="video-comment">${esc(video.comment || 'კომენტარი არ არის.')}</div>
+        </article>
+      `;
+    }).join('');
 
     list.querySelectorAll('.remove-video-btn').forEach((button) => {
       button.addEventListener('click', () => {
@@ -1860,6 +1874,30 @@
 
       videoEditorState.user = data?.user || user;
       videoEditorState.profile = profile;
+
+      /* sync to public player_videos table (if it exists) */
+      try {
+        const uid = user.id;
+        if (uid && client?.from) {
+          await client.from('player_videos').delete().eq('auth_user_id', uid);
+          const rows = nextVideos.map((v) => {
+            const m = String(v.url || '').match(/(?:v=|youtu\.be\/|embed\/)([A-Za-z0-9_-]{11})/);
+            return {
+              auth_user_id: uid,
+              youtube_url: String(v.url || '').trim(),
+              youtube_id: m ? m[1] : '',
+              title: String(v.title || '').trim(),
+              comment: String(v.comment || '').trim(),
+              video_date: String(v.date || '').trim() || null,
+              jersey_number: String(v.number || '').trim(),
+              position: String(v.position || '').trim(),
+              teams: String(v.teams || '').trim()
+            };
+          }).filter((r) => r.youtube_id);
+          if (rows.length) await client.from('player_videos').insert(rows);
+        }
+      } catch (_) { /* table may not exist yet — silently skip */ }
+
       renderVideoList(role, profile, buildRoleView(role, profile, videoEditorState.user, from()).videos.n);
       setVideoStatus(successMessage, 'success');
       const input = document.getElementById('videoUrlInput');
@@ -1884,6 +1922,10 @@
     const input = document.getElementById('videoUrlInput');
     const commentInput = document.getElementById('videoCommentInput');
     const dateInput = document.getElementById('videoDateInput');
+    const numberInput = document.getElementById('videoNumberInput');
+    const positionInput = document.getElementById('videoPositionInput');
+    const teamsInput = document.getElementById('videoTeamsInput');
+
     const parsed = parseYouTubeVideo(input?.value);
     if (!parsed) {
       setVideoStatus('გთხოვ ჩასვა სწორი YouTube ბმული.', 'error');
@@ -1895,6 +1937,7 @@
     const date = String(dateInput?.value || new Date().toISOString().slice(0, 10)).trim();
     if (!comment) {
       setVideoStatus('კომენტარი სავალდებულოა.', 'error');
+      commentInput?.focus();
       return;
     }
 
@@ -1904,13 +1947,22 @@
       return;
     }
 
-    current.unshift({
+    const newVideo = {
       title: `ვიდეო ${current.length + 1}`,
       url: parsed.url,
       comment,
-      date
-    });
+      date,
+      number: String(numberInput?.value || '').trim(),
+      position: String(positionInput?.value || '').trim(),
+      teams: String(teamsInput?.value || '').trim()
+    };
+
+    current.unshift(newVideo);
     await saveProfileVideos(current, 'ვიდეო წარმატებით დაემატა.');
+
+    if (numberInput) numberInput.value = '';
+    if (positionInput) positionInput.value = '';
+    if (teamsInput) teamsInput.value = '';
   }
 
   async function removeVideoByIdentity(id, date) {

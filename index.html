@@ -873,12 +873,36 @@
       border-color: rgba(255, 255, 255, 0.95);
     }
 
+    /* ── Feature Card Overlay ── */
+    .feat-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(248, 250, 252, 0.60);
+      z-index: 4;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      border-radius: var(--radius);
+    }
+    .feat-overlay-badge {
+      background: #f1f5f9;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 50px;
+      padding: 6px 16px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: #64748b;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      user-select: none;
+    }
+
     /* ── App Download Overlay ── */
     .app-dl-overlay {
       position: absolute;
       inset: 0;
-      background: rgba(248, 250, 252, 0.70);
-      backdrop-filter: blur(2px);
+      background: rgba(248, 250, 252, 0.60);
       z-index: 8;
       display: flex;
       align-items: center;
@@ -1704,22 +1728,26 @@
       </p>
 
       <div class="grid-4" style="margin-top:56px;">
-        <div class="card">
+        <div class="card" style="overflow:hidden;">
+          <div class="feat-overlay"><span class="feat-overlay-badge">🔒 მალე</span></div>
           <div class="icon-box">01</div>
           <h3 style="font-size: 1.25rem;">Football Trainer</h3>
           <p class="small" style="margin-top:16px; line-height: 1.7;">150+ პრაქტიკული ვარჯიში ბურთის კონტროლის, პასის, დრიბლინგის და დარტყმისთვის.</p>
         </div>
-        <div class="card">
+        <div class="card" style="overflow:hidden;">
+          <div class="feat-overlay"><span class="feat-overlay-badge">🔒 მალე</span></div>
           <div class="icon-box">02</div>
           <h3 style="font-size: 1.25rem;">Game Brain</h3>
           <p class="small" style="margin-top:16px; line-height: 1.7;">ისწავლე სივრცის დანახვა, სკანინგი, სწორი პოზიციონირება და მატჩის სწრაფად კითხვა.</p>
         </div>
-        <div class="card">
+        <div class="card" style="overflow:hidden;">
+          <div class="feat-overlay"><span class="feat-overlay-badge">🔒 მალე</span></div>
           <div class="icon-box">03</div>
           <h3 style="font-size: 1.25rem;">Elite Mindset</h3>
           <p class="small" style="margin-top:16px; line-height: 1.7;">აიმაღლე თავდაჯერებულობა, გამძლეობა, ფოკუსი და დისციპლინა მძიმე მომენტებში.</p>
         </div>
-        <div class="card">
+        <div class="card" style="overflow:hidden;">
+          <div class="feat-overlay"><span class="feat-overlay-badge">🔒 მალე</span></div>
           <div class="icon-box">04</div>
           <h3 style="font-size: 1.25rem;">Player Tracking</h3>
           <p class="small" style="margin-top:16px; line-height: 1.7;">აკონტროლე შენი პროგრესი, დატვირთვა და ყოველდღიური შესრულება პროფესიონალური მიდგომით.</p>
@@ -2554,7 +2582,7 @@
       const summaryText = document.querySelector('.month-squad-card .month-card-summary p');
       const helperText = document.querySelector('.month-squad-expanded .small');
       if (summaryText) {
-        summaryText.textContent = '';
+        summaryText.textContent = 'გუნდი ჩამოყალიბდა საჯარო ფეხბურთელების ხმებისა და აქტივობის მიხედვით.';
       }
       if (helperText) {
         helperText.textContent = '';
@@ -2634,7 +2662,7 @@
         `;
       }
       if (monthNote) {
-        monthNote.textContent = '';
+        monthNote.textContent = `${topPlayer.fullName} არჩეულია მიმდინარე თვის საუკეთესო ფეხბურთელად.`;
       }
       if (monthPrimaryAction) {
         monthPrimaryAction.href = playerHref;

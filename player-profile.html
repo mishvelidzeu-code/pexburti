@@ -651,6 +651,66 @@
     }
     .compare-diff.is-positive{background:#ecfdf3;color:#166534;border-color:rgba(22,101,52,.14)}
     .compare-diff.is-negative{background:#fef2f2;color:#b91c1c;border-color:rgba(185,28,28,.14)}
+    /* ── Collapsible Compare ── */
+    .compare-toggle-bar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      cursor:pointer;
+      user-select:none;
+    }
+    .compare-toggle-bar h2{margin:0;font-size:1.22rem;letter-spacing:-.03em}
+    .compare-toggle-bar p{margin:6px 0 0;color:var(--muted);line-height:1.6;font-size:.88rem}
+    .compare-chevron{
+      display:grid;
+      place-items:center;
+      width:38px;height:38px;
+      border-radius:999px;
+      background:var(--soft);
+      border:1px solid var(--line);
+      flex:0 0 38px;
+      font-size:1.1rem;
+      transition:transform .25s;
+    }
+    .compare-panel.is-open .compare-chevron{transform:rotate(180deg)}
+    .compare-body{display:none;grid-column:1/-1}
+    .compare-body.is-open{display:grid;gap:16px}
+
+    /* ── Public Videos Section ── */
+    .pub-videos-section{margin-top:14px}
+    .pub-videos-section h2{margin:0 0 4px;font-size:1.22rem;letter-spacing:-.03em}
+    .pub-videos-section>p{margin:0 0 16px;color:var(--muted);font-size:.88rem;line-height:1.6}
+    .pub-video-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+      gap:12px;
+    }
+    .pub-video-card{
+      display:grid;
+      gap:8px;
+      padding:10px;
+      border-radius:18px;
+      background:linear-gradient(180deg,#fff 0%,#f8fafc 100%);
+      border:1px solid rgba(15,23,42,.08);
+      box-shadow:0 8px 20px rgba(15,23,42,.05);
+    }
+    .pub-video-frame{
+      position:relative;width:100%;padding-top:56.25%;
+      border-radius:12px;overflow:hidden;background:#0f172a;
+    }
+    .pub-video-frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+    .pub-video-meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+    .pub-video-meta span{
+      display:inline-flex;align-items:center;padding:4px 8px;
+      border-radius:999px;background:#f1f5f9;color:#334155;font-size:.7rem;font-weight:800;
+    }
+    .pub-video-comment{font-size:.78rem;color:#475569;line-height:1.45;margin-top:2px}
+    .pub-videos-empty{
+      padding:18px;border-radius:16px;border:1px dashed rgba(15,23,42,.12);
+      background:#fff;color:var(--muted);font-size:.85rem;line-height:1.6;
+    }
+
     @media (max-width:1080px){
       .profile-hero,
       .summary-grid,
@@ -748,39 +808,50 @@
         </section>
 
         <section class="panel compare-panel" id="comparisonPanel" hidden>
-          <div class="compare-head">
+          <div class="compare-toggle-bar" id="compareToggleBar">
             <div>
               <h2>მოთამაშეების შედარება</h2>
               <p id="comparisonLead">შედარება ნაჩვენებია მხოლოდ ერთნაირ პოზიციებს შორის.</p>
             </div>
-            <div class="compare-controls" id="comparisonControls" hidden>
-              <div class="compare-control-group">
-                <label for="comparisonSelect">შენი ფეხბურთელები</label>
-                <select id="comparisonSelect" class="compare-select"></select>
+            <span class="compare-chevron">▼</span>
+          </div>
+          <div class="compare-body" id="compareBody">
+            <div class="compare-head">
+              <div class="compare-controls" id="comparisonControls" hidden>
+                <div class="compare-control-group">
+                  <label for="comparisonSelect">შენი ფეხბურთელები</label>
+                  <select id="comparisonSelect" class="compare-select"></select>
+                </div>
+                <button id="comparisonApplyBtn" type="button" class="btn btn-red">შედარება</button>
+                <div class="compare-control-group">
+                  <label for="comparisonSearchInput">სხვა ფეხბურთელის ძებნა</label>
+                  <input id="comparisonSearchInput" class="compare-search" type="search" placeholder="სახელი ან გვარი">
+                </div>
+                <div class="compare-control-group">
+                  <label for="comparisonSearchSelect">შედეგები</label>
+                  <select id="comparisonSearchSelect" class="compare-select"></select>
+                </div>
+                <button id="comparisonSearchApplyBtn" type="button" class="btn btn-white">ძიებით შედარება</button>
+                <button id="comparisonClearBtn" type="button" class="btn btn-white">გასუფთავება</button>
               </div>
-              <button id="comparisonApplyBtn" type="button" class="btn btn-red">შედარება</button>
-              <div class="compare-control-group">
-                <label for="comparisonSearchInput">სხვა ფეხბურთელის ძებნა</label>
-                <input id="comparisonSearchInput" class="compare-search" type="search" placeholder="სახელი ან გვარი">
-              </div>
-              <div class="compare-control-group">
-                <label for="comparisonSearchSelect">შედეგები</label>
-                <select id="comparisonSearchSelect" class="compare-select"></select>
-              </div>
-              <button id="comparisonSearchApplyBtn" type="button" class="btn btn-white">ძიებით შედარება</button>
-              <button id="comparisonClearBtn" type="button" class="btn btn-white">გასუფთავება</button>
             </div>
+            <div id="comparisonMessage" class="compare-note" hidden></div>
+            <div class="compare-grid">
+              <article class="compare-player-card is-primary" id="comparisonPrimaryCard"></article>
+              <article class="compare-player-card" id="comparisonSecondaryCard"></article>
+            </div>
+            <div class="compare-radar">
+              <div class="compare-radar-wrap" id="comparisonRadar"></div>
+              <div class="compare-legend" id="comparisonLegend"></div>
+            </div>
+            <div class="compare-stats" id="comparisonStats"></div>
           </div>
-          <div id="comparisonMessage" class="compare-note" hidden></div>
-          <div class="compare-grid">
-            <article class="compare-player-card is-primary" id="comparisonPrimaryCard"></article>
-            <article class="compare-player-card" id="comparisonSecondaryCard"></article>
-          </div>
-          <div class="compare-radar">
-            <div class="compare-radar-wrap" id="comparisonRadar"></div>
-            <div class="compare-legend" id="comparisonLegend"></div>
-          </div>
-          <div class="compare-stats" id="comparisonStats"></div>
+        </section>
+
+        <section class="panel pub-videos-section" id="pubVideosSection" hidden>
+          <h2>ვიდეო მასალა</h2>
+          <p>მოთამაშის YouTube ვიდეოები პოზიციის, გუნდისა და თარიღის მიხედვით.</p>
+          <div class="pub-video-grid" id="pubVideoGrid"></div>
         </section>
       </div>
 
@@ -1627,6 +1698,72 @@
       }
 
       await mountAgentProspectAction();
+
+      /* ── Comparison panel toggle ── */
+      (function () {
+        const toggleBar = document.getElementById('compareToggleBar');
+        const body = document.getElementById('compareBody');
+        if (!toggleBar || !body) return;
+        toggleBar.addEventListener('click', function () {
+          const open = body.classList.toggle('is-open');
+          comparisonPanel.classList.toggle('is-open', open);
+        });
+      })();
+
+      /* ── Public videos (player_videos table) ── */
+      (async function () {
+        const pubSection = document.getElementById('pubVideosSection');
+        const pubGrid = document.getElementById('pubVideoGrid');
+        if (!pubSection || !pubGrid || !client || !player.authUserId) return;
+
+        function escV(s) {
+          return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+        function parseEmbed(url) {
+          const str = String(url || '');
+          const m = str.match(/(?:v=|youtu\.be\/|embed\/)([A-Za-z0-9_-]{11})/);
+          return m ? `https://www.youtube.com/embed/${m[1]}?rel=0` : null;
+        }
+        function fmt(d) {
+          if (!d) return '';
+          try { return new Date(d).toLocaleDateString('ka-GE',{year:'numeric',month:'long',day:'numeric'}); } catch(e){ return d; }
+        }
+
+        try {
+          const { data: vids, error } = await client
+            .from('player_videos')
+            .select('youtube_url,youtube_id,title,comment,video_date,jersey_number,position,teams')
+            .eq('auth_user_id', player.authUserId)
+            .order('video_date', { ascending: false, nullsFirst: false });
+
+          if (error || !Array.isArray(vids) || !vids.length) return;
+
+          pubSection.hidden = false;
+          const count = vids.length;
+          const minPx = count >= 9 ? 180 : count >= 5 ? 220 : count >= 3 ? 260 : 300;
+          pubGrid.style.gridTemplateColumns = `repeat(auto-fill,minmax(${minPx}px,1fr))`;
+
+          pubGrid.innerHTML = vids.map(function (v) {
+            const embed = parseEmbed(v.youtube_url);
+            if (!embed) return '';
+            const meta = [
+              v.video_date ? `<span>📅 ${escV(fmt(v.video_date))}</span>` : '',
+              v.jersey_number ? `<span>🔢 №${escV(v.jersey_number)}</span>` : '',
+              v.position ? `<span>📍 ${escV(v.position)}</span>` : '',
+              v.teams ? `<span>⚽ ${escV(v.teams)}</span>` : ''
+            ].filter(Boolean).join('');
+            return `
+              <article class="pub-video-card">
+                <div class="pub-video-frame">
+                  <iframe src="${escV(embed)}" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                </div>
+                ${meta ? `<div class="pub-video-meta">${meta}</div>` : ''}
+                ${v.comment ? `<div class="pub-video-comment">${escV(v.comment)}</div>` : ''}
+              </article>
+            `;
+          }).join('');
+        } catch (e) { /* table may not exist yet */ }
+      })();
 
       // Expose physics engine globally — agent dashboard uses this to map real test values to radar scores
       window.playerPhysics = {
