@@ -191,12 +191,18 @@
         .select('*')
         .order('updated_at', { ascending: false });
 
-      if (error || !Array.isArray(data) || !data.length) {
+      if (error) {
+        console.error('[player_profiles] fallback fetch failed:', error.message, '| code:', error.code || '—');
+        return [];
+      }
+      if (!Array.isArray(data) || !data.length) {
+        console.warn('[player_profiles] fallback also empty — ბაზაში მოთამაშეები არ არის ან RLS ბლოკავს.');
         return [];
       }
 
       return data.map(mapProfileFallbackEntry).filter(Boolean);
     } catch (error) {
+      console.error('[player_profiles] fallback exception:', error);
       return [];
     }
   }
@@ -230,7 +236,12 @@
         .eq('is_active', true)
         .order('updated_at', { ascending: false });
 
-      if (error || !Array.isArray(data) || !data.length) {
+      if (error) {
+        console.error('[player_registry] fetch failed:', error.message, '| hint:', error.hint || '—', '| code:', error.code || '—');
+        return await fetchPlayerProfilesFallback(client);
+      }
+      if (!Array.isArray(data) || !data.length) {
+        console.warn('[player_registry] query returned empty. visibility_public=true & is_active=true პირობა შეამოწმე.');
         return await fetchPlayerProfilesFallback(client);
       }
 

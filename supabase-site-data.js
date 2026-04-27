@@ -270,7 +270,11 @@
         .select('player_id, manual_votes')
         .in('player_id', ids);
 
-      if (error || !Array.isArray(data)) {
+      if (error) {
+        console.warn('[player_vote_manual_overrides] fetch failed:', error.message);
+        return enriched;
+      }
+      if (!Array.isArray(data)) {
         return enriched;
       }
 
