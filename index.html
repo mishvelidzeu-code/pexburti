@@ -1312,9 +1312,14 @@
         </div>
 
         <a href="ucxoetshi.html" class="floating f1" style="display:block; text-decoration:none; color:inherit;">
-          <div class="pill" style="background:#16a34a;">ქართველები საზღვარგარეთ</div>
+          <div class="pill" style="background:#000;">ქართველები უცხოეთში</div>
           <h3 style="margin-top:10px;">უცხოეთში მყოფი ქართველები</h3>
           <p class="small" style="margin-top:8px;">ნახე ყველა ქართველი ფეხბურთელი, ვინც საზღვარგარეთ თამაშობს.</p>
+          <button
+            onclick="event.stopPropagation(); event.preventDefault(); document.getElementById('abroadRegModal').classList.add('open');"
+            style="margin-top:12px; width:100%; padding:8px 0; background:#16a34a; color:#fff; border:none; border-radius:10px; font-size:12px; font-weight:800; cursor:pointer; letter-spacing:.03em; font-family:inherit;">
+            რეგისტრაცია
+          </button>
         </a>
 
         <div class="phone-wrap">
@@ -1899,6 +1904,215 @@
     </div>
   </footer>
 
+  <!-- abroad registration modal -->
+  <style>
+    .abroad-modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: rgba(0,0,0,.65);
+      backdrop-filter: blur(4px);
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .abroad-modal-overlay.open { display: flex; }
+    .abroad-modal-box {
+      position: relative;
+      background: #fff;
+      border-radius: 20px;
+      width: min(560px, 100%);
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 32px;
+      box-shadow: 0 24px 64px rgba(0,0,0,.28);
+    }
+    .abroad-modal-close {
+      position: absolute;
+      top: 16px; right: 16px;
+      background: #f1f5f9;
+      border: none;
+      border-radius: 8px;
+      width: 32px; height: 32px;
+      font-size: 20px;
+      line-height: 1;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #475569;
+      transition: .15s;
+    }
+    .abroad-modal-close:hover { background: #e2e8f0; }
+    .abroad-modal-badge {
+      display: inline-block;
+      background: #16a34a;
+      color: #fff;
+      font-size: 10px;
+      font-weight: 800;
+      padding: 5px 10px;
+      border-radius: 6px;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+    .abroad-modal-header h2 {
+      margin: 0 0 16px;
+      font-size: 1.2rem;
+      font-weight: 900;
+      line-height: 1.25;
+      letter-spacing: -.02em;
+      color: #0f172a;
+    }
+    .abroad-modal-notice {
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-radius: 12px;
+      padding: 14px 16px;
+      font-size: .85rem;
+      line-height: 1.65;
+      color: #166534;
+      margin-bottom: 24px;
+    }
+    .abroad-modal-form { display: flex; flex-direction: column; gap: 16px; }
+    .abroad-form-group { display: flex; flex-direction: column; gap: 6px; }
+    .abroad-form-group label {
+      font-size: .75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      color: #475569;
+    }
+    .abroad-form-group input,
+    .abroad-form-group select,
+    .abroad-form-group textarea {
+      padding: 10px 14px;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 10px;
+      font-size: .9rem;
+      font-family: inherit;
+      color: #0f172a;
+      outline: none;
+      transition: border-color .15s;
+      background: #fff;
+    }
+    .abroad-form-group input:focus,
+    .abroad-form-group select:focus,
+    .abroad-form-group textarea:focus { border-color: #16a34a; }
+    .abroad-form-group textarea { resize: vertical; }
+    .abroad-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .abroad-radio-group { display: flex; gap: 20px; }
+    .abroad-radio { display: flex; align-items: center; gap: 8px; font-size: .9rem; cursor: pointer; }
+    .abroad-radio input[type="radio"] { accent-color: #16a34a; width: 16px; height: 16px; }
+    .abroad-submit-btn {
+      width: 100%;
+      padding: 14px;
+      background: #16a34a;
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 800;
+      cursor: pointer;
+      letter-spacing: .03em;
+      transition: background .2s;
+      margin-top: 4px;
+      font-family: inherit;
+    }
+    .abroad-submit-btn:hover:not(:disabled) { background: #15803d; }
+    .abroad-submit-btn:disabled { opacity: .55; cursor: not-allowed; }
+    .abroad-reg-msg {
+      padding: 12px 16px;
+      border-radius: 10px;
+      font-size: .88rem;
+      font-weight: 700;
+      line-height: 1.5;
+    }
+    .abroad-reg-msg.success { background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; }
+    .abroad-reg-msg.error   { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
+    @media (max-width: 520px) {
+      .abroad-modal-box { padding: 20px 16px; }
+      .abroad-form-row { grid-template-columns: 1fr; }
+    }
+  </style>
+
+  <div id="abroadRegModal" class="abroad-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="abroadRegTitle">
+    <div class="abroad-modal-box">
+      <button class="abroad-modal-close" onclick="document.getElementById('abroadRegModal').classList.remove('open');" aria-label="დახურვა">×</button>
+      <div class="abroad-modal-header">
+        <div class="abroad-modal-badge">უცხოეთი</div>
+        <h2 id="abroadRegTitle">უცხოეთში მყოფი ქართველი ფეხბურთელების რეგისტრაცია</h2>
+      </div>
+      <div class="abroad-modal-notice">
+        <strong>მნიშვნელოვანი:</strong> ეს ფორმა განკუთვნილია მხოლოდ იმ ქართველი ფეხბურთელებისთვის, ვინც ამჟამად <strong>საქართველოს გარეთ, უცხოეთში</strong> თამაშობს. ფორმის შევსება შეუძლია როგორც თავად მოთამაშეს, ასევე მის მშობელს.
+      </div>
+      <form id="abroadRegForm" class="abroad-modal-form" novalidate>
+        <div class="abroad-form-group">
+          <label for="arFullName">მოთამაშის სახელი და გვარი *</label>
+          <input id="arFullName" type="text" name="full_name" placeholder="მაგ. გიორგი კვილიტაია" required>
+        </div>
+        <div class="abroad-form-row">
+          <div class="abroad-form-group">
+            <label for="arBirthYear">დაბადების წელი</label>
+            <input id="arBirthYear" type="number" name="birth_year" placeholder="2007" min="1990" max="2020">
+          </div>
+          <div class="abroad-form-group">
+            <label for="arPosition">პოზიცია</label>
+            <select id="arPosition" name="position">
+              <option value="">— არჩევა —</option>
+              <option value="GK">მეკარე</option>
+              <option value="DF">დამცველი</option>
+              <option value="MF">ნახევარმცველი</option>
+              <option value="FW">თავდამსხმელი</option>
+            </select>
+          </div>
+        </div>
+        <div class="abroad-form-row">
+          <div class="abroad-form-group">
+            <label for="arCountry">ქვეყანა *</label>
+            <input id="arCountry" type="text" name="country" placeholder="მაგ. გერმანია" required>
+          </div>
+          <div class="abroad-form-group">
+            <label for="arClub">კლუბი</label>
+            <input id="arClub" type="text" name="club_name" placeholder="კლუბის სახელი">
+          </div>
+        </div>
+        <div class="abroad-form-group">
+          <label>ვინ ავსებს ფორმას?</label>
+          <div class="abroad-radio-group">
+            <label class="abroad-radio">
+              <input type="radio" name="registrant_type" value="player" checked>
+              <span>მოთამაშე</span>
+            </label>
+            <label class="abroad-radio">
+              <input type="radio" name="registrant_type" value="parent">
+              <span>მშობელი</span>
+            </label>
+          </div>
+        </div>
+        <div class="abroad-form-row">
+          <div class="abroad-form-group">
+            <label for="arEmail">ელ-ფოსტა</label>
+            <input id="arEmail" type="email" name="contact_email" placeholder="mail@example.com">
+          </div>
+          <div class="abroad-form-group">
+            <label for="arPhone">ტელეფონი</label>
+            <input id="arPhone" type="tel" name="contact_phone" placeholder="+995 5xx xxx xxx">
+          </div>
+        </div>
+        <div class="abroad-form-group">
+          <label for="arNotes">დამატებითი ინფო</label>
+          <textarea id="arNotes" name="notes" rows="3" placeholder="სასარგებლო დეტალები მოთამაშის შესახებ..."></textarea>
+        </div>
+        <div id="abroadRegMsg" class="abroad-reg-msg" hidden></div>
+        <button type="submit" class="abroad-submit-btn">
+          <span id="abroadRegBtnText">განაცხადის გაგზავნა</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-domain-shared.js"></script>
   <script src="supabase-site-data.js"></script>
@@ -2146,6 +2360,102 @@
       if (monthPrimaryAction) {
         monthPrimaryAction.href = playerHref;
       }
+    })();
+  </script>
+
+  <script>
+    (function () {
+      var modal    = document.getElementById('abroadRegModal');
+      var form     = document.getElementById('abroadRegForm');
+      var msgEl    = document.getElementById('abroadRegMsg');
+      var btnText  = document.getElementById('abroadRegBtnText');
+      var submitBtn = form ? form.querySelector('.abroad-submit-btn') : null;
+
+      if (modal) {
+        modal.addEventListener('click', function (e) {
+          if (e.target === modal) { modal.classList.remove('open'); }
+        });
+      }
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && modal) { modal.classList.remove('open'); }
+      });
+
+      function getClient() {
+        if (window.siteAuth && window.siteAuth.getClient) { return window.siteAuth.getClient(); }
+        if (window.__mfgSupabaseClient) { return window.__mfgSupabaseClient; }
+        return null;
+      }
+      function showMsg(type, text) {
+        if (!msgEl) { return; }
+        msgEl.textContent = text;
+        msgEl.className = 'abroad-reg-msg ' + type;
+        msgEl.hidden = false;
+      }
+      function hideMsg() {
+        if (!msgEl) { return; }
+        msgEl.hidden = true;
+        msgEl.textContent = '';
+      }
+      function resetBtn() {
+        if (submitBtn) { submitBtn.disabled = false; }
+        if (btnText)   { btnText.textContent = 'განაცხადის გაგზავნა'; }
+      }
+
+      if (!form) { return; }
+      form.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        hideMsg();
+
+        var fd = new FormData(form);
+        var fullName = (fd.get('full_name') || '').trim();
+        var country  = (fd.get('country') || '').trim();
+
+        if (!fullName || !country) {
+          showMsg('error', 'გთხოვთ შეავსოთ სავალდებულო ველები (სახელი და ქვეყანა).');
+          return;
+        }
+
+        var birthYearRaw = fd.get('birth_year');
+        var payload = {
+          full_name:       fullName,
+          birth_year:      birthYearRaw ? Number(birthYearRaw) : null,
+          position:        fd.get('position') || null,
+          country:         country,
+          club_name:       (fd.get('club_name') || '').trim() || null,
+          registrant_type: fd.get('registrant_type') || 'player',
+          contact_email:   (fd.get('contact_email') || '').trim() || null,
+          contact_phone:   (fd.get('contact_phone') || '').trim() || null,
+          notes:           (fd.get('notes') || '').trim() || null
+        };
+
+        if (submitBtn) { submitBtn.disabled = true; }
+        if (btnText)   { btnText.textContent = 'იგზავნება...'; }
+
+        var client = getClient();
+        if (!client) {
+          showMsg('error', 'კავშირის პრობლემა. გადატვირთეთ გვერდი და სცადეთ თავიდან.');
+          resetBtn();
+          return;
+        }
+
+        try {
+          var result = await client.from('abroad_registrations').insert(payload);
+          if (result.error) {
+            showMsg('error', 'შეცდომა: ' + (result.error.message || 'მონაცემი ვერ დაემატა. სცადეთ მოგვიანებით.'));
+          } else {
+            showMsg('success', 'განაცხადი წარმატებით გაიგზავნა! ადმინი მალე დაგიკავშირდებათ.');
+            form.reset();
+            setTimeout(function () {
+              modal.classList.remove('open');
+              hideMsg();
+            }, 3500);
+          }
+        } catch (err) {
+          showMsg('error', 'შეცდომა. სცადეთ მოგვიანებით.');
+        }
+
+        resetBtn();
+      });
     })();
   </script>
 </body>
