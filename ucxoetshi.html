@@ -503,9 +503,6 @@
       var ageFilters = document.querySelectorAll('#ageFilters .chip-btn');
 
       var pagePlayers = [];
-      var managedPlayerId = '';
-      var agentProspects = [];
-      var isAgent = false;
 
       function escapeHtml(value) {
         return String(value || '')
@@ -525,6 +522,8 @@
           .join('') || 'MF';
       }
 
+      var POS_LABEL = { GK: 'მეკარე', DF: 'დამცველი', MF: 'ნახევარმცველი', FW: 'თავდამსხმელი' };
+
       function renderPlayers() {
         if (!playersGridNode) { return; }
 
@@ -532,11 +531,11 @@
           playersGridNode.innerHTML = [
             '<article class="player-card" style="grid-column:1 / -1; min-height:auto; align-items:flex-start;">',
             '<div class="player-info" style="width:100%;">',
-            '<h3 class="player-name">უცხოეთში მყოფი ქართველები ჯერ არ ჩანს</h3>',
+            '<h3 class="player-name">რეგისტრირებული მოთამაშეები ჯერ არ ჩანს</h3>',
             '<div class="meta-grid" style="margin-top:10px;">',
             '<div class="meta-item" style="grid-column:1 / -1;">',
             '<span>მდგომარეობა</span>',
-            '<strong>როცა is_abroad=true მოთამაშეები ბაზაში დაემატება, აქ ავტომატურად გამოჩნდება.</strong>',
+            '<strong>როცა ინდექსიდან გაივლის რეგისტრაცია, მოთამაშეები აქ გამოჩნდება.</strong>',
             '</div></div></div></article>'
           ].join('');
           if (resultCountNode) { resultCountNode.textContent = 'ნაპოვნია: 0'; }
@@ -544,47 +543,30 @@
         }
 
         playersGridNode.innerHTML = pagePlayers.map(function (player) {
-          var fullName = String(player.fullName || '').trim();
-          var ageGroup = String(player.ageGroup || 'pro').toLowerCase();
-          var positionCode = player.positionCode || 'MF';
-          var isManaged = Boolean(managedPlayerId && String(player.id) === String(managedPlayerId));
-          var actionHref = isManaged
-            ? 'user-profile.html?view=overview&from=ucxoetshi.html'
-            : (window.siteData && window.siteData.buildPlayerHref
-                ? window.siteData.buildPlayerHref(player.id, 'ucxoetshi.html')
-                : 'player-profile.html?player=' + encodeURIComponent(String(player.id || '')) + '&from=ucxoetshi.html');
-          var actionLabel = isManaged ? 'ჩემი პროფილი' : 'პროფილი';
-          var searchText = [fullName, player.team || '', player.positionLabel || ''].join(' ').toLowerCase();
-          var photoMarkup = player.photo
-            ? '<img src="' + escapeHtml(player.photo) + '" alt="' + escapeHtml(fullName) + '" class="player-photo" loading="lazy">'
-            : '<div class="player-photo player-photo--fallback">' + initials(fullName) + '</div>';
-
-          var playerId = String(player.id || '');
-          var inProspects = isAgent && agentProspects.includes(playerId);
-          var agentBtnMarkup = isAgent
-            ? '<button class="btn-prospect' + (inProspects ? ' is-prospect' : '') + '" data-prospect-id="' + escapeHtml(playerId) + '">' +
-              (inProspects ? '✓ სამიზნეში' : '+ სამიზნეში') + '</button>'
-            : '';
+          var fullName    = escapeHtml(player.fullName || '');
+          var posCode     = escapeHtml((player.position || 'MF').toUpperCase());
+          var posLabel    = escapeHtml(POS_LABEL[player.position] || player.position || '—');
+          var country     = escapeHtml(player.country || '—');
+          var club        = escapeHtml(player.clubName || '—');
+          var birthYear   = player.birthYear ? escapeHtml(String(player.birthYear)) : '—';
+          var age         = player.birthYear ? String(new Date().getFullYear() - player.birthYear) + ' წ.' : '—';
+          var searchText  = [player.fullName, player.country, player.clubName, player.position].join(' ').toLowerCase();
 
           return (
             '<article class="player-card"' +
-            ' data-pos="' + escapeHtml(positionCode.toLowerCase()) + '"' +
-            ' data-age="' + escapeHtml(ageGroup) + '"' +
-            ' data-search="' + escapeHtml(searchText) + '"' +
-            ' data-href="' + escapeHtml(actionHref) + '">' +
-            '<a href="' + escapeHtml(actionHref) + '" class="player-photo-link" tabindex="-1">' + photoMarkup + '</a>' +
-            '<div class="pos-indicator">' + escapeHtml(positionCode) + '</div>' +
+            ' data-pos="' + (player.position || 'mf').toLowerCase() + '"' +
+            ' data-age="all"' +
+            ' data-search="' + searchText + '">' +
+            '<div class="player-photo player-photo--fallback">' + initials(player.fullName) + '</div>' +
+            '<div class="pos-indicator">' + posCode + '</div>' +
             '<div class="player-info">' +
-            '<h3 class="player-name"><a href="' + escapeHtml(actionHref) + '">' + escapeHtml(fullName) + '</a></h3>' +
+            '<h3 class="player-name">' + fullName + '</h3>' +
             '<div class="meta-grid">' +
-            '<div class="meta-item"><span>კატეგორია</span>' +
-            '<strong>' + escapeHtml(player.ageLabel || ageGroup.toUpperCase()) +
-            ' (' + escapeHtml(String(player.age != null ? player.age : '-')) + ' წ.)</strong></div>' +
-            '<div class="meta-item"><span>გუნდი</span>' +
-            '<strong>' + escapeHtml(player.team || 'არ არის მითითებული') + '</strong></div>' +
+            '<div class="meta-item"><span>პოზიცია</span><strong>' + posLabel + '</strong></div>' +
+            '<div class="meta-item"><span>ასაკი</span><strong>' + age + '</strong></div>' +
+            '<div class="meta-item"><span>ქვეყანა</span><strong>' + country + '</strong></div>' +
+            '<div class="meta-item"><span>კლუბი</span><strong>' + club + '</strong></div>' +
             '</div>' +
-            '<a href="' + actionHref + '" class="btn-enter">' + actionLabel + '</a>' +
-            agentBtnMarkup +
             '</div></article>'
           );
         }).join('');
@@ -643,22 +625,32 @@
         });
       }
 
-      if (!client || !window.siteData || !window.siteData.fetchAbroadPlayers) {
+      if (!client) {
         renderPlayers();
         applyFilters();
         return;
       }
 
-      var fetchError = false;
       try {
-        pagePlayers = await window.siteData.fetchAbroadPlayers(client);
-        if (!Array.isArray(pagePlayers)) { pagePlayers = []; }
-      } catch (e) {
-        pagePlayers = [];
-        fetchError = true;
-      }
+        var result = await client
+          .from('abroad_registrations')
+          .select('id, full_name, birth_year, position, country, club_name, registrant_type, created_at')
+          .order('created_at', { ascending: false });
 
-      if (fetchError && !pagePlayers.length) {
+        if (result.error) { throw result.error; }
+
+        pagePlayers = (result.data || []).map(function (row) {
+          return {
+            id:            String(row.id || ''),
+            fullName:      String(row.full_name || '').trim(),
+            position:      String(row.position || 'MF').toUpperCase(),
+            country:       String(row.country || '').trim(),
+            clubName:      String(row.club_name || '').trim(),
+            birthYear:     row.birth_year ? Number(row.birth_year) : null,
+            registrantType: String(row.registrant_type || 'player')
+          };
+        });
+      } catch (fetchErr) {
         if (playersGridNode) {
           playersGridNode.innerHTML = [
             '<article class="player-card" style="grid-column:1 / -1; min-height:auto; align-items:flex-start;">',
@@ -670,88 +662,13 @@
             '<strong>მონაცემების ჩატვირთვა ვერ მოხერხდა. გადაამოწმე ინტერნეტ კავშირი და განაახლე გვერდი.</strong>',
             '</div></div></div></article>'
           ].join('');
+          if (resultCountNode) { resultCountNode.textContent = 'ნაპოვნია: 0'; }
         }
-        if (resultCountNode) { resultCountNode.textContent = 'ნაპოვნია: 0'; }
         return;
-      }
-
-      var authState = window.siteAuth && window.siteAuth.getCurrentAuthState
-        ? await window.siteAuth.getCurrentAuthState(client)
-        : await client.auth.getSession().then(function (r) {
-            return {
-              session: r && r.data ? r.data.session : null,
-              user: r && r.data && r.data.session ? r.data.session.user : null
-            };
-          });
-      var user = authState ? authState.user : null;
-
-      if (user && window.sitePlayerDomain && window.sitePlayerDomain.syncMyAccountDomain) {
-        try { await window.sitePlayerDomain.syncMyAccountDomain(client); } catch (e) {}
-      }
-
-      pagePlayers.sort(function (a, b) {
-        var av = Number(a.votesCount || 0) || 0;
-        var bv = Number(b.votesCount || 0) || 0;
-        if (bv !== av) { return bv - av; }
-        return String(a.fullName || '').localeCompare(String(b.fullName || ''), 'ka');
-      });
-
-      if (user && window.siteAuth && window.siteAuth.resolveProfileRole) {
-        try {
-          var resolvedRole = await window.siteAuth.resolveProfileRole(client, user);
-          if (resolvedRole === 'agent') {
-            isAgent = true;
-            var profileMeta = (user.user_metadata && user.user_metadata.profile) || {};
-            agentProspects = Array.isArray(profileMeta.agentProspects)
-              ? profileMeta.agentProspects.map(String) : [];
-          }
-        } catch (e) {}
       }
 
       renderPlayers();
       applyFilters();
-
-      if (isAgent && playersGridNode) {
-        playersGridNode.addEventListener('click', async function (e) {
-          var btn = e.target.closest('[data-prospect-id]');
-          if (!btn) return;
-          e.preventDefault();
-          var pid = String(btn.dataset.prospectId || '');
-          if (!pid) return;
-
-          btn.disabled = true;
-          var wasIn = agentProspects.includes(pid);
-          var nextProspects = wasIn
-            ? agentProspects.filter(function (id) { return id !== pid; })
-            : agentProspects.concat(pid);
-
-          try {
-            var profileMeta = (user.user_metadata && user.user_metadata.profile) || {};
-            var res = await client.auth.updateUser({
-              data: Object.assign({}, user.user_metadata || {}, {
-                profile: Object.assign({}, profileMeta, { agentProspects: nextProspects })
-              })
-            });
-            if (res.error) throw res.error;
-
-            agentProspects = nextProspects;
-            user.user_metadata = res.data && res.data.user
-              ? res.data.user.user_metadata : user.user_metadata;
-
-            if (!wasIn) {
-              btn.textContent = '✓ სამიზნეში';
-              btn.classList.add('is-prospect');
-              setTimeout(function () { window.location.href = 'agent-dashboard.html'; }, 700);
-            } else {
-              btn.textContent = '+ სამიზნეში';
-              btn.classList.remove('is-prospect');
-              btn.disabled = false;
-            }
-          } catch (err) {
-            btn.disabled = false;
-          }
-        });
-      }
     })();
   </script>
 </body>
